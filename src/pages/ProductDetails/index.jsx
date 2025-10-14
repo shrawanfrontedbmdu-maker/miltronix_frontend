@@ -5,11 +5,12 @@ import CategorySlider from "../../components/ui/CategorySlider";
 import Breadcrumb from "./components/Breadcrumb";
 import ProductGallery from "./components/ProductGallery";
 import ProductInfo from "./components/ProductInfo";
-import { productDetailsData, productData, productSpecsData, productReviewsData } from '../../data/MockData';
+import { productDetailsData, productData, productSpecsData, productReviewsData } from '../../data/mockData';
 import KeyFeatures from './components/KeyFeatures';
 import ProductSpecs from './components/ProductSpecs';
 import RatingSummary from './components/RatingSummary';
 import CustomerFeedback from "./components/CustomerFeedback";
+import SimilarProducts from "./components/SimilarProducts";
 
 const ProductDetailPage = () => {
   const [mainImage, setMainImage] = useState(productData.images[0]);
@@ -17,7 +18,7 @@ const ProductDetailPage = () => {
   return (
     <>
       <Header />
-      <main>
+      <main style={{paddingTop: '10%'}}>
         <CategorySlider />
         <section className="product-detail-section">
         <Breadcrumb path={productData.breadcrumb} />
@@ -27,8 +28,9 @@ const ProductDetailPage = () => {
               <ProductInfo product={productData} />
               <KeyFeatures features={productDetailsData.keyFeatures} />
               <ProductSpecs specs={productSpecsData.specifications} />
-              <RatingSummary reviews={productReviewsData} />
-              <CustomerFeedback reviews={productReviewsData} />
+              <RatingSummary reviews={productReviewsData.reviews} />
+              <CustomerFeedback reviews={productReviewsData.reviews} />
+              <SimilarProducts products={productData.similarProducts} />
             </div>
           </div>
         </section>

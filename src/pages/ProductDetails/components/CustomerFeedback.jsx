@@ -1,18 +1,25 @@
 import React from 'react';
-import { Carousel } from 'react-bootstrap'; // Using react-bootstrap for the carousel
+import { Carousel } from 'react-bootstrap';
 
 const nextIcon = '/src/assets/Frame 239.png';
 
-const CustomerFeedback = ({ reviews }) => {
+// 👇 1. Set a default value for the reviews prop
+const CustomerFeedback = ({ reviews = {} }) => {
+
+  // 👇 2. Add a "guard clause" to check if the images array exists before using it
+  if (!reviews.images || !Array.isArray(reviews.images) || reviews.images.length === 0) {
+    return null; // Or render a "No images" message
+  }
+
   // Helper to chunk images into groups of 4 for the carousel
   const chunkedImages = reviews.images.reduce((resultArray, item, index) => { 
-    const chunkIndex = Math.floor(index/4)
+    const chunkIndex = Math.floor(index/4);
     if(!resultArray[chunkIndex]) {
-      resultArray[chunkIndex] = [] // start a new chunk
+      resultArray[chunkIndex] = []; // start a new chunk
     }
-    resultArray[chunkIndex].push(item)
-    return resultArray
-  }, [])
+    resultArray[chunkIndex].push(item);
+    return resultArray;
+  }, []);
 
   return (
     <div className="col-lg-8 col-md-7">

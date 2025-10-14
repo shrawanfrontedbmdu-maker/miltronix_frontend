@@ -6,7 +6,7 @@ const Breadcrumb = ({ path = [] }) => {
     <section className="profile-container1 py-0">
       <div className="container breadcrumb-bg">
         <div className="breadcrumb-bar1 hv">
-          <div className="breadcrumb-custom hv">
+          <div className="breadcrumb-custom hv ">
             {path.map((item, index) => (
               <span key={index}>
                 {/* If it's not the last item, make it a link */}

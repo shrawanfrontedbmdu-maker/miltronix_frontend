@@ -14,6 +14,9 @@
   font-weight: bold;
   font-style: normal;
 }
+.main-content-padding {
+  padding-top: 106px;
+}
 .hv{
    font-family: 'Helvetica', sans-serif;
 }
@@ -1515,8 +1518,8 @@
   }
  .qled-features1 {
       background-color: #D5D4D3;
-      padding-bottom: 10px ;
-      padding-top: 10px;
+      padding-bottom: 5px ;
+      padding-top: 5px;
     }
 
   .profile-container1 {
@@ -2190,4 +2193,8 @@ ease-in-out;
   line-height: 1.6;
   color: #6c757d;
   margin-bottom: 0;
+}
+
+.prodct-listing-page{
+  background-color: #616D6B;
 }

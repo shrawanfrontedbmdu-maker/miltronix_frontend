@@ -276,7 +276,38 @@ export const productData = {
     ]
   },
   similarProducts: [
-    // ... an array of product objects like the qledDeals from before
+    {
+      id: 'sim-1',
+      saveAmount: '₹ 5,000',
+      image: '/src/assets/image 22.png',
+      title: 'QLED 40 inches',
+      price: '19,999',
+      oldPrice: '25,999',
+    },
+    {
+      id: 'sim-2',
+      saveAmount: '₹ 5,000',
+      image: '/src/assets/image 22.png',
+      title: 'QLED 43 inches',
+      price: '29,999',
+      oldPrice: '35,000',
+    },
+    {
+      id: 'sim-3',
+      saveAmount: '₹ 5,000',
+      image: '/src/assets/image 22.png',
+      title: 'QLED 50 inches',
+      price: '61,500',
+      oldPrice: '65,500',
+    },
+    {
+      id: 'sim-4',
+      saveAmount: '₹ 5,000',
+      image: '/src/assets/image 22.png',
+      title: 'QLED 65 inches',
+      price: '60,000',
+      oldPrice: '80,000',
+    },
   ]
 };
 
@@ -350,3 +381,153 @@ export const productReviewsData = {
   },
   // ... rest of product data
 };
+
+// Add this new object to your mockData.js file
+
+export const filterOptions = {
+  availability: [
+    { id: 'outOfStock', label: 'Include Out of stock' }
+  ],
+  resolutions: [
+    { id: 'fullHD', label: 'Full HD' },
+    { id: 'ultraHD', label: 'Ultra HD' },
+    { id: 'hd', label: 'HD' },
+    { id: 'hdReady', label: 'HD Ready' },
+    { id: '4kultra', label: '4k/ Ultra HD' },
+  ],
+  price: {
+    min: 7999,
+    max: 1449000,
+    step: 1000,
+  },
+  screenSizes: [
+    { id: 'size32', label: '32 inch to 39 inch' },
+    { id: 'size40', label: '40 inch to 49 inch' },
+    { id: 'size50', label: '50 inch to 59 inch' },
+    { id: 'size60', label: '60 inch to 69 inch' },
+    { id: 'size70', label: '70 inch to Above' },
+  ],
+};
+// Data for the main product grid on the page
+export const qledTvProducts = [
+  {
+    id: 'qled-1',
+    saveAmount: '₹300',
+    image: '/src/assets/image 10.png',
+    category: 'Television',
+    title: 'QLED 40-inch',
+    price: '14,444',
+    oldPrice: '22,999',
+    rating: 4.8,
+    reviews: 324,
+    resolution: 'Full HD',
+  },
+  {
+    id: 'qled-2',
+    saveAmount: '₹300',
+    image: '/src/assets/image 10.png',
+    category: 'Television',
+    title: 'QLED 43-inch Ultra HD',
+    price: '21,999',
+    oldPrice: '25,299',
+    rating: 4.8,
+    reviews: 324,
+    resolution: 'Ultra HD',
+  },
+  {
+    id: 'qled-3',
+    saveAmount: '₹300',
+    image: '/src/assets/image 10.png',
+    category: 'Television',
+    title: 'QLED 50-inch HD Ready',
+    price: '32,999',
+    oldPrice: '38,999',
+    rating: 4.8,
+    reviews: 324,
+    resolution: 'HD Ready',
+  },
+  {
+    id: 'qled-4',
+    saveAmount: '₹300',
+    image: '/src/assets/image 10.png',
+    category: 'Television',
+    title: 'QLED 55-inch 4k/ Ultra HD',
+    price: '45,999',
+    oldPrice: '52,999',
+    rating: 4.8,
+    reviews: 324,
+    resolution: '4k/ Ultra HD',
+  },
+  {
+    id: 'qled-5',
+    saveAmount: '₹300',
+    image: '/src/assets/image 10.png',
+    category: 'Television',
+    title: 'QLED 65-inch Ultra HD',
+    price: '68,999',
+    oldPrice: '75,999',
+    rating: 4.8,
+    reviews: 324,
+    resolution: 'Ultra HD',
+  },
+  {
+    id: 'qled-6',
+    saveAmount: '₹300',
+    image: '/src/assets/image 10.png',
+    category: 'Television',
+    title: 'QLED 32-inch HD',
+    price: '11,999',
+    oldPrice: '14,999',
+    rating: 4.8,
+    reviews: 324,
+    resolution: 'HD',
+  },
+  {
+    id: 'qled-7',
+    saveAmount: '₹300',
+    image: '/src/assets/image 10.png',
+    category: 'Television',
+    title: 'QLED 75-inch Ultra HD',
+    price: '89,999',
+    oldPrice: '99,999',
+    rating: 4.8,
+    reviews: 324,
+    resolution: 'Ultra HD',
+  },
+  {
+    id: 'qled-8',
+    saveAmount: '₹300',
+    image: '/src/assets/image 10.png',
+    category: 'Television',
+    title: 'QLED 48-inch Full HD',
+    price: '28,999',
+    oldPrice: '32,999',
+    rating: 4.8,
+    reviews: 324,
+    resolution: 'Full HD',
+  },
+];
+
+// Data for the "Right Resolution" cards
+export const resolutionInfo = [
+    {
+        title: 'HD READY',
+        description: 'Best for watching your favourite show on DTH',
+        image: '/src/assets/card 1 (1).png'
+    },
+    {
+        title: 'FULL HD',
+        description: 'Best for gaming and OTT',
+        image: '/src/assets/card 1 (2).png'
+    },
+    {
+        title: '4K ULTRA',
+        description: 'Do what you love Best in 4k',
+        image: '/src/assets/card 1 (3).png'
+    },
+    {
+        title: '8K ULTRA',
+        description: 'For enthralling and immersive viewing experience',
+        image: '/src/assets/card 1 (4).png'
+    },
+];
