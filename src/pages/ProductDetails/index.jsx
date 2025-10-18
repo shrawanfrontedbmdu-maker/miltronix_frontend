@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import Header from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 import CategorySlider from "../../components/ui/CategorySlider";
-import Breadcrumb from "./components/Breadcrumb";
+import Breadcrumb from "../../components/ui/Breadcrumb";
 import ProductGallery from "./components/ProductGallery";
 import ProductInfo from "./components/ProductInfo";
 import { productDetailsData, productData, productSpecsData, productReviewsData } from '../../data/mockData';
@@ -18,7 +18,7 @@ const ProductDetailPage = () => {
   return (
     <>
       <Header />
-      <main style={{paddingTop: '10%'}}>
+      <main>
         <CategorySlider />
         <section className="product-detail-section">
         <Breadcrumb path={productData.breadcrumb} />

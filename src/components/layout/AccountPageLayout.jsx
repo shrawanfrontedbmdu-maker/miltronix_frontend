@@ -1,7 +1,7 @@
 import React from 'react';
 import AccountSidebar from '../ui/AccountSidebar';
 // Assuming your Breadcrumb is in the Product Details folder
-import Breadcrumb from '../../pages/ProductDetails/components/Breadcrumb';
+import Breadcrumb from '../ui/Breadcrumb';
 
 // 👇 1. Add 'onSave' to the props
 const AccountPageLayout = ({ children, pageTitle, breadcrumbPath, onSave }) => {

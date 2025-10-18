@@ -1,8 +1,8 @@
 import React from 'react';
 import DealCard from '../../../components/ui/DealCard';
-import { productData } from '../../../data/mockData';
+// import { productData } from '../../../data/mockData';
 
-const RecommendationSection = () => {
+const RecommendationSection = ({ products = [] }) => {
   return (
     <>
       <div className="qled-features">
@@ -16,7 +16,7 @@ const RecommendationSection = () => {
       <section className="product-section">
         <div className="container">
           <div className="row g-4">
-            {productData.similarProducts.map((product) => (
+            {products.map((product) => (
               <DealCard key={product.id} deal={product} />
             ))}
           </div>

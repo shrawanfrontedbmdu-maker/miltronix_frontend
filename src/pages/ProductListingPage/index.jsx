@@ -2,15 +2,19 @@ import React, { useState, useEffect } from 'react';
 import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
 import CategorySlider from '../../components/ui/CategorySlider';
-import Breadcrumb from '../ProductDetails/components/Breadcrumb';
+import Breadcrumb from '../../components/ui/Breadcrumb';
 import FilterSidebar from './components/FilterSidebar';
 import ProductGrid from './components/ProductGrid';
 import RecommendationSection from './components/RecommendationSection';
-import { qledTvProducts, filterOptions } from '../../data/mockData';
+import { categoriesData } from '../../data/mockData';
 import PageHeader from './components/PageHeader';
 import ResolutionInfo from './components/ResolutionInfo';
+import { useParams } from 'react-router-dom';
 
 const ProductListingPage = () => {
+  const { categoryName } = useParams();
+  const pageData = categoriesData[categoryName];
+  
   const [filters, setFilters] = useState({
     resolution: [],
     screenSize: [],
@@ -18,10 +22,10 @@ const ProductListingPage = () => {
     includeOutOfStock: false,
   });
 
-  const [filteredProducts, setFilteredProducts] = useState(qledTvProducts);
+  const [filteredProducts, setFilteredProducts] = useState(pageData.products);
 
   useEffect(() => {
-    let products = qledTvProducts;
+    let products = pageData.products;
 
     products = products.filter(p => parseInt(p.price.replace(/,/g, '')) <= filters.price);
 
@@ -29,7 +33,11 @@ const ProductListingPage = () => {
       products = products.filter(p => filters.resolution.includes(p.resolution));
     }
     setFilteredProducts(products);
-  }, [filters]);
+  }, [filters, pageData]);
+
+   if (!pageData) {
+    return <div>Category not found.</div>;
+  }
 
 
   return (
@@ -37,9 +45,9 @@ const ProductListingPage = () => {
       <Header />
       <main style={{backgroundColor: '#D5D4D3'}}>
         <CategorySlider />
-        <Breadcrumb path={['Home Page', 'QLED']} />
+        <Breadcrumb path={[pageData.breadcrumb]} />
         <section className="qled-features1">
-            <PageHeader />
+            <PageHeader title={pageData.pageTitle} subtitle={pageData.pageSubtitle} description={pageData.description} />
         </section>
 
         <div className="container">
@@ -47,7 +55,7 @@ const ProductListingPage = () => {
             <div className="col-md-3">
               {/* The FilterSidebar receives the current filters and the function to update them */}
               <FilterSidebar 
-                options={filterOptions} 
+                options={pageData.filterOptions} 
                 filters={filters} 
                 setFilters={setFilters} 
               />
@@ -59,9 +67,8 @@ const ProductListingPage = () => {
           </div>
         </div>
 
-        <ResolutionInfo />
-
-        <RecommendationSection />
+       <ResolutionInfo info={pageData.infoSection} />
+        <RecommendationSection products={pageData.recommendations} />
 
       </main>
       <Footer />

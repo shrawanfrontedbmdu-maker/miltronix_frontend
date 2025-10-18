@@ -3,7 +3,7 @@ import React from 'react';
 // --- Reusable Components ---
 import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
-import SubscriptionSection from '../HomePage/components/SubscriptionSection'; // Reusing this whole section!
+import SubscriptionSection from '../HomePage/components/SubscriptionSection';
 
 // --- Data ---
 const aboutUsContent = [
