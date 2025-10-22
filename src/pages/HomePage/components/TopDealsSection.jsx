@@ -22,7 +22,7 @@ const TopDealsSection = () => {
                 stunning picture quality, vibrant colors, and the latest technology—all <br />
                 with exclusive discounts you won't want to miss.
               </p>
-              <a href="#" className="btn custom-btn px-4">
+              <a href="/category/qled" className="btn custom-btn px-4">
                 View All Products
               </a>
             </div>

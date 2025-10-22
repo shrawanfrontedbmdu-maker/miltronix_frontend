@@ -11,7 +11,7 @@ const MyProfilePage = () => {
   return (
     <>
       <Header />
-      <main style={{paddingTop: '13%', backgroundColor: '#D5D4D3'}}>
+      <main style={{paddingTop: '180px', backgroundColor: '#D5D4D3'}}>
         <AccountPageLayout style={{marginLeft: '-50px'}}
           pageTitle="My Profile" 
           breadcrumbPath={['Home Page', 'My Account', 'My Profile']}

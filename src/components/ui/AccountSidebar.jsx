@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import './account-breadcrumb.css'; // Make sure this CSS file is being loaded
 
 const sidebarLinks = [
   { name: 'My Profile', icon: 'bi-person', link: '/my-profile' },
@@ -11,21 +12,31 @@ const sidebarLinks = [
   { name: 'Log out', icon: 'bi-box-arrow-right', link: '#' },
 ];
 
-// It receives the 'active' page name as a prop to highlight the correct link
 const AccountSidebar = ({ activePage }) => {
   return (
-    <div className="sidebar hv">
-      <h5 className="hv">My Account</h5>
-      <ul>
-        {sidebarLinks.map(item => (
-          <li key={item.name} className={activePage === item.name ? 'active hv' : 'hv'}>
-            <Link to={item.link} className="text-decoration-none">
-              <i className={`bi ${item.icon} me-2`}></i>{item.name}
-            </Link>
-          </li>
-        ))}
+    <aside className="sidebar account-sidebar hv" aria-label="Account navigation">
+      <h5 className="account-sidebar-title hv">My Account</h5>
+      <ul className="account-sidebar-list ">
+        {sidebarLinks.map(item => {
+          const isActive = activePage === item.name;
+          return (
+            // This line correctly assigns 'account-nav-item' to every list item
+            <li
+              key={item.name}
+              className={`account-nav-item ${isActive ? 'active' : ''} hv`}
+              aria-current={isActive ? 'page' : undefined}
+            >
+              <Link to={item.link} className="account-nav-link">
+                <span className="icon-box">
+                  <i className={`bi ${item.icon}`}></i>
+                </span>
+                <span className="account-nav-label">{item.name}</span>
+              </Link>
+            </li>
+          );
+        })}
       </ul>
-    </div>
+    </aside>
   );
 };
 

@@ -1019,3 +1019,56 @@ export const myOrdersData = {
   ],
   pending: [],
 };
+
+export const wishlistData = [
+  {
+    id: 'wish-1',
+    saveAmount: '₹300',
+    image: '/src/assets/image 11.png',
+    category: 'Camera',
+    title: '2 MP HD DOME CAMERA',
+    price: '1,999',
+    oldPrice: '2,299',
+    rating: 4.8,
+    reviews: 324,
+  },
+  {
+    id: 'wish-2',
+    saveAmount: '₹300',
+    image: '/src/assets/image 10.png',
+    category: 'Television',
+    title: 'QLED 40-inch',
+    price: '14,444',
+    oldPrice: '22,999',
+    rating: 4.8,
+    reviews: 324,
+  },
+];
+
+export const savedAddressesData = [
+  {
+    id: 'addr1',
+    name: 'Nikhil Saini',
+    addressLine1: 'S-5, B-41, B block, Sector 63,',
+    addressLine2: 'Noida, Uttar Pradesh',
+    mobile: '8568976976',
+  },
+  // Add more addresses if needed
+];
+
+export const savedPaymentsData = [
+  {
+    id: 'card1',
+    type: 'Visa',
+    last4: '1234',
+    expiry: '08/2026',
+    icon: '/src/assets/credit-card.png', // Or use a specific Visa icon
+  },
+  {
+    id: 'card2',
+    type: 'Master Card',
+    last4: '5678',
+    expiry: '12/2027',
+    icon: '/src/assets/credit-card.png', // Or use a specific Mastercard icon
+  },
+];

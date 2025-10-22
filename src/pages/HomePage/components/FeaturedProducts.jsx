@@ -11,6 +11,7 @@ const FeaturedProducts = () => {
         subtitle="Products"
         description={<>Discover our most popular electronics with cutting-edge <br /> features and unbeatable prices</>}
         buttonText="View All Products"
+        buttonLink='/category/qled'
       />
 
       <div className="container">

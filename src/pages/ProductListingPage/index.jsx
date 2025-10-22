@@ -45,7 +45,7 @@ const ProductListingPage = () => {
       <Header />
       <main style={{backgroundColor: '#D5D4D3'}}>
         <CategorySlider />
-        <Breadcrumb path={[pageData.breadcrumb]} />
+        <Breadcrumb path={pageData.breadcrumb} />
         <section className="qled-features1">
             <PageHeader title={pageData.pageTitle} subtitle={pageData.pageSubtitle} description={pageData.description} />
         </section>

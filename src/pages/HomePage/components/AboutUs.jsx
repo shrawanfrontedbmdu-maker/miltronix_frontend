@@ -16,6 +16,7 @@ function AboutUs() {
             Learn More <i className="bi bi-arrow-right ms-2"></i>
           </>
         }
+        buttonLink="/about-us"
         description={<><p>We are committed to delivering high-quality products and<br />reliable services that bring value, innovation, and trust to every<br />customer we serve.</p></>}
       />
 
