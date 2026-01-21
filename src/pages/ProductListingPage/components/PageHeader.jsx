@@ -1,14 +1,21 @@
-import React from 'react';
-import SectionHeader from '../../../components/ui/SectionHeader'; // Reusing our generic header
+import React from "react";
+import SectionHeader from "../../../components/ui/SectionHeader";
 
 const PageHeader = ({ title, subtitle, description }) => {
+  // Fallback values agar backend me missing ho
+  const finalTitle = title || "Category";
+  const finalSubtitle = subtitle || "";
+  const finalDescription = description || "";
+
   return (
-    <section className="qled-features1">
-      <SectionHeader
-        title={title}
-        subtitle={subtitle}
-        description={description}
-      />
+    <section className="page-header-section py-4">
+      <div className="container">
+        <SectionHeader
+          title={finalTitle}
+          subtitle={finalSubtitle}
+          description={finalDescription}
+        />
+      </div>
     </section>
   );
 };

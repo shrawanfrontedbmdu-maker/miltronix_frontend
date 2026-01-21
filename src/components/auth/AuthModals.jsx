@@ -1,53 +1,61 @@
 import React, { useState } from "react";
 import { Modal } from "react-bootstrap";
-import { login, signup, loginWithGoogle } from "../../api/api";
 import googleIcon from "../../assets/Google-Logo-Icon-PNG-Photo.png";
+import { signup, verifyOtp, login, resendOtp } from "../../api/api";
 
 function AuthModals({ modalToShow, setModalToShow }) {
   const handleClose = () => setModalToShow(null);
 
-  const switchToLogin = (e) => {
-    e.preventDefault();
-    setModalToShow("login");
-  };
-
-  const switchToSignup = (e) => {
-    e.preventDefault();
-    setModalToShow("signup");
-  };
+  const switchToLogin = () => setModalToShow("login");
+  const switchToSignup = () => setModalToShow("signup");
 
   // ---------------- SIGNUP ----------------
   const [signupData, setSignupData] = useState({
-    name: "",
+    fullName: "",
     email: "",
     mobile: "",
     password: "",
-    confirmPassword: "",
   });
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState("");
 
   const handleSignupChange = (e) =>
     setSignupData({ ...signupData, [e.target.name]: e.target.value });
 
   const handleSignupSubmit = async (e) => {
     e.preventDefault();
-    if (signupData.password !== signupData.confirmPassword) {
-      alert("Passwords do not match");
-      return;
-    }
     try {
-      const res = await signup(signupData);
-      alert(res.message || "Signup successful");
-      handleClose();
+      await signup(signupData);
+      setOtpSent(true);
+      alert("OTP sent to your mobile");
     } catch (err) {
       alert(err.response?.data?.message || "Signup failed");
     }
   };
 
+  const handleOtpSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await verifyOtp({ mobile: signupData.mobile, otp });
+      alert("OTP verified! You can now login");
+      setOtpSent(false);
+      handleClose();
+    } catch (err) {
+      alert(err.response?.data?.message || "OTP verification failed");
+    }
+  };
+
+  const handleResendOtp = async () => {
+    try {
+      await resendOtp({ mobile: signupData.mobile });
+      alert("OTP resent successfully");
+    } catch (err) {
+      alert(err.response?.data?.message || "Resend OTP failed");
+    }
+  };
+
   // ---------------- LOGIN ----------------
-  const [loginData, setLoginData] = useState({
-    identifier: "",
-    password: "",
-  });
+  const [loginData, setLoginData] = useState({ mobile: "", password: "" });
 
   const handleLoginChange = (e) =>
     setLoginData({ ...loginData, [e.target.name]: e.target.value });
@@ -64,9 +72,7 @@ function AuthModals({ modalToShow, setModalToShow }) {
     }
   };
 
-  // ---------------- GOOGLE LOGIN ----------------
   const handleGoogleLoginClick = () => {
-    // Redirect to backend for OAuth
     window.location.href = "http://localhost:3000/api/auth/google-login";
   };
 
@@ -83,118 +89,122 @@ function AuthModals({ modalToShow, setModalToShow }) {
   return (
     <>
       {/* ================= SIGNUP MODAL ================= */}
-      <Modal
-        show={modalToShow === "signup"}
-        onHide={handleClose}
-        centered
-        dialogClassName="auth-modal-dialog"
-      >
+      <Modal show={modalToShow === "signup"} onHide={handleClose} centered>
         <Modal.Body className="p-4 p-md-5">
           <h2 className="fw-bold text-center mb-2">Create Account</h2>
-          <p className="text-muted text-center mb-4">
-            Join Mitronix and explore more
-          </p>
 
-          <form onSubmit={handleSignupSubmit}>
-            <input
-              type="text"
-              name="name"
-              className="form-control mb-3"
-              placeholder="Full Name"
-              value={signupData.name}
-              onChange={handleSignupChange}
-              required
-            />
-            <input
-              type="email"
-              name="email"
-              className="form-control mb-3"
-              placeholder="Email Address"
-              value={signupData.email}
-              onChange={handleSignupChange}
-              required
-            />
-            <input
-              type="text"
-              name="mobile"
-              className="form-control mb-3"
-              placeholder="Mobile Number"
-              value={signupData.mobile}
-              onChange={handleSignupChange}
-              required
-            />
-            <input
-              type="password"
-              name="password"
-              className="form-control mb-3"
-              placeholder="Password"
-              value={signupData.password}
-              onChange={handleSignupChange}
-              required
-            />
-            <input
-              type="password"
-              name="confirmPassword"
-              className="form-control mb-4"
-              placeholder="Confirm Password"
-              value={signupData.confirmPassword}
-              onChange={handleSignupChange}
-              required
-            />
+          {!otpSent ? (
+            <form onSubmit={handleSignupSubmit}>
+              <input
+                type="text"
+                name="fullName"
+                placeholder="Full Name"
+                value={signupData.fullName}
+                onChange={handleSignupChange}
+                className="form-control mb-3"
+                required
+              />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value={signupData.email}
+                onChange={handleSignupChange}
+                className="form-control mb-3"
+                required
+              />
+              <input
+                type="text"
+                name="mobile"
+                placeholder="Mobile"
+                value={signupData.mobile}
+                onChange={handleSignupChange}
+                className="form-control mb-3"
+                required
+              />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={signupData.password}
+                onChange={handleSignupChange}
+                className="form-control mb-3"
+                required
+              />
 
-            <button
-              type="button"
-              className="btn btn-outline-dark w-100 mb-3"
-              style={googleBtnStyle}
-              onClick={handleGoogleLoginClick}
-            >
-              <img src={googleIcon} alt="Google" style={{ width: 28, height: 28 }} />
-              Continue with Google
-            </button>
+              <button
+                type="button"
+                className="btn btn-outline-dark w-100 mb-3"
+                style={googleBtnStyle}
+                onClick={handleGoogleLoginClick}
+              >
+                <img
+                  src={googleIcon}
+                  alt="Google"
+                  style={{ width: 28, height: 28 }}
+                />
+                Continue with Google
+              </button>
 
-            <button className="btn btn-dark w-100 py-2">Sign Up</button>
-          </form>
+              <button className="btn btn-dark w-100 py-2">Sign Up</button>
+            </form>
+          ) : (
+            <form onSubmit={handleOtpSubmit}>
+              <input
+                type="text"
+                placeholder="Enter OTP"
+                value={otp}
+                onChange={(e) => setOtp(e.target.value)}
+                className="form-control mb-3"
+                required
+              />
+              <button className="btn btn-dark w-100 py-2 mb-2">Verify OTP</button>
+              <button
+                type="button"
+                className="btn btn-outline-secondary w-100"
+                onClick={handleResendOtp}
+              >
+                Resend OTP
+              </button>
+            </form>
+          )}
 
-          <p className="text-center mt-4 mb-0">
-            Already have an account?{" "}
-            <span
-              className="fw-semibold text-decoration-underline cursor-pointer"
-              onClick={switchToLogin}
-            >
-              Login
-            </span>
-          </p>
+          {!otpSent && (
+            <p className="text-center mt-4 mb-0">
+              Already have an account?{" "}
+              <span
+                className="fw-semibold text-decoration-underline cursor-pointer"
+                onClick={switchToLogin}
+              >
+                Login
+              </span>
+            </p>
+          )}
         </Modal.Body>
       </Modal>
 
       {/* ================= LOGIN MODAL ================= */}
-      <Modal
-        show={modalToShow === "login"}
-        onHide={handleClose}
-        centered
-        dialogClassName="auth-modal-dialog"
-      >
+      <Modal show={modalToShow === "login"} onHide={handleClose} centered>
         <Modal.Body className="p-4 p-md-5">
           <h2 className="fw-bold text-center mb-2">Welcome Back</h2>
-          <p className="text-muted text-center mb-4">Login to continue</p>
 
           <form onSubmit={handleLoginSubmit}>
             <input
               type="text"
-              name="identifier"
-              className="form-control mb-3"
-              placeholder="Email or Mobile Number"
-              value={loginData.identifier}
+              name="mobile"
+              placeholder="Mobile Number"
+              value={loginData.mobile}
               onChange={handleLoginChange}
+              className="form-control mb-3"
               required
             />
             <input
               type="password"
               name="password"
-              className="form-control mb-4"
               placeholder="Password"
               value={loginData.password}
               onChange={handleLoginChange}
+              className="form-control mb-4"
               required
             />
 
@@ -204,7 +214,11 @@ function AuthModals({ modalToShow, setModalToShow }) {
               style={googleBtnStyle}
               onClick={handleGoogleLoginClick}
             >
-              <img src={googleIcon} alt="Google" style={{ width: 28, height: 28 }} />
+              <img
+                src={googleIcon}
+                alt="Google"
+                style={{ width: 28, height: 28 }}
+              />
               Continue with Google
             </button>
 

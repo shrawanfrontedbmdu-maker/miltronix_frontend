@@ -1,44 +1,51 @@
-import React from 'react';
+import React from "react";
 
-const starIconFull = '/src/assets/icon 7.svg';
-const starIconEmpty = '/src/assets/icon 8.svg';
+const starIconFull = "/src/assets/icon7.svg";
+const starIconEmpty = "/src/assets/icon8.svg";
 
 const ShopCard = ({ product }) => {
   if (!product) return null;
 
-  const fullStars = Math.floor(product.rating || 0);
+  const rating = product.rating || 0;
+  const fullStars = Math.floor(rating);
   const emptyStars = 5 - fullStars;
-
-  // Safe image URL, fallback placeholder
-  const imageUrl = product.image ? product.image : '/placeholder.png';
+  const imageUrl = product.image || "/src/assets/placeholder.png";
+  const categoryName = product.category || product.categoryKey || "";
+  const saveAmount = product.saveAmount ? Number(product.saveAmount) : null;
 
   return (
     <div className="col-md-6 col-lg-4">
-      <div className="shop-card text-center">
-        {product.saveAmount && (
-          <span className="shop-card-badge">Save ₹{product.saveAmount?.toLocaleString()}</span>
+      <div className="shop-card text-center position-relative">
+        {saveAmount && (
+          <span className="shop-card-badge">
+            Save ₹{saveAmount.toLocaleString()}
+          </span>
         )}
+
         <img
           src={imageUrl}
-          alt={product.title || 'Product'}
+          alt={product.title || "Product"}
           className="img-fluid shop-card-img"
         />
-        <h6 className="product-category2">{product.category || ''}</h6>
-        <h5 className="product-title2">{product.title || ''}</h5>
+
+        <h6 className="product-category2">{categoryName}</h6>
+        <h5 className="product-title2">{product.title || "Product"}</h5>
         <p className="product-price2">₹{product.price?.toLocaleString() || 0}</p>
         {product.oldPrice && (
           <p className="product-old-price2">₹{product.oldPrice?.toLocaleString()}</p>
         )}
-        <div className="product-rating1">
+
+        <div className="product-rating1 d-flex align-items-center justify-content-center gap-1">
           {[...Array(fullStars)].map((_, i) => (
-            <img key={i} src={starIconFull} alt="star" className="star1" />
+            <img key={`full-${i}`} src={starIconFull} alt="star" className="star1" />
           ))}
           {[...Array(emptyStars)].map((_, i) => (
-            <img key={i} src={starIconEmpty} alt="star" className="star1" />
+            <img key={`empty-${i}`} src={starIconEmpty} alt="star" className="star1" />
           ))}
-          <span>{product.rating || 0} ({product.reviews || 0})</span>
+          <span>{rating} ({product.reviews || 0})</span>
         </div>
-        <div className="d-flex justify-content-between">
+
+        <div className="d-flex justify-content-between mt-2">
           <button className="shop-card-btn-cart w-75">
             <i className="bi bi-cart"></i> Add to Cart
           </button>
