@@ -1,9 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
+import {
+  addItemToCart, // our API function
+  getCartItems,
+} from "../../api/api"; // make sure path is correct
 
 const starIconFull = "/src/assets/icon7.svg";
 const starIconEmpty = "/src/assets/icon8.svg";
 
 const ShopCard = ({ product }) => {
+  const [loading, setLoading] = useState(false);
+  const [added, setAdded] = useState(false);
+
   if (!product) return null;
 
   const rating = product.rating || 0;
@@ -12,6 +19,26 @@ const ShopCard = ({ product }) => {
   const imageUrl = product.image || "/src/assets/placeholder.png";
   const categoryName = product.category || product.categoryKey || "";
   const saveAmount = product.saveAmount ? Number(product.saveAmount) : null;
+
+  // ---------------- Add to Cart Handler ----------------
+  const handleAddToCart = async () => {
+    setLoading(true);
+    try {
+      await addItemToCart({
+        productId: product.id,
+        quantity: 1,
+        price: product.price,
+      });
+      setAdded(true);
+      // Optional: refresh cart or show toast
+      const cart = await getCartItems();
+      console.log("Updated Cart:", cart);
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="col-md-6 col-lg-4">
@@ -46,8 +73,13 @@ const ShopCard = ({ product }) => {
         </div>
 
         <div className="d-flex justify-content-between mt-2">
-          <button className="shop-card-btn-cart w-75">
-            <i className="bi bi-cart"></i> Add to Cart
+          <button
+            className={`shop-card-btn-cart w-75 ${added ? "btn-success" : ""}`}
+            onClick={handleAddToCart}
+            disabled={loading || added}
+          >
+            {loading ? "Adding..." : added ? "Added" : "Add to Cart"}
+            <i className="bi bi-cart ms-1"></i>
           </button>
           <button className="btn shop-card-btn-wishlist">
             <i className="bi bi-heart-fill"></i>

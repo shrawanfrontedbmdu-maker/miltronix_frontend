@@ -54,7 +54,46 @@ export const login = async (data: { mobile: string; password: string }) => {
   return res.data;
 };
 
-// Optional: Google login redirect (if you want frontend to trigger)
+// Optional: Google login redirect
 export const loginWithGoogle = () => {
   window.location.href = `${BASE_URL}/auth/google-login`;
+};
+
+// ---------------- CART ----------------
+
+// Add item to cart
+export const addItemToCart = async (data: {
+  productId: string;
+  quantity: number;
+  price: number;
+}) => {
+  const res = await API.post("/cart/items", data);
+  return res.data;
+};
+
+// Get all cart items
+export const getCartItems = async () => {
+  const res = await API.get("/cart");
+  return res.data;
+};
+
+// Update a specific cart item
+export const updateCartItem = async (
+  itemId: string,
+  data: { quantity?: number; price?: number }
+) => {
+  const res = await API.put(`/cart/items/${itemId}`, data);
+  return res.data;
+};
+
+// Merge cart (e.g., guest cart → user cart)
+export const mergeCart = async (items: { productId: string; quantity: number }[]) => {
+  const res = await API.post("/cart/merge", { items });
+  return res.data;
+};
+
+// Remove item from cart
+export const removeCartItem = async (itemId: string) => {
+  const res = await API.delete(`/cart/items/${itemId}`);
+  return res.data;
 };
