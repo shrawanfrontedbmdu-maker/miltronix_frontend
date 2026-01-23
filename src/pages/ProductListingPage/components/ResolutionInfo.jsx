@@ -1,7 +1,8 @@
 import React from "react";
 
+const BACKEND_URL = "http://localhost:3000";
+
 const ResolutionInfo = ({ info = {} }) => {
-  // Guard clause: agar cards nahi hain, render mat karo
   if (!info.cards || info.cards.length === 0) return null;
 
   return (
@@ -29,11 +30,11 @@ const ResolutionInfo = ({ info = {} }) => {
       <section className="resolution-section py-4">
         <div className="container">
           <div className="row g-3">
-            {info.cards.map((card) => (
-              <div key={card._id || card.title} className="col-12 col-md-6 col-lg-3">
+            {info.cards.map((card, idx) => (
+              <div key={card._id || idx} className="col-12 col-md-6 col-lg-3">
                 <div className="resolution-card text-center mb-3">
                   <img
-                    src={card.image || "/src/assets/default-card.png"}
+                    src={card.image ? `${BACKEND_URL}${card.image}` : "/src/assets/default-card.png"}
                     alt={card.alt || card.title || "Card Image"}
                     className="img-fluid resolution-img mb-3"
                   />

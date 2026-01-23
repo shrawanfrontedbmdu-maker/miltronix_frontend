@@ -1,14 +1,23 @@
 // src/api/api.ts
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 
-const BASE_URL = import.meta.env.VITE_BASE_URL;
+const BASE_URL = import.meta.env.VITE_BASE_URL || "http://localhost:3000";
 
 // ---------------- BASE AXIOS ----------------
-const API = axios.create({
+const API: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
+});
+
+// Add Authorization header if token exists
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token"); // store token after login
+  if (token) {
+    config.headers!["Authorization"] = `Bearer ${token}`;
+  }
+  return config;
 });
 
 // ---------------- CATEGORIES ----------------
@@ -28,7 +37,7 @@ export const fetchProductsByCategory = async (categoryId: string) => {
 // Signup → sends OTP
 export const signup = async (data: {
   fullName: string;
-  email: string;
+  email?: string;
   mobile: string;
   password: string;
 }) => {
@@ -51,6 +60,8 @@ export const resendOtp = async (data: { mobile: string }) => {
 // Login → only mobile + password
 export const login = async (data: { mobile: string; password: string }) => {
   const res = await API.post("/auth/login", data);
+  // Save token to localStorage for auth
+  localStorage.setItem("token", res.data.token);
   return res.data;
 };
 
@@ -86,7 +97,7 @@ export const updateCartItem = async (
   return res.data;
 };
 
-// Merge cart (e.g., guest cart → user cart)
+// Merge cart (guest cart → user cart)
 export const mergeCart = async (items: { productId: string; quantity: number }[]) => {
   const res = await API.post("/cart/merge", { items });
   return res.data;

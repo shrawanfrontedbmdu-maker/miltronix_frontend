@@ -1,13 +1,12 @@
 import React, { useState } from "react";
-import {
-  addItemToCart, // our API function
-  getCartItems,
-} from "../../api/api"; // make sure path is correct
+import { addItemToCart, getCartItems } from "../../api/api";
 
-const starIconFull = "/src/assets/icon7.svg";
-const starIconEmpty = "/src/assets/icon8.svg";
+const BACKEND_URL = "http://localhost:3000";
 
-const ShopCard = ({ product }) => {
+const starIconFull = "/assets/icon7.svg";
+const starIconEmpty = "/assets/icon8.svg";
+
+const ShopCard = ({ product, onCartUpdate }) => {
   const [loading, setLoading] = useState(false);
   const [added, setAdded] = useState(false);
 
@@ -16,11 +15,16 @@ const ShopCard = ({ product }) => {
   const rating = product.rating || 0;
   const fullStars = Math.floor(rating);
   const emptyStars = 5 - fullStars;
-  const imageUrl = product.image || "/src/assets/placeholder.png";
+
+  // ✅ Image URL fallback
+  const imageUrl = product.image
+    ? `${BACKEND_URL}${product.image}`
+    : `${BACKEND_URL}/images/placeholder.png`;
+
   const categoryName = product.category || product.categoryKey || "";
   const saveAmount = product.saveAmount ? Number(product.saveAmount) : null;
 
-  // ---------------- Add to Cart Handler ----------------
+  // ---------------- Add to Cart ----------------
   const handleAddToCart = async () => {
     setLoading(true);
     try {
@@ -30,11 +34,17 @@ const ShopCard = ({ product }) => {
         price: product.price,
       });
       setAdded(true);
-      // Optional: refresh cart or show toast
-      const cart = await getCartItems();
-      console.log("Updated Cart:", cart);
+
+      // Fetch updated cart
+      const updatedCart = await getCartItems();
+
+      // Call optional callback if parent wants to update cart UI
+      if (onCartUpdate) onCartUpdate(updatedCart);
+
+      console.log("Cart updated:", updatedCart);
     } catch (error) {
       console.error("Failed to add to cart:", error);
+      alert("Failed to add item to cart");
     } finally {
       setLoading(false);
     }
@@ -57,9 +67,15 @@ const ShopCard = ({ product }) => {
 
         <h6 className="product-category2">{categoryName}</h6>
         <h5 className="product-title2">{product.title || "Product"}</h5>
-        <p className="product-price2">₹{product.price?.toLocaleString() || 0}</p>
+
+        <p className="product-price2">
+          ₹{product.price?.toLocaleString() || 0}
+        </p>
+
         {product.oldPrice && (
-          <p className="product-old-price2">₹{product.oldPrice?.toLocaleString()}</p>
+          <p className="product-old-price2">
+            ₹{product.oldPrice.toLocaleString()}
+          </p>
         )}
 
         <div className="product-rating1 d-flex align-items-center justify-content-center gap-1">
@@ -81,6 +97,7 @@ const ShopCard = ({ product }) => {
             {loading ? "Adding..." : added ? "Added" : "Add to Cart"}
             <i className="bi bi-cart ms-1"></i>
           </button>
+
           <button className="btn shop-card-btn-wishlist">
             <i className="bi bi-heart-fill"></i>
           </button>
