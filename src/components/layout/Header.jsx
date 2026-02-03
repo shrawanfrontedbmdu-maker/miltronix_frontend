@@ -8,7 +8,7 @@ import cartIcon from '../../assets/SVG.svg';
 import userIcon from '../../assets/icon 6.svg';
 import locationIcon from '../../assets/Icon 2.svg';
 import searchIcon from '../../assets/Icon 3.svg';
-import dropdownIcon from '../../assets/Icon 4.svg';
+import dropdownIcon from '../../assets/icon 4.svg';
 import wishlistIcon from '../../assets/icon 5.svg';
 
 function Header() {
