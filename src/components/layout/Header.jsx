@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import AuthModals from '../auth/AuthModals';
 import { Link } from "react-router-dom";
+import './header.css'
 
 // Assets
 import logoBanner from '../../assets/MILTRONIX APP DESIGN 3.png';
@@ -32,9 +33,9 @@ function Header() {
         <div className="header-container bg-transparent d-flex justify-content-between align-items-center px-4 py-2">
           
           {/* Cart Button */}
-          <Link to="/cart" className="text-decoration-none see-more">
+          <Link to="/cart" className="text-decoration-none see-more  main" >
             <div className="cart-box d-flex align-items-center justify-content-center">
-              <img src={cartIcon} alt="Cart" className="me-lg-2" width="16" height="16" />
+              <img src={cartIcon} alt="Cart" className="me-lg-2" width="16" height="16"/>
               <span className="d-none d-lg-block">Cart</span>
             </div>
           </Link>

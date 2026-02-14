@@ -1,4 +1,5 @@
 import React from 'react';
+import './qled.css'
 
 // --- Data for the Feature Icons ---
 // Place your image paths here. This makes it easy to add or remove features.
@@ -27,7 +28,8 @@ const QledFeatures = () => {
             </h2>
           </div>
           <div className="col-md-8">
-            <p className="qled-desc d-none d-md-block">
+            {/* <p className="qled-desc d-none d-md-block line"> */}
+            <p className='line'>
               QLED delivers vibrant colors, deeper contrast, and brighter visuals with long-lasting <br />
               performance for an immersive viewing experience.
             </p>

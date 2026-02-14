@@ -5,7 +5,6 @@ import ShopCard from "../../../components/ui/ShopCard";
 import { fetchProducts } from "../../../api/api";
 
 const ProductGrid = () => {
-  // 👇 URL से categoryKey या categoryId ले रहे हैं
   const { categoryKey, categoryId } = useParams(); 
 
   const [products, setProducts] = useState([]);

@@ -85,7 +85,6 @@ const FilterSidebar = ({ categoryId, filters, setProducts }) => {
         return (
           <div key={key} className="mb-4">
             <h6 className="filter-subtitle hv">{filter.title}</h6>
-
             {filter.items.map((item) => (
               <div className="form-check" key={item._id}>
                 <input

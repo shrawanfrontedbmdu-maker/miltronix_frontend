@@ -20,7 +20,7 @@ const ServicesSection = () => {
               </h2>
             </div>
             <div className="col-md-6 d-flex justify-content-between align-items-end">
-              <p className="qled-desc mb-0 d-none d-md-block">
+              <p className="qled-desc mb-0 d-none d-md-block  services">
                 We understand that your business needs more than just <br />
                 products. Our comprehensive service ecosystem is <br />
                 designed to support your success at every step.
