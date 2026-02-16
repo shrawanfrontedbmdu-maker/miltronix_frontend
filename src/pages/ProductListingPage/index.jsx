@@ -18,9 +18,10 @@ const ProductListingPage = () => {
   const { categoryName } = useParams();
 
   const [pageData, setPageData] = useState(null);
-  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  console.log("🔍 URL categoryName:", categoryName);
 
   useEffect(() => {
     const loadCategory = async () => {
@@ -29,12 +30,16 @@ const ProductListingPage = () => {
         setError(null);
 
         const categories = await fetchCategories();
+        console.log("📦 All Categories:", categories);
 
+        // ✅ categoryKey se match karo
         const category = categories.find(
           (c) =>
             c.categoryKey?.toLowerCase() ===
             decodeURIComponent(categoryName || "").toLowerCase()
         );
+
+        console.log("✅ Matched Category:", category);
 
         if (!category) {
           setError("Category not found");
@@ -42,9 +47,8 @@ const ProductListingPage = () => {
         }
 
         setPageData(category);
-        setProducts(category.products || []);
       } catch (err) {
-        console.error(err);
+        console.error("🔥 Error:", err);
         setError("Failed to load category");
       } finally {
         setLoading(false);
@@ -55,13 +59,23 @@ const ProductListingPage = () => {
   }, [categoryName]);
 
   if (loading) {
-    return <div style={{ padding: "2rem", textAlign: "center" }}>Loading...</div>;
+    return (
+      <div className="text-center py-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <h5 className="mt-3">Loading category...</h5>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div style={{ padding: "2rem", textAlign: "center", color: "red" }}>
-        {error}
+      <div className="container text-center py-5">
+        <div className="alert alert-danger" role="alert">
+          <i className="bi bi-exclamation-triangle-fill me-2"></i>
+          {error}
+        </div>
       </div>
     );
   }
@@ -87,13 +101,12 @@ const ProductListingPage = () => {
               <FilterSidebar
                 categoryId={pageData?._id}
                 filters={pageData?.filterOptions}
-                products={products}
-                setProducts={setProducts}
               />
             </div>
 
             <div className="col-md-9">
-              <ProductGrid products={products} />
+              {/* ✅ categoryId pass karo, not products */}
+              <ProductGrid categoryId={pageData?._id} />
             </div>
           </div>
         </div>
