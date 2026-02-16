@@ -9,7 +9,7 @@ import SubscriptionSection from '../HomePage/components/SubscriptionSection';
 const aboutUsContent = [
   {
     title: 'Our Story',
-    text: "Founded in 2005, Mitronix began as a small startup with a big vision: to revolutionize the electronics industry. Over the years, we've grown into a global leader, known for our commitment to quality, innovation, and customer satisfaction. Our journey has been marked by significant milestones, including the development of groundbreaking technologies and the expansion of our product line to meet the evolving needs of our customers.",
+    text: "Founded in 2005, Mitronix began as a small startup with a big vision: to revolutionize the electronics industry. Over the years, we've grown into a global leader, known for our commitment to quality, innovation, and customer satisfaction. Our journey has been marked by significant milestones, including the development of groundbreaking technologies and the expansion of our product line to meet the evolving needs of our customer.",
   },
   {
     title: 'Our Mission',
