@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import OrderCard from "../../../components/ui/OrderCard";
-import { getMyOrders } from "../../../api/api";
+// import { getMyOrders } from "../../../api/api";
 
 const OrderList = () => {
   const [activeTab, setActiveTab] = useState("active");

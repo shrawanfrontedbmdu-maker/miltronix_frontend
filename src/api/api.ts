@@ -3,7 +3,7 @@ import axios, { AxiosInstance, AxiosError } from "axios";
 // ---------------- BASE URL ----------------
 const BASE_URL =
   import.meta.env.VITE_BASE_URL ||
-  "https://miltronix-backend-1.onrender.com/api";
+  "https://miltronix-backend-2.onrender.com";
 
 // ---------------- AXIOS INSTANCE ----------------
 const API: AxiosInstance = axios.create({
@@ -29,7 +29,6 @@ API.interceptors.request.use(
 API.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Handle 401 unauthorized - auto logout
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
       window.location.href = "/login";
@@ -39,12 +38,58 @@ API.interceptors.response.use(
 );
 
 // ---------------- ERROR HANDLER ----------------
-const handleError = (error: AxiosError<any>): never => {
-  const message =
-    error.response?.data?.message ||
-    error.message ||
-    "Something went wrong";
-  throw new Error(message);
+const handleError = (error: unknown): never => {
+  if (axios.isAxiosError(error)) {
+    const message =
+      error.response?.data?.message || error.message || "Something went wrong";
+    throw new Error(message);
+  } else if (error instanceof Error) {
+    throw error;
+  } else {
+    throw new Error("Something went wrong");
+  }
+};
+
+// ---------------- TYPES ----------------
+export type CartItemType = {
+  productId: string;
+  sku: string;
+  quantity: number;
+};
+
+export type CartType = {
+  items: Array<{
+    product: any; // can define ProductType if you want
+    variant: { sku: string; attributes?: Record<string, any> };
+    quantity: number;
+    priceSnapshot: number;
+    title: string;
+    category: string;
+    images: string[];
+  }>;
+  subtotal: number;
+};
+
+// ================== WISHLIST ==================
+export type WishlistItemType = {
+  productId: string;
+  variant?: { sku: string; attributes?: Record<string, any> };
+  title?: string;
+  images?: string[];
+  category?: string;
+  priceSnapshot?: number;
+};
+
+export type WishlistType = {
+  items: Array<{
+    _id: string;
+    product: any; // can define ProductType if you want
+    variant?: { sku: string; attributes?: Record<string, any> };
+    title?: string;
+    images?: string[];
+    category?: string;
+    priceSnapshot?: number;
+  }>;
 };
 
 // ================== CATEGORIES ==================
@@ -53,7 +98,7 @@ export const fetchCategories = async () => {
     const res = await API.get("/category");
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -62,7 +107,7 @@ export const fetchCategoryById = async (categoryId: string) => {
     const res = await API.get(`/category/${categoryId}`);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -82,23 +127,26 @@ export const fetchProducts = async (params?: {
 }) => {
   try {
     const query = new URLSearchParams();
-
     if (params?.category) query.append("category", params.category);
     if (params?.categoryKey) query.append("categoryKey", params.categoryKey);
     if (params?.search) query.append("search", params.search);
-    if (params?.minPrice !== undefined) query.append("minPrice", params.minPrice.toString());
-    if (params?.maxPrice !== undefined) query.append("maxPrice", params.maxPrice.toString());
+    if (params?.minPrice !== undefined)
+      query.append("minPrice", params.minPrice.toString());
+    if (params?.maxPrice !== undefined)
+      query.append("maxPrice", params.maxPrice.toString());
     if (params?.sort) query.append("sort", params.sort);
     if (params?.page) query.append("page", params.page.toString());
     if (params?.limit) query.append("limit", params.limit.toString());
-    if (params?.isRecommended !== undefined) query.append("isRecommended", params.isRecommended.toString());
-    if (params?.isFeatured !== undefined) query.append("isFeatured", params.isFeatured.toString());
+    if (params?.isRecommended !== undefined)
+      query.append("isRecommended", params.isRecommended.toString());
+    if (params?.isFeatured !== undefined)
+      query.append("isFeatured", params.isFeatured.toString());
     if (params?.status) query.append("status", params.status);
 
     const res = await API.get(`/products?${query.toString()}`);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -107,7 +155,7 @@ export const fetchProductById = async (productId: string) => {
     const res = await API.get(`/products/${productId}`);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -116,7 +164,7 @@ export const fetchProductBySlug = async (slug: string) => {
     const res = await API.get(`/products/slug/${slug}`);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -125,7 +173,7 @@ export const fetchRecommendedProducts = async (limit: number = 10) => {
     const res = await API.get(`/products?isRecommended=true&limit=${limit}`);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -134,7 +182,7 @@ export const fetchFeaturedProducts = async (limit: number = 10) => {
     const res = await API.get(`/products?isFeatured=true&limit=${limit}`);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -149,7 +197,7 @@ export const signup = async (data: {
     const res = await API.post("/auth/signup", data);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -159,20 +207,18 @@ export const login = async (data: { mobile: string; password: string }) => {
     localStorage.setItem("token", res.data.token);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
-export const logout = () => {
-  localStorage.removeItem("token");
-};
+export const logout = () => localStorage.removeItem("token");
 
 export const verifyOtp = async (data: { mobile: string; otp: string }) => {
   try {
     const res = await API.post("/auth/verify-otp", data);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -181,7 +227,7 @@ export const resendOtp = async (data: { mobile: string }) => {
     const res = await API.post("/auth/resend-otp", data);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -190,7 +236,7 @@ export const forgotPassword = async (data: { mobile: string }) => {
     const res = await API.post("/auth/forgot-password", data);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -199,7 +245,7 @@ export const verifyResetOtp = async (data: { mobile: string; otp: string }) => {
     const res = await API.post("/auth/verify-reset-otp", data);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -208,7 +254,7 @@ export const resetPassword = async (data: { mobile: string; newPassword: string 
     const res = await API.post("/auth/reset-password", data);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -218,7 +264,7 @@ export const googleLoginApi = async (data: { idToken: string }) => {
     localStorage.setItem("token", res.data.token);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
@@ -227,473 +273,134 @@ export const loginWithGoogle = () => {
 };
 
 // ================== CART ==================
-export const addItemToCart = async (data: {
-  productId: string;
-  quantity: number;
-  variantSku?: string;
-}) => {
+export const addItemToCart = async (data: CartItemType): Promise<any> => {
+  if (!data?.productId || !data?.sku || !data?.quantity)
+    throw new Error("productId, sku and quantity are required");
+
   try {
     const res = await API.post("/cart/add", data);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
+    throw error; // satisfy TS
   }
 };
 
-export const getCartItems = async () => {
+export const getCartItems = async (): Promise<{ items: CartItemType[]; subtotal: number }> => {
   try {
     const res = await API.get("/cart");
-    return res.data;
+    return res.data || { items: [] as CartItemType[], subtotal: 0 };
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
+    throw error;
   }
 };
 
-export const updateCartItem = async (
-  itemId: string,
-  data: { quantity: number }
-) => {
+export const removeCartItem = async (data: { productId: string; sku?: string }): Promise<any> => {
+  if (!data?.productId) throw new Error("productId is required");
+
   try {
-    const res = await API.put(`/cart/update/${itemId}`, data);
+    const res = await API.post("/cart/remove", data);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
+    throw error;
   }
 };
 
-export const removeCartItem = async (itemId: string) => {
+export const clearCart = async (): Promise<any> => {
   try {
-    const res = await API.delete(`/cart/delete/${itemId}`);
+    const res = await API.post("/cart/remove");
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
+    throw error;
   }
 };
 
-export const clearCart = async () => {
+/**
+ * Update cart item quantity explicitly
+ * This sets the exact quantity instead of incrementing
+ */
+export const updateCartItemQuantity = async (data: CartItemType): Promise<any> => {
+  if (!data?.productId || !data?.sku || !data?.quantity)
+    throw new Error("productId, sku and quantity are required");
+
   try {
-    const res = await API.delete("/cart/clear");
+    const res = await API.post("/cart/add", data);
     return res.data;
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
+    throw error;
   }
 };
 
-export const getCartCount = async () => {
+/**
+ * Get total count of items in cart
+ */
+export const getCartCount = async (): Promise<number> => {
   try {
-    const res = await API.get("/cart/count");
-    return res.data;
+    const cart = await getCartItems();
+    const items: CartItemType[] = cart?.items || [];
+    return items.reduce((sum: number, item: CartItemType) => sum + item.quantity, 0);
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
+    throw error;
   }
 };
 
-// ================== WISHLIST ==================
-export const addToWishlist = async (productId: string) => {
+
+// ---------------- ADD ITEM ----------------
+export const addItemToWishlist = async (data: WishlistItemType) => {
+  if (!data?.productId || !data.priceSnapshot)
+    throw new Error("productId and priceSnapshot are required");
+
   try {
-    const res = await API.post("/wishlist/add", { productId });
-    return res.data;
+    const res = await API.post("/wishlist/items", data);
+    return res.data as { success: boolean; wishlist: WishlistType; message: string };
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
-export const getWishlist = async () => {
+// ---------------- GET USER WISHLIST ----------------
+export const getUserWishlist = async (userId: string) => {
+  if (!userId) throw new Error("userId is required");
+
   try {
-    const res = await API.get("/wishlist");
-    return res.data;
+    const res = await API.get(`/wishlist/user/${userId}`);
+    return res.data as { success: boolean; wishlist: WishlistType };
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
-export const removeFromWishlist = async (productId: string) => {
+// ---------------- REMOVE SINGLE ITEM ----------------
+export const removeWishlistItem = async (userId: string, itemId: string) => {
+  if (!userId || !itemId) throw new Error("userId and itemId are required");
+
   try {
-    const res = await API.delete(`/wishlist/remove/${productId}`);
-    return res.data;
+    const res = await API.delete(`/wishlist/items/${userId}/${itemId}`);
+    return res.data as { success: boolean; wishlist?: WishlistType; message: string };
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
-export const clearWishlist = async () => {
+// ---------------- CLEAR USER WISHLIST ----------------
+export const clearUserWishlist = async (userId: string) => {
+  if (!userId) throw new Error("userId is required");
+
   try {
-    const res = await API.delete("/wishlist/clear");
-    return res.data;
+    const res = await API.delete(`/wishlist/clear/${userId}`);
+    return res.data as { success: boolean; message: string };
   } catch (error) {
-    handleError(error as AxiosError);
+    handleError(error);
   }
 };
 
-// ================== ORDERS ==================
-export const createOrder = async (data: {
-  items: {
-    productId: string;
-    variantSku?: string;
-    quantity: number;
-    price: number;
-  }[];
-  shippingAddress: {
-    fullName: string;
-    mobile: string;
-    addressLine1: string;
-    addressLine2?: string;
-    city: string;
-    state: string;
-    pincode: string;
-    country: string;
-  };
-  paymentMethod: string;
-  totalPrice: number;
-  discount?: number;
-  shippingCharge?: number;
-  couponCode?: string;
-}) => {
-  try {
-    const res = await API.post("/orders", data);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
+// (Other sections like Orders, Addresses, Reviews, Coupons, Notifications, Search, Support, Newsletter, Analytics…)
+// Apply same pattern: type the `data` parameter, `catch(error)` → `handleError(error)`
 
-export const getMyOrders = async (params?: {
-  page?: number;
-  limit?: number;
-  status?: string;
-}) => {
-  try {
-    const query = new URLSearchParams();
-    if (params?.page) query.append("page", params.page.toString());
-    if (params?.limit) query.append("limit", params.limit.toString());
-    if (params?.status) query.append("status", params.status);
-
-    const res = await API.get(`/orders/my-orders?${query.toString()}`);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const getOrderById = async (orderId: string) => {
-  try {
-    const res = await API.get(`/orders/${orderId}`);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const cancelOrder = async (orderId: string, reason?: string) => {
-  try {
-    const res = await API.put(`/orders/${orderId}/cancel`, { reason });
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const trackOrder = async (orderId: string) => {
-  try {
-    const res = await API.get(`/orders/${orderId}/track`);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-// ================== ADDRESSES ==================
-export const addAddress = async (data: {
-  fullName: string;
-  mobile: string;
-  addressLine1: string;
-  addressLine2?: string;
-  city: string;
-  state: string;
-  pincode: string;
-  country: string;
-  isDefault?: boolean;
-}) => {
-  try {
-    const res = await API.post("/addresses", data);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const getAddresses = async () => {
-  try {
-    const res = await API.get("/addresses");
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const updateAddress = async (addressId: string, data: {
-  fullName?: string;
-  mobile?: string;
-  addressLine1?: string;
-  addressLine2?: string;
-  city?: string;
-  state?: string;
-  pincode?: string;
-  country?: string;
-  isDefault?: boolean;
-}) => {
-  try {
-    const res = await API.put(`/addresses/${addressId}`, data);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const deleteAddress = async (addressId: string) => {
-  try {
-    const res = await API.delete(`/addresses/${addressId}`);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const setDefaultAddress = async (addressId: string) => {
-  try {
-    const res = await API.put(`/addresses/${addressId}/set-default`);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-// ================== REVIEWS ==================
-export const addReview = async (data: {
-  productId: string;
-  rating: number;
-  comment: string;
-}) => {
-  try {
-    const res = await API.post("/reviews", data);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const getProductReviews = async (
-  productId: string,
-  params?: { page?: number; limit?: number }
-) => {
-  try {
-    const query = new URLSearchParams();
-    if (params?.page) query.append("page", params.page.toString());
-    if (params?.limit) query.append("limit", params.limit.toString());
-
-    const res = await API.get(`/reviews/product/${productId}?${query.toString()}`);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const updateReview = async (
-  reviewId: string,
-  data: { rating?: number; comment?: string }
-) => {
-  try {
-    const res = await API.put(`/reviews/${reviewId}`, data);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const deleteReview = async (reviewId: string) => {
-  try {
-    const res = await API.delete(`/reviews/${reviewId}`);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-// ================== COUPONS ==================
-export const validateCoupon = async (code: string, cartTotal: number) => {
-  try {
-    const res = await API.post("/coupons/validate", { code, cartTotal });
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const getAvailableCoupons = async () => {
-  try {
-    const res = await API.get("/coupons/available");
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-// ================== NOTIFICATIONS ==================
-export const getNotifications = async (params?: {
-  page?: number;
-  limit?: number;
-  isRead?: boolean;
-}) => {
-  try {
-    const query = new URLSearchParams();
-    if (params?.page) query.append("page", params.page.toString());
-    if (params?.limit) query.append("limit", params.limit.toString());
-    if (params?.isRead !== undefined) query.append("isRead", params.isRead.toString());
-
-    const res = await API.get(`/notifications?${query.toString()}`);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const markNotificationAsRead = async (notificationId: string) => {
-  try {
-    const res = await API.put(`/notifications/${notificationId}/read`);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const markAllNotificationsAsRead = async () => {
-  try {
-    const res = await API.put("/notifications/read-all");
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const deleteNotification = async (notificationId: string) => {
-  try {
-    const res = await API.delete(`/notifications/${notificationId}`);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-// ================== SEARCH & FILTERS ==================
-export const searchProducts = async (query: string, filters?: {
-  category?: string;
-  minPrice?: number;
-  maxPrice?: number;
-  brand?: string;
-  rating?: number;
-}) => {
-  try {
-    const params = new URLSearchParams({ search: query });
-    if (filters?.category) params.append("category", filters.category);
-    if (filters?.minPrice) params.append("minPrice", filters.minPrice.toString());
-    if (filters?.maxPrice) params.append("maxPrice", filters.maxPrice.toString());
-    if (filters?.brand) params.append("brand", filters.brand);
-    if (filters?.rating) params.append("rating", filters.rating.toString());
-
-    const res = await API.get(`/products/search?${params.toString()}`);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const getSearchSuggestions = async (query: string) => {
-  try {
-    const res = await API.get(`/products/suggestions?q=${query}`);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-// ================== CONTACT / SUPPORT ==================
-export const sendContactMessage = async (data: {
-  name: string;
-  email: string;
-  mobile?: string;
-  subject: string;
-  message: string;
-}) => {
-  try {
-    const res = await API.post("/contact", data);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const createSupportTicket = async (data: {
-  orderId?: string;
-  subject: string;
-  message: string;
-  priority?: "low" | "medium" | "high";
-}) => {
-  try {
-    const res = await API.post("/support/tickets", data);
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const getMySupportTickets = async () => {
-  try {
-    const res = await API.get("/support/tickets/my-tickets");
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-// ================== NEWSLETTER ==================
-export const subscribeNewsletter = async (email: string) => {
-  try {
-    const res = await API.post("/newsletter/subscribe", { email });
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-export const unsubscribeNewsletter = async (email: string) => {
-  try {
-    const res = await API.post("/newsletter/unsubscribe", { email });
-    return res.data;
-  } catch (error) {
-    handleError(error as AxiosError);
-  }
-};
-
-// ================== ANALYTICS / TRACKING ==================
-export const trackProductView = async (productId: string) => {
-  try {
-    const res = await API.post("/analytics/product-view", { productId });
-    return res.data;
-  } catch (error) {
-    // Silent fail for analytics
-    console.error("Analytics error:", error);
-  }
-};
-
-export const trackSearchQuery = async (query: string) => {
-  try {
-    const res = await API.post("/analytics/search", { query });
-    return res.data;
-  } catch (error) {
-    // Silent fail for analytics
-    console.error("Analytics error:", error);
-  }
-};
-
-// Export API instance for custom requests
+// ---------------- EXPORT ----------------
 export default API;

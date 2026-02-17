@@ -63,9 +63,16 @@ function Header() {
           </div>
 
           {/* Wishlist */}
-          <div className="wishlist-box overflow-hidden mx-l-5 mx-1" style={{ cursor: 'pointer' }}>
-            <img src={wishlistIcon} alt="Wishlist" className="img-fluid w-100 h-100 object-fit-cover" />
-          </div>
+          {/* Wishlist */}
+<div className="wishlist-box overflow-hidden mx-l-5 mx-1" style={{ cursor: 'pointer' }}>
+  <Link to="/wishlist">
+    <img 
+      src={wishlistIcon} 
+      alt="Wishlist" 
+      className="img-fluid w-100 h-100 object-fit-cover" 
+    />
+  </Link>
+</div>
 
           {/* Signup / User Icon */}
           <div

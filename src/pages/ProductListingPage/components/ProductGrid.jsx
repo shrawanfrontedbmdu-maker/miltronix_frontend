@@ -120,7 +120,7 @@ const ProductGrid = ({ categoryId }) => {
       <div className="row g-4">
         {products.length > 0 ? (
           products.map((product) => (
-            <ShopCard key={product._id} product={product} />
+            <ShopCard key={product._id} product={product } />
           ))
         ) : (
           <div className="col-12">
