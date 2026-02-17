@@ -1,4 +1,3 @@
-// src/pages/ProductListingPage/ProductListingPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
@@ -13,30 +12,34 @@ import RecommendationSection from "./components/RecommendationSection";
 import PageHeader from "./components/PageHeader";
 import ResolutionInfo from "./components/ResolutionInfo";
 
-import { fetchCategories, fetchProducts } from "../../api/api";
+import { fetchCategories } from "../../api/api";
 
 const ProductListingPage = () => {
   const { categoryName } = useParams();
 
   const [pageData, setPageData] = useState(null);
-  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  console.log("🔍 URL categoryName:", categoryName);
+
   useEffect(() => {
-    const loadCategoryAndProducts = async () => {
+    const loadCategory = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        // 1️⃣ Fetch all categories
         const categories = await fetchCategories();
+        console.log("📦 All Categories:", categories);
 
+        // ✅ categoryKey se match karo
         const category = categories.find(
           (c) =>
             c.categoryKey?.toLowerCase() ===
             decodeURIComponent(categoryName || "").toLowerCase()
         );
+
+        console.log("✅ Matched Category:", category);
 
         if (!category) {
           setError("Category not found");
@@ -44,29 +47,35 @@ const ProductListingPage = () => {
         }
 
         setPageData(category);
-
-        // 2️⃣ Fetch products for this category from backend
-        const productsData = await fetchProducts({ categoryKey: category.categoryKey });
-        setProducts(productsData.products || productsData || []);
       } catch (err) {
-        console.error(err);
-        setError("Failed to load category or products");
+        console.error("🔥 Error:", err);
+        setError("Failed to load category");
       } finally {
         setLoading(false);
       }
     };
 
-    loadCategoryAndProducts();
+    loadCategory();
   }, [categoryName]);
 
   if (loading) {
-    return <div style={{ padding: "2rem", textAlign: "center" }}>Loading...</div>;
+    return (
+      <div className="text-center py-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <h5 className="mt-3">Loading category...</h5>
+      </div>
+    );
   }
 
   if (error) {
     return (
-      <div style={{ padding: "2rem", textAlign: "center", color: "red" }}>
-        {error}
+      <div className="container text-center py-5">
+        <div className="alert alert-danger" role="alert">
+          <i className="bi bi-exclamation-triangle-fill me-2"></i>
+          {error}
+        </div>
       </div>
     );
   }
@@ -92,13 +101,12 @@ const ProductListingPage = () => {
               <FilterSidebar
                 categoryId={pageData?._id}
                 filters={pageData?.filterOptions}
-                products={products}
-                setProducts={setProducts}
               />
             </div>
 
             <div className="col-md-9">
-              <ProductGrid products={products} />
+              {/* ✅ categoryId pass karo, not products */}
+              <ProductGrid categoryId={pageData?._id} />
             </div>
           </div>
         </div>

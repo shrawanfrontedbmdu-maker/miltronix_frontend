@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { addItemToCart, getCartItems } from "../../api/api";
 
-const BACKEND_URL = "https://miltronix-backend-1.onrender.com";
+const BACKEND_URL = "https://miltronix-backend-1.onrender.com"; /// ye apna code h
+
 // Icons
 const starFull = "/assets/icon7.svg";
 const starEmpty = "/assets/icon8.svg";
@@ -48,7 +49,7 @@ function ProductCard({ product, onCartUpdate }) {
       setLoading(false);
     }
   };
-
+     
   return (
     <div className="col-12 col-sm-6 col-lg-4">
       <div className="product-card h-100 text-center position-relative">

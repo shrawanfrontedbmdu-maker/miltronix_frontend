@@ -1,0 +1,150 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f4f4f4;
+}
+
+.payment-container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1200px;
+  margin: auto;
+}
+
+.payment-left {
+  flex: 2;
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.payment-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.payment-content {
+  display: flex;
+  margin-top: 20px;
+}
+
+.payment-methods {
+  width: 200px;
+  border-right: 1px solid #ddd;
+}
+
+.payment-methods div {
+  padding: 15px;
+  cursor: pointer;
+  border-radius: 6px;
+  margin-bottom: 10px;
+}
+
+.payment-methods div:hover {
+  background: #f0f0f0;
+}
+
+.payment-methods .active {
+  background: #e6f0ee;
+  font-weight: bold;
+}
+
+.payment-form {
+  flex: 1;
+  padding: 0 20px;
+}
+
+.payment-form input,
+.payment-form select {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+/* 
+.row {
+  display: flex;
+  gap: 10px;
+} */
+
+.pay-btn {
+  width: 100%;
+  padding: 12px;
+  background: #2e4f4f;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.pay-btn:hover {
+  background: #1f3a3a;
+}
+
+.order-summary,
+.price-summary {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.product {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.product img {
+  width: 80px;
+  border-radius: 6px;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 8px 0;
+}
+
+.discount {
+  color: green;
+}
+
+.total {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.upi-qr {
+  width: 200px;
+  margin: 10px 0;
+  border-radius: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .payment-container {
+    flex-direction: column;
+  }
+
+  .payment-content {
+    flex-direction: column;
+  }
+
+  .payment-methods {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .payment-methods div {
+    flex: 1;
+    text-align: center;
+  }
+}

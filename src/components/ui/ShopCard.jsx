@@ -1,75 +1,67 @@
 // src/components/ui/ShopCard.jsx
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { addItemToCart, getCartItems } from "../../api/api";
+import { useNavigate } from "react-router-dom";
 
-// ⭐ Star icons
-const starIconFull = "/assets/icon7.svg";
-const starIconHalf = "/assets/icon9.svg";
-const starIconEmpty = "/assets/icon8.svg";
+const starIconFull = "/src/assets/icon 7.svg";
+const starIconHalf = "/src/assets/icon 9.svg";
+const starIconEmpty = "/src/assets/icon 8.svg";
 
 const ShopCard = ({ product, onCartUpdate }) => {
   const [loading, setLoading] = useState(false);
   const [added, setAdded] = useState(false);
-  const [selectedVariant, setSelectedVariant] = useState(null);
-  const [wishlist, setWishlist] = useState(false);
 
-  useEffect(() => {
-    console.log("🛒 ShopCard product:", product);
-  }, [product]);
-
-  useEffect(() => {
-    setAdded(false);
-    setSelectedVariant(null);
-    if (product?.variants?.length === 1) {
-      setSelectedVariant(product.variants[0]);
-    }
-  }, [product?._id]);
+  const navigate = useNavigate();
 
   if (!product) return null;
 
-  // ⭐ Rating
-  const ratingValue = Number(product.rating || 4.5);
-  const rating = Math.min(5, ratingValue);
+  // ===== IMAGE =====
+  const imageUrl =
+    product.images && product.images.length > 0
+      ? product.images[0].url
+      : "/images/placeholder.png";
+
+  // ===== CATEGORY NAME =====
+  const categoryName =
+    typeof product.category === "object" && product.category
+      ? product.category.pageTitle || product.category.categoryKey || "Uncategorized"
+      : "Uncategorized";
+
+  // ===== PRICE (from first variant) =====
+  const price =
+    product.variants && product.variants.length > 0
+      ? product.variants[0].price
+      : 0;
+
+  // ===== OLD PRICE (MRP or compare price) =====
+  const oldPrice =
+    product.variants && product.variants.length > 0
+      ? product.variants[0].compareAtPrice || price + 5000
+      : price + 5000;
+
+  // ===== SAVE AMOUNT =====
+  const saveAmount = oldPrice - price;
+
+  // ===== RATING =====
+  const rating = Math.min(5, product.avgRating || 0);
   const fullStars = Math.floor(rating);
   const halfStar = rating - fullStars >= 0.5;
   const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
-  const reviewsCount = product.reviews || 0;
 
-  // 🖼 Image
-  const imageUrl = product.images?.[0]?.url || "/images/placeholder.png";
+  // ===== REVIEWS COUNT =====
+  const reviews = product.reviewCount || 0;
 
-  // 📂 Category
-  const categoryName =
-    product.category?.name || product.category?.categoryKey || product.categoryKey || "";
+  // ===== STOCK CHECK =====
+  const hasStock =
+    product.variants && product.variants.length > 0
+      ? product.variants[0].hasStock
+      : false;
 
-  // 💰 Prices
-  const sellingPrice = Number(
-    selectedVariant?.sellingPrice ??
-      selectedVariant?.price ??
-      product.sellingPrice ??
-      product.sellingprice ??
-      0
-  );
-  const mrp = Number(selectedVariant?.mrp ?? product.mrp ?? 0);
-  const saveAmount = mrp > sellingPrice ? mrp - sellingPrice : 0;
-
-  // 📦 Stock
-  const inStock = selectedVariant
-    ? selectedVariant.stockQuantity > 0
-    : product.stockQuantity > 0;
-  const canAddToCart =
-    product.variants?.length > 0 ? !!selectedVariant && inStock : inStock;
-
-  // 🛒 Add to cart
   const handleAddToCart = async () => {
-    if (!product?._id) return alert("Product ID missing");
-    if (!localStorage.getItem("token")) return alert("Please login first");
-    if (!canAddToCart) {
-      return alert(
-        product.variants?.length > 0
-          ? "Please select a variant"
-          : "Out of stock"
-      );
+    if (!product._id) return alert("Product ID not found");
+
+    if (!product.variants || product.variants.length === 0) {
+      return alert("Product has no variants available");
     }
 
     setLoading(true);
@@ -77,122 +69,112 @@ const ShopCard = ({ product, onCartUpdate }) => {
       await addItemToCart({
         productId: product._id,
         quantity: 1,
-        variant: selectedVariant || {},
+        variantSku: product.variants[0].sku,
       });
 
       setAdded(true);
 
       if (onCartUpdate) {
-        const cart = await getCartItems();
-        onCartUpdate(cart);
+        const updatedCart = await getCartItems();
+        onCartUpdate(updatedCart);
       }
 
-      console.log("✅ Added to cart");
-    } catch (err) {
-      console.error("❌ Add to cart error:", err);
-      alert(err.message || "Failed to add to cart");
+      setTimeout(() => {
+        navigate("/cart");
+      }, 500);
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+      alert(error.message || "Failed to add item to cart");
+      setAdded(false);
     } finally {
       setLoading(false);
     }
   };
 
-  // ❤️ Wishlist toggle
-  const toggleWishlist = () => {
-    setWishlist((prev) => !prev);
-    // future: call API to add/remove wishlist
-  };
-
   return (
-    <div className="shop-card text-center border rounded p-3 position-relative">
+    <div className="col-md-6 col-lg-4">
+      <div className="shop-card text-center">
+        {/* SAVE BADGE */}
+        {saveAmount > 0 && (
+          <span className="shop-card-badge">Save ₹{saveAmount.toLocaleString()}</span>
+        )}
 
-      {/* Save badge */}
-      {saveAmount > 0 && (
-        <span className="position-absolute top-0 start-0 bg-danger text-white px-2 py-1 rounded">
-          Save ₹{saveAmount.toLocaleString()}
-        </span>
-      )}
+        {/* IMAGE */}
+        <img
+          src={imageUrl}
+          alt={product.name || "Product"}
+          className="img-fluid shop-card-img"
+          onClick={() => navigate(`/product/${product._id}`)}
+          style={{ cursor: "pointer" }}
+        />
 
-      {/* Image */}
-      <img
-        src={imageUrl}
-        alt={product.name}
-        className="img-fluid mb-2"
-        onError={(e) => (e.currentTarget.src = "/images/placeholder.png")}
-      />
+        {/* CATEGORY */}
+        <h6 className="product-category2">{categoryName}</h6>
 
-      {/* Category */}
-      <h6 className="text-muted">{categoryName}</h6>
-
-      {/* Name */}
-      <h5>{product.name}</h5>
-
-      {/* Price */}
-      <p className="fw-bold">₹{sellingPrice.toLocaleString()}</p>
-
-      {/* Old price */}
-      {mrp > sellingPrice && (
-        <p className="text-muted text-decoration-line-through">
-          ₹{mrp.toLocaleString()}
-        </p>
-      )}
-
-      {/* Rating */}
-      <div className="d-flex justify-content-center gap-1 mb-2">
-        {[...Array(fullStars)].map((_, i) => (
-          <img key={`f-${i}`} src={starIconFull} className="star1" />
-        ))}
-        {halfStar && <img src={starIconHalf} className="star1" />}
-        {[...Array(emptyStars)].map((_, i) => (
-          <img key={`e-${i}`} src={starIconEmpty} className="star1" />
-        ))}
-        <span>({reviewsCount})</span>
-      </div>
-
-      {/* Variants */}
-      {product.variants?.length > 0 && (
-        <div className="d-flex gap-2 flex-wrap justify-content-center mb-2">
-          {product.variants.map((v) => {
-            const label =
-              Object.values(v.attributes || {}).join(" / ") || "Variant";
-            const isSelected = selectedVariant?.sku === v.sku;
-
-            return (
-              <button
-                key={v.sku}
-                disabled={v.stockQuantity === 0}
-                onClick={() => setSelectedVariant(v)}
-                className={`btn btn-sm ${
-                  isSelected ? "btn-primary" : "btn-outline-secondary"
-                }`}
-              >
-                {label} {v.stockQuantity === 0 && "(Out of stock)"}
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Buttons */}
-      <div className="d-flex justify-content-between mt-2">
-        <button
-          onClick={handleAddToCart}
-          disabled={loading || added || !canAddToCart}
-          className={`btn w-75 ${added ? "btn-success" : "btn-primary"}`}
+        {/* TITLE */}
+        <h5
+          className="product-title2"
+          onClick={() => navigate(`/product/${product._id}`)}
+          style={{ cursor: "pointer" }}
         >
-          {loading
-            ? "Adding..."
-            : added
-            ? "Added"
-            : canAddToCart
-            ? "Add to Cart"
-            : product.variants?.length > 0
-            ? "Select Variant"
-            : "Out of Stock"}
-        </button>
+          {product.name}
+        </h5>
 
-        <button className="btn" onClick={toggleWishlist}>
-          <i className={`bi bi-heart${wishlist ? "-fill text-danger" : ""}`}></i>
-        </button>
+        {/* PRICE */}
+        <p className="product-price2">₹{price.toLocaleString()}</p>
+
+        {/* OLD PRICE */}
+        {oldPrice > price && (
+          <p className="product-old-price2">₹{oldPrice.toLocaleString()}</p>
+        )}
+
+        {/* RATING */}
+        <div className="product-rating1">
+          {[...Array(fullStars)].map((_, i) => (
+            <img key={`full-${i}`} src={starIconFull} alt="star" className="star1" />
+          ))}
+
+          {halfStar && <img src={starIconHalf} alt="half-star" className="star1" />}
+
+          {[...Array(emptyStars)].map((_, i) => (
+            <img key={`empty-${i}`} src={starIconEmpty} alt="star" className="star1" />
+          ))}
+
+          <span>
+            {rating.toFixed(1)} ({reviews})
+          </span>
+        </div>
+
+        {/* BUTTONS */}
+        <div className="d-flex justify-content-between">
+          <button
+            className={`shop-card-btn-cart w-75 ${added ? "btn-success" : ""}`}
+            onClick={handleAddToCart}
+            disabled={loading || added || !hasStock}
+          >
+            {loading ? (
+              "Adding..."
+            ) : added ? (
+              "Added"
+            ) : !hasStock ? (
+              "Out of Stock"
+            ) : (
+              <>
+                <i className="bi bi-cart"></i> Add to Cart
+              </>
+            )}
+          </button>
+
+          <button
+            className="btn shop-card-btn-wishlist"
+            onClick={(e) => {
+              e.stopPropagation();
+              console.log("Add to wishlist:", product._id);
+            }}
+          >
+            <i className="bi bi-heart-fill"></i>
+          </button>
+        </div>
       </div>
     </div>
   );

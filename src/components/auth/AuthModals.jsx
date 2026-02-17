@@ -256,8 +256,6 @@ function AuthModals({ modalToShow, setModalToShow }) {
   // ---------------- UI ----------------
   return (
     <>
-
-    
       {/* ================= SIGNUP MODAL ================= */}
       <Modal show={modalToShow === "signup"} onHide={handleClose} centered>
         <Modal.Body className="p-4 p-md-5">

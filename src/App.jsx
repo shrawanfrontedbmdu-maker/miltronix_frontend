@@ -17,7 +17,10 @@ import CorporateSalesPage from './pages/CorporateSalesPage';
 import HelpSupportPage from './pages/HelpSupportPage';
 import ContactUsPage from './pages/ContactUsPage';
 import CartPage from './pages/cartpage';
-
+import Checkout from './components/ui/Checkout';
+import OrderAddress from './components/ui/OrderAddress';
+// import SecendAddress from './components/ui/SecendAddress';
+import Pay from './components/ui/pay';
 
 function App() {
   return (
@@ -40,7 +43,10 @@ function App() {
           <Route path="/help-support" element={<HelpSupportPage />} />
           <Route path="/contact-us" element={<ContactUsPage />} />
           <Route path="/cart" element={<CartPage />} />
-         
+           <Route path="/checkout" element={<Checkout/>} />
+          <Route path="/orderaddress" element={<OrderAddress/>} />
+          {/* <Route path="/secendaddress" element={<SecendAddress/>} /> */}
+             <Route path="/pay" element={<Pay/>} />
       </Routes>
     </Router>
   )
