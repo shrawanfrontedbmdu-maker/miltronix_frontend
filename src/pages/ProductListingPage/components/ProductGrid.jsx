@@ -17,6 +17,8 @@ const ProductGrid = ({ categoryId }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const userId = JSON.parse(localStorage.getItem("user") || "null")?._id || "";
+
   useEffect(() => {
     const loadProducts = async () => {
       try {
@@ -30,7 +32,7 @@ const ProductGrid = ({ categoryId }) => {
 
         if (search) params.search = search;
         if (sort) params.sort = sort;
-        
+
         if (categoryId) {
           params.category = categoryId;
         }
@@ -104,7 +106,7 @@ const ProductGrid = ({ categoryId }) => {
         <p className="mb-0">
           Showing <strong>{products.length}</strong> of <strong>{total}</strong> products
         </p>
-        
+
         <select
           className="form-select w-auto"
           value={sort}
@@ -120,7 +122,11 @@ const ProductGrid = ({ categoryId }) => {
       <div className="row g-4">
         {products.length > 0 ? (
           products.map((product) => (
-            <ShopCard key={product._id} product={product} />
+            <ShopCard
+              key={product._id}
+              product={product}
+              userId={userId}  // ← FIX: userId pass kiya
+            />
           ))
         ) : (
           <div className="col-12">

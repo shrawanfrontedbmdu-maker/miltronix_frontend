@@ -13,8 +13,7 @@ const FilterSidebar = ({ categoryId, filters, setProducts }) => {
   });
 
   useEffect(() => {
-    if (!categoryId) return;
-
+    if (!categoryId || !setProducts) return;
     fetchFilteredProducts();
     // eslint-disable-next-line
   }, [selected, categoryId]);
@@ -30,7 +29,7 @@ const FilterSidebar = ({ categoryId, filters, setProducts }) => {
       };
 
       const res = await axios.get(`${BASE_URL}/products`, { params });
-      setProducts(res.data);
+      setProducts(res.data.products || []); // ✅ ensure array
     } catch (err) {
       console.error("Filter error:", err);
     }
@@ -62,11 +61,9 @@ const FilterSidebar = ({ categoryId, filters, setProducts }) => {
             type="range"
             min={filters.price.min}
             max={filters.price.max}
+            value={selected.price || filters.price.max}
             onChange={(e) =>
-              setSelected((p) => ({
-                ...p,
-                price: Number(e.target.value),
-              }))
+              setSelected((p) => ({ ...p, price: Number(e.target.value) }))
             }
             className="form-range"
           />
@@ -92,11 +89,9 @@ const FilterSidebar = ({ categoryId, filters, setProducts }) => {
                   className="form-check-input"
                   id={item._id}
                   onChange={() => toggleFilter(key, item.label)}
+                  checked={selected[key].includes(item.label)}
                 />
-                <label
-                  className="form-check-label hv"
-                  htmlFor={item._id}
-                >
+                <label className="form-check-label hv" htmlFor={item._id}>
                   {item.label}
                 </label>
               </div>
