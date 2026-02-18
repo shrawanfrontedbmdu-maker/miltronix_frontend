@@ -51,7 +51,7 @@ function App() {
         <Route path="/orderaddress" element={<OrderAddress />} />
         <Route path="/secendaddress" element={<SecendAddress />} />
         <Route path="/pay" element={<Pay />} />
-        // Routes ke andar:
+      
         <Route path="/order-confirm" element={<OrderConfirmPage />} />
       </Routes>
     </Router>
