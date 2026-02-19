@@ -1,102 +1,145 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import "./orderaddress.css";
 import Header from "../layout/Header";
 import Footer from "../layout/Footer";
 import { useNavigate } from "react-router-dom";
-
-
-  
-
-const products = [
-  {
-    id: 1,
-    title: "Mi 55-inch (139 cm) 4K Ultra HD Smart LED TV",
-    desc: "Google TV | HDR10+ | Dolby Vision | 60Hz Refresh Rate | Bezel-less Design",
-    price: 89990,
-    rating: 4,
-    image:
-      "https://images.unsplash.com/photo-1593784991095-a205069470b6?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 2,
-    title: "Mi 360° 1080p Full HD Smart Security Camera",
-    desc: "AI Motion Detection | Night Vision | 2-Way Audio | WiFi | Alexa Support",
-    price: 89990,
-    rating: 5,
-    image:
-      "https://images.unsplash.com/photo-1585776245991-cf89dd7fc73a?auto=format&fit=crop&w=800&q=80",
-  },
-  {
-    id: 3,
-    title: "Mi 4A 43-inch Full HD Smart LED TV",
-    desc: "Full HD Display | PatchWall | Dolby Audio | 60Hz | Smart Remote",
-    price: 89990,
-    rating: 4,
-    image:
-      "https://images.unsplash.com/photo-1601944177325-f8867652837f?auto=format&fit=crop&w=800&q=80",
-  },
-];
-
- 
-
+import { getCheckoutDetailsApi } from "../../api/api";
 
 function OrderAddress() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
- const HandleClick = () =>{
-    navigate('/secendaddress')
- }
-  const total = products.reduce((acc, item) => acc + item.price, 0);
+  const [products, setProducts] = useState([]);
+  const [pricing, setPricing] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponError, setCouponError] = useState("");
+
+  const HandleClick = () => {
+    navigate("/secendaddress");
+  };
+
+  const loadCheckoutDetails = async () => {
+    try {
+      setLoading(true);
+      const res = await getCheckoutDetailsApi(couponCode);
+
+      if (res?.success) {
+        setProducts(res.items || []);
+        setPricing(res.pricing || null);
+        setCouponError(res.couponError || "");
+      }
+    } catch (error) {
+      console.error("Checkout error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCheckoutDetails();
+  }, []);
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <div className="container-3">Loading checkout...</div>
+        <Footer />
+      </>
+    );
+  }
+
+  if (!pricing) {
+    return (
+      <>
+        <Header />
+        <div className="container-3">No checkout data found</div>
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <>
-    <Header/>
-    <div className="container-3">
-      <div className="product-section-3">
-        {products.map((product) => (
-          <div className="card-all" key={product.id}>
-            <img src={product.image} alt={product.title} />
+      <Header />
 
-            <div className="card-content-3">
-              <h3>{product.title}</h3>
+      <div className="container-3">
+        {/* PRODUCTS */}
+        <div className="product-section-3">
+          {products.length === 0 && <p>No items in cart</p>}
 
-              <div className="rating">
-                {"★".repeat(product.rating)}
-                {"☆".repeat(5 - product.rating)}
+          {products.map((product) => (
+            <div className="card-all" key={product.cartId}>
+              <img src={product.image} alt={product.productName} />
+
+              <div className="card-content-3">
+                <h3>{product.productName}</h3>
+
+                <p className="desc">
+                  {product.brand} | SKU: {product.variant.sku}
+                </p>
+
+                <p className="price">
+                  ₹{product.totalPrice.toLocaleString()}
+                  <span className="tax">(incl. of taxes)</span>
+                </p>
+
+                <p>Qty: {product.quantity}</p>
+
+                <button>Add to Wish List</button>
               </div>
-
-              <p className="desc">{product.desc}</p>
-
-              <p className="price">
-                ₹{product.price.toLocaleString()}
-                <span className="tax">(incl. of taxes)</span>
-              </p>
-
-              <button>Add to Wish List</button>
             </div>
+          ))}
+        </div>
+
+        {/* SUMMARY */}
+        <div className="summary-section">
+          <div className="summary-card">
+            <h3>Order Summary ({products.length} Items)</h3>
+
+            <div className="summary-row">
+              <span>Subtotal</span>
+              <span>₹{pricing.subtotal.toLocaleString()}</span>
+            </div>
+
+            <div className="summary-row">
+              <span>Discount</span>
+              <span>- ₹{pricing.totalDiscount.toLocaleString()}</span>
+            </div>
+
+            <div className="summary-row">
+              <span>Coupon Discount</span>
+              <span>- ₹{pricing.couponDiscount.toLocaleString()}</span>
+            </div>
+
+            <div className="summary-row total">
+              <span>Total</span>
+              <span>₹{pricing.finalAmount.toLocaleString()}</span>
+            </div>
+
+            {/* Coupon Input */}
+            <div className="coupon-box">
+              <input
+                type="text"
+                placeholder="Enter coupon code"
+                value={couponCode}
+                onChange={(e) => setCouponCode(e.target.value)}
+              />
+              <button onClick={loadCheckoutDetails}>Apply</button>
+            </div>
+
+            {couponError && (
+              <p style={{ color: "red", marginTop: "8px" }}>{couponError}</p>
+            )}
+
+            <button className="checkout-btn" onClick={HandleClick}>
+              Checkout
+            </button>
           </div>
-        ))}
-      </div>
-
-      <div className="summary-section">
-        <div className="summary-card">
-          <h3>Order Summary (3 Items)</h3>
-
-          <div className="summary-row">
-            <span>Original Price</span>
-            <span>₹{total.toLocaleString()}</span>
-          </div>
-
-          <div className="summary-row total">
-            <span>Total</span>
-            <span>₹{total.toLocaleString()}</span>
-          </div>
-
-          <button className="checkout-btn" onClick={HandleClick}>Checkout</button>
         </div>
       </div>
-    </div>
-    <Footer/>
+
+      <Footer />
     </>
   );
 }

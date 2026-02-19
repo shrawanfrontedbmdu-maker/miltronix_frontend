@@ -1,14 +1,15 @@
-import axios, { AxiosInstance, AxiosError } from "axios";
+import axios, { AxiosInstance } from "axios";
+import { toast } from "react-toastify";
 
 // ---------------- BASE URL ----------------
 const BASE_URL =
-  import.meta.env.VITE_BASE_URL || "https://miltronix-backend-2.onrender.com/api";
+  import.meta.env.VITE_BASE_URL || "https://miltronix-backend-2.onrender.com";
 
 // ---------------- AXIOS INSTANCE ----------------
 const API: AxiosInstance = axios.create({
   baseURL: BASE_URL,
   headers: { "Content-Type": "application/json" },
-  timeout: 30000, // 30 seconds timeout
+  timeout: 30000,
 });
 
 // ---------------- AUTH INTERCEPTOR ----------------
@@ -21,20 +22,27 @@ API.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error),
+  (error) => Promise.reject(error)
 );
 
 // ---------------- RESPONSE INTERCEPTOR ----------------
+
+
 API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      window.location.href = "/login";
+
+      toast.error("Please login first");
+
+      window.dispatchEvent(new Event("openLoginModal"));
     }
+
     return Promise.reject(error);
-  },
+  }
 );
+
 
 // ---------------- ERROR HANDLER ----------------
 const handleError = (error: unknown): never => {
@@ -49,7 +57,7 @@ const handleError = (error: unknown): never => {
   }
 };
 
-// ---------------- TYPES ----------------
+// ================== CART TYPES ==================
 export type CartItemType = {
   productId: string;
   sku: string;
@@ -71,13 +79,12 @@ export type CartType = {
 
 // ================== WISHLIST TYPES ==================
 export type WishlistItemType = {
-  userId: string; // required by controller in req.body
   productId: string;
   variant?: { sku: string; attributes?: Record<string, any> };
   title?: string;
   images?: string[];
   category?: string;
-  priceSnapshot: number; // required by controller
+  priceSnapshot: number;
 };
 
 export type WishlistType = {
@@ -92,6 +99,107 @@ export type WishlistType = {
     category?: string;
     priceSnapshot?: number;
   }>;
+};
+
+// ================== ADDRESS TYPE ==================
+/**
+ * Unified address type — backend schema se exactly match karta hai.
+ * Saved addresses aur order shipping/billing dono ke liye yahi use karo.
+ */
+export type AddressType = {
+  _id?: string;
+  fullName: string;
+  mobile?: string;
+  houseFlatNo: string;
+  buildingApartment?: string;
+  streetLocality: string;
+  landmark?: string;
+  pinCode: string;       // capital C — backend schema se match
+  city: string;
+  state: string;
+  country?: string;
+  isDefault?: boolean;
+};
+
+// ================== ORDER TYPES ==================
+export type OrderItemType = {
+  productId: string;
+  sku: string;
+  name: string;
+  quantity: number;
+  mrp: number;
+  unitPrice: number;
+  taxAmount?: number;
+  discountAmount?: number;
+  lineTotal?: number;
+};
+
+export type OrderType = {
+  _id: string;
+  orderNumber: string;
+  user: string;
+  customer: {
+    name: string;
+    email?: string;
+    phone?: string;
+    company?: string;
+  };
+  items: OrderItemType[];
+  shippingAddress: AddressType;
+  billingAddress: AddressType;
+  coupon?: string;
+  couponCode?: string;
+  subtotal: number;
+  taxAmount: number;
+  shippingCost: number;
+  couponDiscount: number;   // fixed: discountAmount → couponDiscount
+  totalAmount: number;
+  currency: string;
+  payment: {
+    method: string;
+    status: "Pending" | "Paid" | "Failed" | "Refunded";
+    transactionId?: string;
+    provider?: string;
+    paidAt?: string;
+  };
+  fulfillment: {
+    orderStatus:
+      | "Draft"
+      | "Pending"
+      | "Processing"
+      | "Packaging"
+      | "Shipped"
+      | "Delivered"
+      | "Cancelled"
+      | "Completed";
+    shipments?: any[];
+    statusHistory?: { status: string; timestamp: string; note?: string }[];
+  };
+  priority: "Low" | "Normal" | "High" | "Urgent";
+  notes?: string;
+  trackingnumber?: string;
+  isActive: boolean;
+  isArchived: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type CreateOrderPayloadType = {
+  user: string;
+  shippingAddressId?: string;
+  shippingAddress?: AddressType;
+  billingAddressId?: string;
+  billingAddress?: AddressType;
+  couponCode?: string;
+  paymentMethod?: string;
+  paymentStatus?: string;
+  transactionId?: string;
+  shippingCost?: number;
+  taxRate?: number;
+  currency?: string;
+  orderStatus?: string;
+  priority?: string;
+  notes?: string;
 };
 
 // ================== CATEGORIES ==================
@@ -129,21 +237,17 @@ export const fetchProducts = async (params?: {
 }) => {
   try {
     const query = new URLSearchParams();
-    if (params?.category) query.append("category", params.category);
+    if (params?.category)    query.append("category", params.category);
     if (params?.categoryKey) query.append("categoryKey", params.categoryKey);
-    if (params?.search) query.append("search", params.search);
-    if (params?.minPrice !== undefined)
-      query.append("minPrice", params.minPrice.toString());
-    if (params?.maxPrice !== undefined)
-      query.append("maxPrice", params.maxPrice.toString());
-    if (params?.sort) query.append("sort", params.sort);
-    if (params?.page) query.append("page", params.page.toString());
-    if (params?.limit) query.append("limit", params.limit.toString());
-    if (params?.isRecommended !== undefined)
-      query.append("isRecommended", params.isRecommended.toString());
-    if (params?.isFeatured !== undefined)
-      query.append("isFeatured", params.isFeatured.toString());
-    if (params?.status) query.append("status", params.status);
+    if (params?.search)      query.append("search", params.search);
+    if (params?.minPrice !== undefined) query.append("minPrice", params.minPrice.toString());
+    if (params?.maxPrice !== undefined) query.append("maxPrice", params.maxPrice.toString());
+    if (params?.sort)        query.append("sort", params.sort);
+    if (params?.page)        query.append("page", params.page.toString());
+    if (params?.limit)       query.append("limit", params.limit.toString());
+    if (params?.isRecommended !== undefined) query.append("isRecommended", params.isRecommended.toString());
+    if (params?.isFeatured !== undefined)    query.append("isFeatured", params.isFeatured.toString());
+    if (params?.status)      query.append("status", params.status);
 
     const res = await API.get(`/products?${query.toString()}`);
     return res.data;
@@ -188,7 +292,7 @@ export const fetchFeaturedProducts = async (limit: number = 10) => {
   }
 };
 
-// ---------------- AUTH ----------------
+// ================== AUTH ==================
 export const signup = async (data: {
   fullName: string;
   email?: string;
@@ -281,23 +385,18 @@ export const loginWithGoogle = () => {
 export const addItemToCart = async (data: CartItemType): Promise<any> => {
   if (!data?.productId || !data?.sku || !data?.quantity)
     throw new Error("productId, sku and quantity are required");
-
   try {
     const res = await API.post("/cart/add", data);
     return res.data;
   } catch (error) {
     handleError(error);
-    throw error;
   }
 };
 
-export const getCartItems = async (): Promise<{
-  items: CartItemType[];
-  subtotal: number;
-}> => {
+export const getCartItems = async (): Promise<CartType> => {
   try {
     const res = await API.get("/cart");
-    return res.data || { items: [] as CartItemType[], subtotal: 0 };
+    return res.data || { items: [], subtotal: 0 };
   } catch (error) {
     handleError(error);
     throw error;
@@ -309,56 +408,28 @@ export const removeCartItem = async (data: {
   sku?: string;
 }): Promise<any> => {
   if (!data?.productId) throw new Error("productId is required");
-
   try {
     const res = await API.post("/cart/remove", data);
     return res.data;
   } catch (error) {
     handleError(error);
-    throw error;
   }
 };
 
 export const clearCart = async (): Promise<any> => {
   try {
-    const res = await API.post("/cart/remove");
+    const res = await API.post("/cart/clear");
     return res.data;
   } catch (error) {
     handleError(error);
-    throw error;
   }
 };
 
-/**
- * Update cart item quantity explicitly
- * This sets the exact quantity instead of incrementing
- */
-export const updateCartItemQuantity = async (
-  data: CartItemType,
-): Promise<any> => {
-  if (!data?.productId || !data?.sku || !data?.quantity)
-    throw new Error("productId, sku and quantity are required");
-
-  try {
-    const res = await API.post("/cart/add", data);
-    return res.data;
-  } catch (error) {
-    handleError(error);
-    throw error;
-  }
-};
-
-/**
- * Get total count of items in cart
- */
+/** Cart mein total kitne items hain */
 export const getCartCount = async (): Promise<number> => {
   try {
     const cart = await getCartItems();
-    const items: CartItemType[] = cart?.items || [];
-    return items.reduce(
-      (sum: number, item: CartItemType) => sum + item.quantity,
-      0,
-    );
+    return (cart?.items || []).reduce((sum, item) => sum + (item.quantity || 0), 0);
   } catch (error) {
     handleError(error);
     throw error;
@@ -366,48 +437,67 @@ export const getCartCount = async (): Promise<number> => {
 };
 
 // ================== WISHLIST ==================
-
-// ---------------- ADD ITEM ----------------
 export const addItemToWishlist = async (data: WishlistItemType) => {
-  if (!data?.userId || !data?.productId || !data?.priceSnapshot)
-    throw new Error("userId, productId and priceSnapshot are required");
-
+  if (!data?.productId || !data?.priceSnapshot)
+    throw new Error("productId and priceSnapshot are required");
   try {
     const res = await API.post("/wishlist/items", data);
-    return res.data as {
-      success: boolean;
-      wishlist: WishlistType;
-      message: string;
-    };
+    return res.data as { success: boolean; wishlist: WishlistType; message: string };
   } catch (error) {
     handleError(error);
-    throw error;
   }
 };
 
-// ---------------- GET USER WISHLIST ----------------
 export const getUserWishlist = async (userId: string) => {
   if (!userId) throw new Error("userId is required");
-
   try {
     const res = await API.get(`/wishlist/user/${userId}`);
     return res.data as { success: boolean; wishlist: WishlistType };
   } catch (error) {
     handleError(error);
-    throw error;
   }
 };
 
-// ---------------- REMOVE SINGLE ITEM ----------------
 export const removeWishlistItem = async (userId: string, itemId: string) => {
   if (!userId || !itemId) throw new Error("userId and itemId are required");
-
   try {
     const res = await API.delete(`/wishlist/items/${userId}/${itemId}`);
+    return res.data as { success: boolean; wishlist?: WishlistType; message: string };
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const clearUserWishlist = async (userId: string) => {
+  if (!userId) throw new Error("userId is required");
+  try {
+    const res = await API.delete(`/wishlist/clear/${userId}`);
+    return res.data as { success: boolean; message: string };
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// ================== CHECKOUT ==================
+export const getCheckoutDetailsApi = async (couponCode?: string) => {
+  try {
+    const res = await API.post("/checkout/checkout-details", {
+      couponCode: couponCode || "",
+    });
     return res.data as {
       success: boolean;
-      wishlist?: WishlistType;
-      message: string;
+      items: any[];
+      itemCount: number;
+      totalQuantity: number;
+      pricing: {
+        subtotal: number;
+        totalCutPrice: number;
+        totalDiscount: number;
+        couponDiscount: number;
+        finalAmount: number;
+      };
+      coupon?: { couponId: string; code: string; appliedDiscount: number };
+      couponError?: string | null;
     };
   } catch (error) {
     handleError(error);
@@ -415,21 +505,97 @@ export const removeWishlistItem = async (userId: string, itemId: string) => {
   }
 };
 
-// ---------------- CLEAR USER WISHLIST ----------------
-export const clearUserWishlist = async (userId: string) => {
-  if (!userId) throw new Error("userId is required");
-
+// ================== ADDRESS APIs ==================
+export const addAddressApi = async (data: AddressType) => {
   try {
-    const res = await API.delete(`/wishlist/clear/${userId}`);
-    return res.data as { success: boolean; message: string };
+    const res = await API.post("/addresses", data);
+    return res.data as AddressType;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const getAddressesApi = async () => {
+  try {
+    const res = await API.get("/addresses");
+    return res.data as AddressType[];
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const updateAddressApi = async (id: string, data: AddressType) => {
+  if (!id) throw new Error("Address id is required");
+  try {
+    const res = await API.put(`/addresses/${id}`, data);
+    return res.data as AddressType;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const deleteAddressApi = async (id: string) => {
+  if (!id) throw new Error("Address id is required");
+  try {
+    const res = await API.delete(`/addresses/${id}`);
+    return res.data as { message: string };
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// ================== ORDER APIs — User (My Orders) ==================
+
+/** Naya order create karo cart se */
+export const createOrderApi = async (data: CreateOrderPayloadType) => {
+  try {
+    const res = await API.post("/orders", data);
+    return res.data as { message: string; data: OrderType };
   } catch (error) {
     handleError(error);
     throw error;
   }
 };
 
-// (Other sections like Orders, Addresses, Reviews, Coupons, Notifications, Search, Support, Newsletter, Analytics…)
-// Apply same pattern: type the `data` parameter, `catch(error)` → `handleError(error)`
+/** User ke saare orders — My Orders page ke liye */
+export const getOrdersByUserApi = async (userId: string) => {
+  if (!userId) throw new Error("userId is required");
+  try {
+    const res = await API.get(`/orders/user/${userId}`);
+    return res.data as { success: boolean; count: number; data: OrderType[] };
+  } catch (error) {
+    handleError(error);
+    throw error;
+  }
+};
+
+/** Ek order ka detail */
+export const getOrderByIdApi = async (orderId: string) => {
+  if (!orderId) throw new Error("orderId is required");
+  try {
+    const res = await API.get(`/orders/detail/${orderId}`);
+    return res.data as { success: boolean; data: OrderType };
+  } catch (error) {
+    handleError(error);
+    throw error;
+  }
+};
+
+export const cancelOrderApi = async (
+  orderId: string,
+  userId: string,
+  reason?: string
+) => {
+  if (!orderId || !userId) throw new Error("orderId and userId are required");
+  try {
+    const res = await API.patch(`/orders/cancel/${orderId}`, { userId, reason });
+    return res.data as { success: boolean; message: string; data: OrderType };
+  } catch (error) {
+    handleError(error);
+    throw error;
+  }
+};
+
 
 // ---------------- EXPORT ----------------
 export default API;
