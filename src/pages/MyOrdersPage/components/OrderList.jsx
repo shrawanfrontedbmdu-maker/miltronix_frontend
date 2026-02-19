@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import OrderCard from "../../../components/ui/OrderCard";
 import { getOrdersByUserApi } from "../../../api/api";
 
-// ─── Status mapper ────────────────────────────────────────────────────────────
+// ─── Status mapper (backend compatible) ─────────────────────────────
 const getStatus = (order) => {
   const os = order?.fulfillment?.orderStatus || "";
-  if (["Processing", "Packaging", "Shipped"].includes(os)) return "Active";
+
+  if (["Confirmed", "Shipped"].includes(os)) return "Active";
   if (["Delivered", "Completed"].includes(os)) return "Delivered";
   if (os === "Cancelled") return "Cancelled";
   return "Pending";
@@ -19,23 +20,16 @@ const OrderList = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const userId = getUserId();
-
-      if (!userId) {
-        setError("User not logged in.");
-        setLoading(false);
-        return;
-      }
-
       try {
-        // ✅ FIXED: userId pass nahi karna — backend token se user identify karta hai
+        // backend token se user identify karta hai
         const res = await getOrdersByUserApi();
-        // ✅ FIXED: res.orders hai, res.data nahi
+
         const list = res?.orders || [];
         const normalized = list.map((order) => ({
           ...order,
           status: getStatus(order),
         }));
+
         setOrders(normalized);
       } catch (err) {
         console.error("Failed to fetch orders:", err);
@@ -48,25 +42,28 @@ const OrderList = () => {
     fetchOrders();
   }, []);
 
-  // ─── Tab counts ──────────────────────────────────────────────────────────────
+  // ─── Tab counts ───────────────────────────────────────────────────
   const counts = {
-    active:    orders.filter((o) => o.status === "Active").length,
+    active: orders.filter((o) => o.status === "Active").length,
     delivered: orders.filter((o) => o.status === "Delivered").length,
-    pending:   orders.filter((o) => o.status === "Pending" || o.status === "Cancelled").length,
+    pending: orders.filter(
+      (o) => o.status === "Pending" || o.status === "Cancelled"
+    ).length,
   };
 
-  // ─── Filter by tab ───────────────────────────────────────────────────────────
+  // ─── Filter by tab ────────────────────────────────────────────────
   const filteredOrders = orders.filter((order) => {
-    if (activeTab === "active")    return order.status === "Active";
+    if (activeTab === "active") return order.status === "Active";
     if (activeTab === "delivered") return order.status === "Delivered";
-    if (activeTab === "pending")   return order.status === "Pending" || order.status === "Cancelled";
+    if (activeTab === "pending")
+      return order.status === "Pending" || order.status === "Cancelled";
     return true;
   });
 
   const tabLabel = {
-    active:    "active",
+    active: "active",
     delivered: "delivered",
-    pending:   "pending or cancelled",
+    pending: "pending or cancelled",
   };
 
   return (
@@ -75,12 +72,15 @@ const OrderList = () => {
         My Orders
       </h5>
 
-      {/* ── Tabs ──────────────────────────────────────────────────────────── */}
+      {/* Tabs */}
       <div className="tab-links mb-4">
         <a
           href="#"
           className={activeTab === "active" ? "active" : ""}
-          onClick={(e) => { e.preventDefault(); setActiveTab("active"); }}
+          onClick={(e) => {
+            e.preventDefault();
+            setActiveTab("active");
+          }}
         >
           Active Orders ({counts.active})
         </a>
@@ -88,7 +88,10 @@ const OrderList = () => {
         <a
           href="#"
           className={activeTab === "delivered" ? "active" : ""}
-          onClick={(e) => { e.preventDefault(); setActiveTab("delivered"); }}
+          onClick={(e) => {
+            e.preventDefault();
+            setActiveTab("delivered");
+          }}
         >
           Past Orders ({counts.delivered})
         </a>
@@ -96,13 +99,16 @@ const OrderList = () => {
         <a
           href="#"
           className={activeTab === "pending" ? "active" : ""}
-          onClick={(e) => { e.preventDefault(); setActiveTab("pending"); }}
+          onClick={(e) => {
+            e.preventDefault();
+            setActiveTab("pending");
+          }}
         >
           Pending / Cancelled ({counts.pending})
         </a>
       </div>
 
-      {/* ── Content ───────────────────────────────────────────────────────── */}
+      {/* Content */}
       {loading ? (
         <p>Loading orders...</p>
       ) : error ? (

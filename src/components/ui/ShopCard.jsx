@@ -11,7 +11,7 @@ const ShopCard = ({
   userId,
   onCartUpdate,
   onWishlistUpdate,
-  onRemove // 👈 NEW PROP
+  onRemove,
 }) => {
   const [loadingCart, setLoadingCart] = useState(false);
   const [addedCart, setAddedCart] = useState(false);
@@ -115,7 +115,6 @@ const ShopCard = ({
     <div className="col-md-6 col-lg-4">
       <div className="shop-card text-center position-relative">
 
-        {/* ✅ REMOVE BUTTON (only in wishlist page) */}
         {onRemove && (
           <button
             onClick={onRemove}
@@ -149,19 +148,21 @@ const ShopCard = ({
           alt={product.name || "Product"}
           className="img-fluid shop-card-img"
           style={{ cursor: "pointer" }}
-          onClick={() => navigate(`/product/${product._id}`)}
+          onClick={() => navigate(`/checkout/${product._id}`)}
         />
 
         <h6 className="product-category2">{categoryName}</h6>
+
         <h5
           className="product-title2"
           style={{ cursor: "pointer" }}
-          onClick={() => navigate(`/product/${product._id}`)}
+          onClick={() => navigate(`/checkout/${product._id}`)}
         >
           {product.name}
         </h5>
 
         <p className="product-price2">₹{price.toLocaleString()}</p>
+
         {oldPrice > price && (
           <p className="product-old-price2">
             ₹{oldPrice.toLocaleString()}
@@ -202,7 +203,6 @@ const ShopCard = ({
               )}
           </button>
 
-          {/* ❤️ Wishlist button only when NOT remove mode */}
           {!onRemove && (
             <button
               className={`btn shop-card-btn-wishlist ${addedWishlist ? "btn-danger" : ""}`}
