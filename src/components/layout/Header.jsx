@@ -156,7 +156,7 @@ function Header() {
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
 
-            <span className="ms-2 text-nowrap">
+            {/* <span className="ms-2 text-nowrap">
               <strong>All</strong>
               <img
                 src={dropdownIcon}
@@ -165,7 +165,7 @@ function Header() {
                 width="16"
                 height="16"
               />
-            </span>
+            </span> */}
 
             {/* 🔥 Dropdown Suggestions */}
             {showDropdown && suggestions.length > 0 && (

@@ -53,11 +53,8 @@ export default function Pay() {
             : method === "netbanking"
             ? "NETBANKING"
             : "COD",
-        paymentStatus: "Pending",
         shippingCost: 0,
         currency: "INR",
-        orderStatus: "Processing",
-        priority: "Normal",
         shippingAddress: formattedAddress,
         billingAddress: formattedAddress,
       };

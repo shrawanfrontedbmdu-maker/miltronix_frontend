@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 
 // ---------------- BASE URL ----------------
 const BASE_URL =
-  import.meta.env.VITE_BASE_URL || "https://miltronix-backend-2.onrender.com/api";
+  import.meta.env.VITE_BASE_URL || "https://miltronix-backend-2.onrender.com";
 
 // ---------------- AXIOS INSTANCE ----------------
 const API: AxiosInstance = axios.create({
@@ -25,16 +25,23 @@ API.interceptors.request.use(
 );
 
 // ---------------- RESPONSE INTERCEPTOR ----------------
+
+
 API.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
       localStorage.removeItem("token");
-      window.location.href = "/login";
+
+      toast.error("Please login first");
+
+      window.dispatchEvent(new Event("openLoginModal"));
     }
+
     return Promise.reject(error);
   }
 );
+
 
 // ---------------- ERROR HANDLER ----------------
 const handleError = (error: unknown): never => {
@@ -487,7 +494,6 @@ export const getCheckoutDetailsApi = async (couponCode?: string) => {
     };
   } catch (error) {
     handleError(error);
-    throw error;
   }
 };
 

@@ -19,6 +19,14 @@ const OrderList = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      const userId = getUserId();
+
+      if (!userId) {
+        setError("User not logged in.");
+        setLoading(false);
+        return;
+      }
+
       try {
         // ✅ FIXED: userId pass nahi karna — backend token se user identify karta hai
         const res = await getOrdersByUserApi();
