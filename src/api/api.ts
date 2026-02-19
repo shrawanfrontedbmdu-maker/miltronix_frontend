@@ -1,5 +1,4 @@
 import axios, { AxiosInstance } from "axios";
-import { toast } from "react-toastify";
 
 // ---------------- BASE URL ----------------
 const BASE_URL =
@@ -102,10 +101,6 @@ export type WishlistType = {
 };
 
 // ================== ADDRESS TYPE ==================
-/**
- * Unified address type — backend schema se exactly match karta hai.
- * Saved addresses aur order shipping/billing dono ke liye yahi use karo.
- */
 export type AddressType = {
   _id?: string;
   fullName: string;
@@ -114,7 +109,7 @@ export type AddressType = {
   buildingApartment?: string;
   streetLocality: string;
   landmark?: string;
-  pinCode: string;       // capital C — backend schema se match
+  pinCode: string;
   city: string;
   state: string;
   country?: string;
@@ -132,6 +127,7 @@ export type OrderItemType = {
   taxAmount?: number;
   discountAmount?: number;
   lineTotal?: number;
+  image?: string; // injected by getUserOrders controller
 };
 
 export type OrderType = {
@@ -152,7 +148,7 @@ export type OrderType = {
   subtotal: number;
   taxAmount: number;
   shippingCost: number;
-  couponDiscount: number;   // fixed: discountAmount → couponDiscount
+  discountAmount: number;
   totalAmount: number;
   currency: string;
   payment: {
@@ -164,10 +160,8 @@ export type OrderType = {
   };
   fulfillment: {
     orderStatus:
-      | "Draft"
       | "Pending"
-      | "Processing"
-      | "Packaging"
+      | "Confirmed"
       | "Shipped"
       | "Delivered"
       | "Cancelled"
@@ -184,8 +178,8 @@ export type OrderType = {
   updatedAt: string;
 };
 
+// ✅ FIXED: removed `user` field (backend reads it from token, not body)
 export type CreateOrderPayloadType = {
-  user: string;
   shippingAddressId?: string;
   shippingAddress?: AddressType;
   billingAddressId?: string;
@@ -425,7 +419,6 @@ export const clearCart = async (): Promise<any> => {
   }
 };
 
-/** Cart mein total kitne items hain */
 export const getCartCount = async (): Promise<number> => {
   try {
     const cart = await getCartItems();
@@ -501,7 +494,6 @@ export const getCheckoutDetailsApi = async (couponCode?: string) => {
     };
   } catch (error) {
     handleError(error);
-    throw error;
   }
 };
 
@@ -544,9 +536,9 @@ export const deleteAddressApi = async (id: string) => {
   }
 };
 
-// ================== ORDER APIs — User (My Orders) ==================
+// ================== ORDER APIs ==================
 
-/** Naya order create karo cart se */
+// ─── Create order from cart ────────────────────────────────────────
 export const createOrderApi = async (data: CreateOrderPayloadType) => {
   try {
     const res = await API.post("/orders", data);
@@ -557,45 +549,58 @@ export const createOrderApi = async (data: CreateOrderPayloadType) => {
   }
 };
 
-/** User ke saare orders — My Orders page ke liye */
-export const getOrdersByUserApi = async (userId: string) => {
-  if (!userId) throw new Error("userId is required");
+// ─── My Orders list ────────────────────────────────────────────────
+// ✅ FIXED: was /orders/user → now /orders/my-orders (matches backend route)
+export const getOrdersByUserApi = async (params?: {
+  page?: number;
+  limit?: number;
+  status?: string;
+}) => {
   try {
-    const res = await API.get(`/orders/user/${userId}`);
-    return res.data as { success: boolean; count: number; data: OrderType[] };
+    const query = new URLSearchParams();
+    if (params?.page)   query.append("page", params.page.toString());
+    if (params?.limit)  query.append("limit", params.limit.toString());
+    if (params?.status) query.append("status", params.status);
+
+    const res = await API.get(`/orders/my-orders?${query.toString()}`);
+    return res.data as {
+      success: boolean;
+      orders: OrderType[];
+      totalPages: number;
+      currentPage: number;
+      totalOrders: number;
+    };
   } catch (error) {
     handleError(error);
     throw error;
   }
 };
 
-/** Ek order ka detail */
+// ─── Single order detail ───────────────────────────────────────────
+// ✅ FIXED: route now exists on backend
 export const getOrderByIdApi = async (orderId: string) => {
   if (!orderId) throw new Error("orderId is required");
   try {
-    const res = await API.get(`/orders/detail/${orderId}`);
-    return res.data as { success: boolean; data: OrderType };
+    const res = await API.get(`/orders/${orderId}`);
+    return res.data as { success: boolean; order: OrderType };
   } catch (error) {
     handleError(error);
     throw error;
   }
 };
 
-export const cancelOrderApi = async (
-  orderId: string,
-  userId: string,
-  reason?: string
-) => {
-  if (!orderId || !userId) throw new Error("orderId and userId are required");
+// ─── Cancel order ──────────────────────────────────────────────────
+// ✅ FIXED: route now exists on backend (PATCH /orders/cancel/:id)
+export const cancelOrderApi = async (orderId: string, reason?: string) => {
+  if (!orderId) throw new Error("orderId is required");
   try {
-    const res = await API.patch(`/orders/cancel/${orderId}`, { userId, reason });
+    const res = await API.patch(`/orders/cancel/${orderId}`, { reason });
     return res.data as { success: boolean; message: string; data: OrderType };
   } catch (error) {
     handleError(error);
     throw error;
   }
 };
-
 
 // ---------------- EXPORT ----------------
 export default API;
