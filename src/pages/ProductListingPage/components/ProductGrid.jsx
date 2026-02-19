@@ -102,21 +102,6 @@ const ProductGrid = ({ categoryId }) => {
   return (
     <div>
       {/* SORT & COUNT */}
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <p className="mb-0">
-          Showing <strong>{products.length}</strong> of <strong>{total}</strong> products
-        </p>
-
-        <select
-          className="form-select w-auto"
-          value={sort}
-          onChange={(e) => updateSearchParams({ search, sort: e.target.value, page: 1 })}
-        >
-          <option value="latest">Latest</option>
-          <option value="price_low">Price: Low to High</option>
-          <option value="price_high">Price: High to Low</option>
-        </select>
-      </div>
 
       {/* PRODUCT GRID */}
       <div className="row g-4">

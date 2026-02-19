@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from "axios";
-
+import { toast } from "react-toastify";
 // ---------------- BASE URL ----------------
 const BASE_URL =
   import.meta.env.VITE_BASE_URL || "https://miltronix-backend-2.onrender.com";
@@ -127,7 +127,7 @@ export type OrderItemType = {
   taxAmount?: number;
   discountAmount?: number;
   lineTotal?: number;
-  image?: string; // injected by getUserOrders controller
+  image?: string; 
 };
 
 export type OrderType = {
@@ -536,7 +536,6 @@ export const deleteAddressApi = async (id: string) => {
   }
 };
 
-// ================== ORDER APIs ==================
 
 // ─── Create order from cart ────────────────────────────────────────
 export const createOrderApi = async (data: CreateOrderPayloadType) => {
@@ -549,8 +548,9 @@ export const createOrderApi = async (data: CreateOrderPayloadType) => {
   }
 };
 
-// ─── My Orders list ────────────────────────────────────────────────
-// ✅ FIXED: was /orders/user → now /orders/my-orders (matches backend route)
+// ================== USER ORDERS ==================
+
+// Get logged-in user's orders
 export const getOrdersByUserApi = async (params?: {
   page?: number;
   limit?: number;
@@ -558,11 +558,13 @@ export const getOrdersByUserApi = async (params?: {
 }) => {
   try {
     const query = new URLSearchParams();
-    if (params?.page)   query.append("page", params.page.toString());
-    if (params?.limit)  query.append("limit", params.limit.toString());
+
+    if (params?.page) query.append("page", params.page.toString());
+    if (params?.limit) query.append("limit", params.limit.toString());
     if (params?.status) query.append("status", params.status);
 
     const res = await API.get(`/orders/my-orders?${query.toString()}`);
+
     return res.data as {
       success: boolean;
       orders: OrderType[];
@@ -576,31 +578,103 @@ export const getOrdersByUserApi = async (params?: {
   }
 };
 
-// ─── Single order detail ───────────────────────────────────────────
-// ✅ FIXED: route now exists on backend
+
+// Get single order by id
 export const getOrderByIdApi = async (orderId: string) => {
   if (!orderId) throw new Error("orderId is required");
+
   try {
     const res = await API.get(`/orders/${orderId}`);
-    return res.data as { success: boolean; order: OrderType };
+
+    return res.data as {
+      success: boolean;
+      order: OrderType;
+    };
   } catch (error) {
     handleError(error);
     throw error;
   }
 };
 
-// ─── Cancel order ──────────────────────────────────────────────────
-// ✅ FIXED: route now exists on backend (PATCH /orders/cancel/:id)
+
+// Cancel order
 export const cancelOrderApi = async (orderId: string, reason?: string) => {
   if (!orderId) throw new Error("orderId is required");
+
   try {
     const res = await API.patch(`/orders/cancel/${orderId}`, { reason });
-    return res.data as { success: boolean; message: string; data: OrderType };
+
+    return res.data as {
+      success: boolean;
+      message: string;
+      data: OrderType;
+    };
   } catch (error) {
     handleError(error);
     throw error;
   }
 };
+
+
+// ================== PROFILE ==================
+export const getUserProfileApi = async () => {
+  try {
+    const res = await API.get("/auth/profile");
+    return res.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// ================== BANNERS ==================
+export const fetchBanners = async () => {
+  try {
+    const res = await API.get("/banners");
+    return res.data as {
+      message: string;
+      banners: {
+        _id: string;
+        bannertype: string;
+        theme: string;
+        title: string;
+        description: string;
+        bennerimg: string;
+        startDate: string;
+        status: string;
+        createdAt: string;
+        updatedAt: string;
+      }[];
+    };
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// ================== SUBCATEGORIES ==================
+export const fetchSubcategories = async (categoryId: string) => {
+  if (!categoryId) throw new Error("categoryId is required");
+  try {
+    const res = await API.get(`/subcategory?category=${categoryId}`);
+    return res.data as {
+      success: boolean;
+      count: number;
+      subcategories: Array<{
+        _id: string;
+        name: string;
+        description?: string;
+        slug?: string;
+        status?: string;
+        createdAt: string;
+        updatedAt: string;
+      }>;
+    };
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+
+
 
 // ---------------- EXPORT ----------------
 export default API;
