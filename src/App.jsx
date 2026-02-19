@@ -20,7 +20,7 @@ import CartPage from "./pages/cartpage";
 import Checkout from "./components/ui/Checkout";
 import OrderAddress from "./components/ui/OrderAddress";
 import SecendAddress from "./components/ui/SecendAddress";
-import Pay from "./components/ui/Pay.jsx";
+// import Pay from "./components/ui/Pay.jsx";
 import SearchPage from './pages/search/SearchPage';
 import OrderConfirmPage from "./components/ui/orderConfirm";
 
@@ -52,7 +52,7 @@ function App() {
         <Route path="/orderaddress" element={<OrderAddress />} />
         <Route path="/secendaddress" element={<SecendAddress />} />
         <Route path="/search" element={<SearchPage />} />
-        <Route path="/pay" element={<Pay />} />
+        {/* <Route path="/pay" element={<Pay />} /> */}
       
         <Route path="/order-confirm" element={<OrderConfirmPage />} />
       </Routes>
