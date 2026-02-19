@@ -20,10 +20,9 @@ import CartPage from "./pages/cartpage";
 import Checkout from "./components/ui/Checkout";
 import OrderAddress from "./components/ui/OrderAddress";
 import SecendAddress from "./components/ui/SecendAddress";
-import Pay from "./components/ui/pay";
-import SearchPage from './pages/search/SearchPage';
+import Pay from "./components/ui/Pay";
 import OrderConfirmPage from "./components/ui/orderConfirm";
-
+import SearchPage from "./pages/search/SearchPage";
 function App() {
   return (
     <Router>
@@ -50,10 +49,10 @@ function App() {
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/orderaddress" element={<OrderAddress />} />
-        <Route path="/secendaddress" element={<SecendAddress />} />
         <Route path="/search" element={<SearchPage />} />
+        <Route path="/secendaddress" element={<SecendAddress />} />
+
         <Route path="/pay" element={<Pay />} />
-      
         <Route path="/order-confirm" element={<OrderConfirmPage />} />
       </Routes>
     </Router>

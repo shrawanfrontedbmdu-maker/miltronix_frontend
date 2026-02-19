@@ -11,17 +11,6 @@ const getStatus = (order) => {
   return "Pending";
 };
 
-// ─── Get logged-in userId from localStorage ───────────────────────────────────
-const getUserId = () => {
-  try {
-    const user = localStorage.getItem("user");
-    if (user) return JSON.parse(user)?._id || JSON.parse(user)?.id || null;
-    return null;
-  } catch {
-    return null;
-  }
-};
-
 const OrderList = () => {
   const [activeTab, setActiveTab] = useState("active");
   const [orders, setOrders] = useState([]);
@@ -39,8 +28,10 @@ const OrderList = () => {
       }
 
       try {
-        const res = await getOrdersByUserApi(userId);
-        const list = res?.data || [];
+        // ✅ FIXED: userId pass nahi karna — backend token se user identify karta hai
+        const res = await getOrdersByUserApi();
+        // ✅ FIXED: res.orders hai, res.data nahi
+        const list = res?.orders || [];
         const normalized = list.map((order) => ({
           ...order,
           status: getStatus(order),
@@ -57,7 +48,7 @@ const OrderList = () => {
     fetchOrders();
   }, []);
 
-  // ─── Tab counts ─────────────────────────────────────────────────────────────
+  // ─── Tab counts ──────────────────────────────────────────────────────────────
   const counts = {
     active:    orders.filter((o) => o.status === "Active").length,
     delivered: orders.filter((o) => o.status === "Delivered").length,
@@ -84,7 +75,7 @@ const OrderList = () => {
         My Orders
       </h5>
 
-      {/* ── Tabs ─────────────────────────────────────────────────────────── */}
+      {/* ── Tabs ──────────────────────────────────────────────────────────── */}
       <div className="tab-links mb-4">
         <a
           href="#"
@@ -111,7 +102,7 @@ const OrderList = () => {
         </a>
       </div>
 
-      {/* ── Content ──────────────────────────────────────────────────────── */}
+      {/* ── Content ───────────────────────────────────────────────────────── */}
       {loading ? (
         <p>Loading orders...</p>
       ) : error ? (

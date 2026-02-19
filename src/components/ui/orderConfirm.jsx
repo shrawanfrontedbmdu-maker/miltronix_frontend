@@ -19,12 +19,14 @@ const OrderConfirmPage = () => {
   const extraItems = (order.items?.length || 1) - 1;
   const shipping   = order.shippingAddress || {};
 
-  // FIX: couponDiscount (not discountAmount)
   const couponDiscount = Number(order.couponDiscount || 0);
   const subtotal       = Number(order.subtotal || 0);
   const shippingCost   = Number(order.shippingCost || 0);
   const taxAmount      = Number(order.taxAmount || 0);
   const totalAmount    = Number(order.totalAmount || 0);
+
+  // ✅ FIXED: real image from backend, fallback to placeholder
+  const itemImage = firstItem?.image || "/src/assets/placeholder.png";
 
   const estimatedDelivery = () => {
     const d = new Date(order.createdAt || Date.now());
@@ -95,11 +97,12 @@ const OrderConfirmPage = () => {
         <div
           style={{ display: "flex", gap: 16, alignItems: "flex-start", marginBottom: 20 }}
         >
+          {/* ✅ FIXED: real product image with fallback */}
           <img
-            src="/src/assets/placeholder.png"
+            src={itemImage}
             alt={firstItem.name || "Product"}
             onError={(e) => {
-              e.target.src = "https://via.placeholder.com/120x90?text=Product";
+              e.target.src = "/src/assets/placeholder.png";
             }}
             style={{
               width: 120,
@@ -186,7 +189,7 @@ const OrderConfirmPage = () => {
             </div>
 
             <Row label="Order ID" value={`#${order.orderNumber || order._id}`} />
-            <Row label="Payment" value={order.payment?.method || "COD"} />
+            <Row label="Payment"  value={order.payment?.method || "COD"} />
 
             <hr style={{ margin: "10px 0" }} />
 
@@ -211,11 +214,7 @@ const OrderConfirmPage = () => {
 
             <hr style={{ margin: "10px 0" }} />
 
-            <Row
-              label="Total"
-              value={`₹${fmt(totalAmount)}`}
-              bold
-            />
+            <Row label="Total" value={`₹${fmt(totalAmount)}`} bold />
           </div>
         </div>
 
