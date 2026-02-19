@@ -20,20 +20,23 @@ const statusStyle = (status) => {
 };
 
 const OrderCard = ({ order }) => {
-  const firstItem   = order.items?.[0];
-  const totalItems  = order.items?.length || 0;
-  const extraItems  = totalItems - 1;
+  const firstItem  = order.items?.[0];
+  const totalItems = order.items?.length || 0;
+  const extraItems = totalItems - 1;
 
-  const itemName    = firstItem?.name || "Product";
-  const itemQty     = firstItem?.quantity || 1;
-  const itemPrice   = firstItem?.unitPrice || firstItem?.mrp || 0;
+  const itemName   = firstItem?.name || "Product";
+  const itemQty    = firstItem?.quantity || 1;
+  const itemPrice  = firstItem?.unitPrice || firstItem?.mrp || 0;
+
+  // ✅ FIXED: real image from backend, fallback to placeholder
+  const itemImage  = firstItem?.image || "/src/assets/placeholder.png";
 
   const totalAmount = order.totalAmount || 0;
   const orderNumber = order.orderNumber || order._id?.slice(-6)?.toUpperCase() || "—";
   const orderStatus = order.fulfillment?.orderStatus || order.status || "Pending";
   const trackingNo  = order.trackingnumber || null;
 
-  const orderDate   = order.createdAt
+  const orderDate = order.createdAt
     ? new Date(order.createdAt).toLocaleDateString("en-IN", {
         day: "2-digit",
         month: "short",
@@ -75,9 +78,11 @@ const OrderCard = ({ order }) => {
       {/* ── Item info + action ──────────────────────────────────────────── */}
       <div className="d-flex align-items-center justify-content-between">
         <div className="d-flex align-items-center gap-3">
+          {/* ✅ FIXED: real product image */}
           <img
-            src="/src/assets/placeholder.png"
+            src={itemImage}
             alt={itemName}
+            onError={(e) => { e.target.src = "/src/assets/placeholder.png"; }}
             style={{
               width: "80px",
               height: "60px",

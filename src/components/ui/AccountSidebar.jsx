@@ -12,6 +12,23 @@ const sidebarLinks = [
   { name: 'Log out', icon: 'bi-box-arrow-right', link: '#' },
 ];
 
+  const handleLogout = () => {
+    const confirmLogout = window.confirm(
+      "Are you sure you want to logout?"
+    );
+
+    if (confirmLogout) {
+      // Remove auth data
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      // Optional: clear everything
+      // localStorage.clear();
+
+      navigate("/"); // redirect after logout
+    }
+  };
+
 const AccountSidebar = ({ activePage }) => {
   return (
     <aside className="sidebar account-sidebar hv" aria-label="Account navigation">
@@ -26,12 +43,25 @@ const AccountSidebar = ({ activePage }) => {
               className={`account-nav-item ${isActive ? 'active' : ''} hv`}
               aria-current={isActive ? 'page' : undefined}
             >
-              <Link to={item.link} className="account-nav-link">
-                <span className="icon-box">
-                  <i className={`bi ${item.icon}`}></i>
-                </span>
-                <span className="account-nav-label">{item.name}</span>
-              </Link>
+              {item.name === "Log out" ? (
+                <button
+                  onClick={handleLogout}
+                  className="account-nav-link logout-btn"
+                  style={{ background: "none", border: "none", width: "100%", textAlign: "left" }}
+                >
+                  <span className="icon-box">
+                    <i className={`bi ${item.icon}`}></i>
+                  </span>
+                  <span className="account-nav-label">{item.name}</span>
+                </button>
+              ) : (
+                <Link to={item.link} className="account-nav-link">
+                  <span className="icon-box">
+                    <i className={`bi ${item.icon}`}></i>
+                  </span>
+                  <span className="account-nav-label">{item.name}</span>
+                </Link>
+              )}
             </li>
           );
         })}
