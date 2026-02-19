@@ -20,7 +20,7 @@ import CartPage from "./pages/cartpage";
 import Checkout from "./components/ui/Checkout";
 import OrderAddress from "./components/ui/OrderAddress";
 import SecendAddress from "./components/ui/SecendAddress";
-import Pay from "./components/ui/pay";
+import Pay from "./components/ui/Pay";
 import SearchPage from './pages/search/SearchPage';
 import OrderConfirmPage from "./components/ui/orderConfirm";
 
