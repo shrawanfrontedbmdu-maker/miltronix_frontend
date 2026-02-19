@@ -21,7 +21,7 @@ import Checkout from "./components/ui/Checkout";
 import OrderAddress from "./components/ui/OrderAddress";
 import SecendAddress from "./components/ui/SecendAddress";
 import Pay from "./components/ui/Pay";
-import SearchPage from './pages/search/SearchPage';
+// import SearchPage from './pages/search/SearchPage';
 import OrderConfirmPage from "./components/ui/orderConfirm";
 import SearchPage from "./pages/search/SearchPage";
 function App() {
@@ -52,7 +52,6 @@ function App() {
         <Route path="/orderaddress" element={<OrderAddress />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/secendaddress" element={<SecendAddress />} />
-
         <Route path="/pay" element={<Pay />} />
         <Route path="/order-confirm" element={<OrderConfirmPage />} />
       </Routes>
