@@ -1,4 +1,3 @@
-// src/pages/products/ProductListingPage.jsx
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
@@ -9,111 +8,92 @@ import Breadcrumb from "../../components/ui/Breadcrumb";
 
 import FilterSidebar from "./components/FilterSidebar";
 import ProductGrid from "./components/ProductGrid";
+import RecommendationSection from "./components/RecommendationSection";
 import PageHeader from "./components/PageHeader";
 import ResolutionInfo from "./components/ResolutionInfo";
 
-import { fetchCategories, fetchProducts, getCartItems } from "../../api/api";
+import { fetchCategories } from "../../api/api";
 
 const ProductListingPage = () => {
   const { categoryName } = useParams();
 
   const [pageData, setPageData] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [allProducts, setAllProducts] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [cartItems, setCartItems] = useState([]);
 
-  // ===== Load Products & Categories =====
+  console.log("🔍 URL categoryName:", categoryName);
+
   useEffect(() => {
-    const loadData = async () => {
+    const loadCategory = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const [productsData, categoriesData] = await Promise.all([
-          fetchProducts(),
-          fetchCategories(),
-        ]);
+        const categories = await fetchCategories();
+        console.log("📦 All Categories:", categories);
 
-        setAllProducts(productsData);
-        setCategories(categoriesData);
+        // ✅ categoryKey se match karo
+        const category = categories.find(
+          (c) =>
+            c.categoryKey?.toLowerCase() ===
+            decodeURIComponent(categoryName || "").toLowerCase()
+        );
 
-        if (categoryName) {
-          // Find matching category
-          const category = categoriesData.find(
-            (c) =>
-              c.categoryKey?.toLowerCase() ===
-              decodeURIComponent(categoryName).toLowerCase()
-          );
+        console.log("✅ Matched Category:", category);
 
-          if (!category) {
-            setError("Category not found");
-            setProducts([]);
-            setPageData(null);
-            return;
-          }
-
-          setPageData(category);
-
-          // Filter products by categoryKey (for dynamic products)
-          const filteredProducts = productsData.filter(
-            (p) => p.categoryKey === category.categoryKey
-          );
-          setProducts(filteredProducts);
-        } else {
-          setPageData(null);
-          setProducts(productsData);
+        if (!category) {
+          setError("Category not found");
+          return;
         }
+
+        setPageData(category);
       } catch (err) {
-        console.error(err);
-        setError("Failed to load products or categories");
+        console.error("🔥 Error:", err);
+        setError("Failed to load category");
       } finally {
         setLoading(false);
       }
     };
 
-    loadData();
+    loadCategory();
   }, [categoryName]);
 
-  // ===== Cart items =====
-  useEffect(() => {
-    const loadCart = async () => {
-      try {
-        const cart = await getCartItems();
-        setCartItems(cart);
-      } catch (err) {
-        console.error("Failed to fetch cart items", err);
-      }
-    };
-    loadCart();
-  }, []);
+  if (loading) {
+    return (
+      <div className="text-center py-5">
+        <div className="spinner-border text-primary" role="status">
+          <span className="visually-hidden">Loading...</span>
+        </div>
+        <h5 className="mt-3">Loading category...</h5>
+      </div>
+    );
+  }
 
-  // ===== Handle cart update =====
-  const handleCartUpdate = (updatedCart) => {
-    setCartItems(updatedCart);
-  };
-
-  if (loading) return <div style={{ padding: "2rem", textAlign: "center" }}>Loading...</div>;
-  if (error) return <div style={{ padding: "2rem", textAlign: "center", color: "red" }}>{error}</div>;
+  if (error) {
+    return (
+      <div className="container text-center py-5">
+        <div className="alert alert-danger" role="alert">
+          <i className="bi bi-exclamation-triangle-fill me-2"></i>
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
       <Header />
 
       <main style={{ backgroundColor: "#D5D4D3" }}>
-        <CategorySlider categories={categories} />
+        <CategorySlider />
 
-        {pageData && <Breadcrumb path={pageData?.breadcrumb || []} />}
+        <Breadcrumb path={pageData?.breadcrumb || []} />
 
-        {pageData && (
-          <PageHeader
-            title={pageData?.pageTitle}
-            subtitle={pageData?.pageSubtitle}
-            description={pageData?.description}
-          />
-        )}
+        <PageHeader
+          title={pageData?.pageTitle}
+          subtitle={pageData?.pageSubtitle}
+          description={pageData?.description}
+        />
 
         <div className="container">
           <div className="row">
@@ -121,22 +101,23 @@ const ProductListingPage = () => {
               <FilterSidebar
                 categoryId={pageData?._id}
                 filters={pageData?.filterOptions}
-                products={products}
-                setProducts={setProducts}
               />
             </div>
 
             <div className="col-md-9">
-              <ProductGrid
-                products={products}
-                onCartUpdate={handleCartUpdate}
-                pageSize={12}
-              />
+              {/* ✅ categoryId pass karo, not products */}
+              <ProductGrid categoryId={pageData?._id} />
             </div>
           </div>
         </div>
 
-        {pageData?.infoSection && <ResolutionInfo info={pageData.infoSection} />}
+        {pageData?.infoSection && (
+          <ResolutionInfo info={pageData.infoSection} />
+        )}
+
+        {pageData?.recommendations?.length > 0 && (
+          <RecommendationSection products={pageData.recommendations} />
+        )}
       </main>
 
       <Footer />

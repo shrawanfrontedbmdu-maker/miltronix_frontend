@@ -1,55 +1,82 @@
+// src/components/ui/FilterSidebar.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
-const FilterSidebar = ({ categoryId, filters, products, setProducts }) => {
-  const [options, setOptions] = useState(filters || null);
+const FilterSidebar = ({ categoryId, filters, setProducts }) => {
+  const [selected, setSelected] = useState({
+    resolution: [],
+    screenSize: [],
+    availability: [],
+    price: null,
+  });
 
   useEffect(() => {
-    if (!categoryId) return;
-    setOptions(filters);
-  }, [filters, categoryId]);
+    if (!categoryId || !setProducts) return;
+    fetchFilteredProducts();
+    // eslint-disable-next-line
+  }, [selected, categoryId]);
 
-  const applyFilter = (filterType, value) => {
-    if (!products) return;
+  const fetchFilteredProducts = async () => {
+    try {
+      const params = {
+        category: categoryId,
+        resolution: selected.resolution.join(","),
+        screenSize: selected.screenSize.join(","),
+        availability: selected.availability.join(","),
+        maxPrice: selected.price,
+      };
 
-    const filtered = products.filter((p) => {
-      if (filterType === "price") return p.price <= value;
-      if (filterType === "resolution") return value.includes(p.resolution);
-      if (filterType === "screenSize") return value.includes(p.screenSize);
-      if (filterType === "availability") return value.includes(p.inStock ? "In Stock" : "Out of Stock");
-      return true;
-    });
-
-    setProducts(filtered);
+      const res = await axios.get(`${BASE_URL}/products`, { params });
+      setProducts(res.data.products || []); // ✅ ensure array
+    } catch (err) {
+      console.error("Filter error:", err);
+    }
   };
 
-  if (!options) return <div>Loading filters...</div>;
+  const toggleFilter = (type, value) => {
+    setSelected((prev) => {
+      const exists = prev[type].includes(value);
+      return {
+        ...prev,
+        [type]: exists
+          ? prev[type].filter((v) => v !== value)
+          : [...prev[type], value],
+      };
+    });
+  };
+
+  if (!filters) return <div>Loading filters...</div>;
 
   return (
     <div className="filter-card p-4">
       <h4 className="filter-title mb-4 ff2">Filter</h4>
 
-      {options.price && (
+      {/* PRICE */}
+      {filters.price && (
         <div className="mb-4">
           <h6 className="filter-subtitle hv">Price</h6>
           <input
             type="range"
-            min={options.price.min}
-            max={options.price.max}
-            onChange={(e) => applyFilter("price", Number(e.target.value))}
+            min={filters.price.min}
+            max={filters.price.max}
+            value={selected.price || filters.price.max}
+            onChange={(e) =>
+              setSelected((p) => ({ ...p, price: Number(e.target.value) }))
+            }
             className="form-range"
           />
           <div className="d-flex justify-content-between">
-            <span>₹{options.price.min}</span>
-            <span>₹{options.price.max}</span>
+            <span>₹{filters.price.min}</span>
+            <span>₹{filters.price.max}</span>
           </div>
         </div>
       )}
 
+      {/* OTHER FILTERS */}
       {["resolution", "screenSize", "availability"].map((key) => {
-        const filter = options[key];
+        const filter = filters[key];
         if (!filter) return null;
 
         return (
@@ -61,9 +88,8 @@ const FilterSidebar = ({ categoryId, filters, products, setProducts }) => {
                   type="checkbox"
                   className="form-check-input"
                   id={item._id}
-                  onChange={(e) =>
-                    applyFilter(key, e.target.checked ? [item.label] : [])
-                  }
+                  onChange={() => toggleFilter(key, item.label)}
+                  checked={selected[key].includes(item.label)}
                 />
                 <label className="form-check-label hv" htmlFor={item._id}>
                   {item.label}

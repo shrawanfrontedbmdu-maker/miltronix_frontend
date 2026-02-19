@@ -348,7 +348,7 @@ export const customerReviews = [
 
 export const subscriptionFeatures = [
   {
-    icon: "/src/assets/icon 15.svg",
+    icon: "/src/assets/icon15.svg",
     alt: "Tag Icon",
     title: "Exclusive Deals",
     description: "Get access to subscriber-only discounts and flash sales",
@@ -1005,14 +1005,6 @@ export const categoriesData = {
       ],
     },
     recommendations: [
-      {
-        id: "rec-cctv-1",
-        saveAmount: "₹500",
-        title: "Ceiling Camera",
-        image: "/src/assets/ceiling-cam.png",
-        price: "1,999",
-        oldPrice: "2,499",
-      },
       {
         id: "rec-cctv-2",
         saveAmount: "₹500",

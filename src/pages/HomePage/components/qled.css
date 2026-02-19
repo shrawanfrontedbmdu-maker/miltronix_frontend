@@ -1,0 +1,10 @@
+.line{
+     margin-bottom: 50px;
+}
+
+@media (max-width: 333px){
+   .line{
+      margin: 10px 25px;
+      text-align: justify;
+   }
+} 

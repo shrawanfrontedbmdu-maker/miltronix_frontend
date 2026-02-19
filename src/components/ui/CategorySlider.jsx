@@ -4,8 +4,6 @@ import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import { fetchCategories } from "../../api/api";
 
-const BACKEND_URL = "https://miltronix-backend-1.onrender.com";
-
 function CategorySlider() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
@@ -15,9 +13,9 @@ function CategorySlider() {
     const loadCategories = async () => {
       try {
         const cats = await fetchCategories();
-        setCategories(cats);
+        setCategories(Array.isArray(cats) ? cats : []);
       } catch (err) {
-        console.error(err);
+        console.error("Fetch categories error:", err);
       } finally {
         setLoading(false);
       }
@@ -30,83 +28,48 @@ function CategorySlider() {
     navigate(`/category/${categoryKey}`);
   };
 
-  if (loading)
-    return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
-        Loading categories...
-      </div>
-    );
+  if (loading) {
+    return <div style={{ padding: "2rem", textAlign: "center" }}>Loading...</div>;
+  }
 
-  if (!categories.length)
-    return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
-        No categories found
-      </div>
-    );
+  if (!categories.length) {
+    return <div style={{ padding: "2rem", textAlign: "center" }}>No categories found</div>;
+  }
 
   return (
     <>
-      {/* Inline CSS */}
-     <style>{`
-  .category-bg {
-    background: #e5e3e1;
-    padding: 70px 0 25px 0; /* increased top padding */
-  }
+      <style>{`
+        .category-bg {
+          background: #e5e3e1;
+          padding: 70px 0 25px 0;
+        }
 
-  .category-swiper {
-    padding: 10px 0;
-  }
+        .category-slide {
+          text-align: center;
+          cursor: pointer;
+        }
 
-  .category-slide {
-    text-align: center;
-    cursor: pointer;
-  }
+        .category-img {
+          width: 100px;
+          height: 100px;
+          object-fit: contain;
+          display: block;
+          margin: auto;
+          transition: transform 0.3s ease;
+        }
 
-  .category-circle {
-    width: 110px; /* increased from 90px */
-    height: 110px; /* increased from 90px */
-    margin: auto;
-    border-radius: 50%;
-    background: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  }
+        .category-img:hover {
+          transform: scale(1.05);
+        }
 
-  .category-circle:hover {
-    transform: scale(1.05);
-  }
-
-  .category-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 50%;
-  }
-
-  .category-title {
-    margin-top: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    color: #222;
-    text-transform: uppercase;
-  }
-
-  @media (max-width: 576px) {
-    .category-circle {
-      width: 90px; /* increased from 70px */
-      height: 90px; /* increased from 70px */
-    }
-
-    .category-title {
-      font-size: 12px;
-    }
-  }
-`}</style>
-
+        .category-title {
+          margin-top: 8px;
+          font-size: 14px;
+          font-weight: 600;
+          color: #222;
+          text-transform: uppercase;
+        }
+      `}</style>
 
       <section className="category-bg">
         <div className="container">
@@ -114,11 +77,10 @@ function CategorySlider() {
             slidesPerView={3}
             spaceBetween={20}
             breakpoints={{
-              576: { slidesPerView: 4, spaceBetween: 20 },
-              768: { slidesPerView: 5, spaceBetween: 25 },
-              992: { slidesPerView: 7, spaceBetween: 30 },
+              576: { slidesPerView: 4 },
+              768: { slidesPerView: 5 },
+              992: { slidesPerView: 7 },
             }}
-            className="category-swiper"
           >
             {categories.map((cat) => (
               <SwiperSlide
@@ -126,17 +88,21 @@ function CategorySlider() {
                 className="category-slide"
                 onClick={() => handleClick(cat.categoryKey)}
               >
-                <div className="category-circle">
-                  <img
-                    src={
-                      cat.image
-                        ? `${BACKEND_URL}${cat.image}`
-                        : "/src/assets/default-category.png"
-                    }
-                    alt={cat.pageTitle || "category"}
-                    className="category-img"
-                  />
-                </div>
+                <img
+                  src={
+                    cat.image
+                      ? cat.image.startsWith("http")
+                        ? cat.image
+                        : cat.image
+                      : "/src/assets/default-category.png"
+                  }
+                  alt={cat.pageTitle || "category"}
+                  className="category-img"
+                  onError={(e) => {
+                    e.currentTarget.src = "/src/assets/default-category.png";
+                  }}
+                />
+
                 <p className="category-title">{cat.pageTitle}</p>
               </SwiperSlide>
             ))}

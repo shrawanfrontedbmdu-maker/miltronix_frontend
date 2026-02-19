@@ -1,6 +1,6 @@
 import React from "react";
 
-const BACKEND_URL = "http://localhost:3000";
+const BACKEND_URL = "https://miltronix-backend-2.onrender.com";
 
 const ResolutionInfo = ({ info = {} }) => {
   if (!info.cards || info.cards.length === 0) return null;

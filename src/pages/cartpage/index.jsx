@@ -1,20 +1,22 @@
-// src/pages/cart/CartPage.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Header from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 import AccountPageLayout from "../../components/layout/AccountPageLayout";
-import { getCartItems, updateCartItem, removeCartItem } from "../../api/api";
+import { getCartItems, addItemToCart, removeCartItem } from "../../api/api";
 
-const BACKEND_URL = "http://localhost:3000";
+const BACKEND_URL = "https://miltronix-backend-2.onrender.com";
 
 const CartPage = () => {
+  const navigate = useNavigate();
   const [cart, setCart] = useState({ items: [], subtotal: 0 });
   const [loading, setLoading] = useState(true);
+  const [updatingKey, setUpdatingKey] = useState(null);
 
-  // Load cart from backend
+  // ---------------- Load Cart ----------------
   const loadCart = async () => {
-    setLoading(true);
     try {
+      setLoading(true);
       const data = await getCartItems();
       setCart(data || { items: [], subtotal: 0 });
     } catch (err) {
@@ -29,109 +31,157 @@ const CartPage = () => {
     loadCart();
   }, []);
 
-  // Update quantity
-  const handleQuantityChange = async (itemId, quantity) => {
-    if (quantity < 1) return; // Prevent invalid quantity
+  // ---------------- Quantity Change ----------------
+  const handleQuantityChange = async (item, newQty) => {
+    if (newQty < 1) return;
+
     try {
-      await updateCartItem(itemId, { quantity });
+      setUpdatingKey(`${item.product._id}-${item.variant.sku}`);
+      const qtyDiff = newQty - item.quantity;
+      if (qtyDiff === 0) return;
+
+      await addItemToCart({
+        productId: item.product._id,
+        sku: item.variant.sku,
+        quantity: qtyDiff,
+      });
+
       await loadCart();
     } catch (err) {
-      console.error("Failed to update quantity:", err);
+      alert("Failed to update cart item");
+      console.error(err);
+    } finally {
+      setUpdatingKey(null);
     }
   };
 
-  // Remove item from cart
-  const handleRemoveItem = async (itemId) => {
+  // ---------------- Remove Item ----------------
+  const handleRemove = async (item) => {
     try {
-      await removeCartItem(itemId);
+      setUpdatingKey(`${item.product._id}-${item.variant.sku}`);
+      await removeCartItem({ productId: item.product._id });
       await loadCart();
     } catch (err) {
-      console.error("Failed to remove item:", err);
+      alert("Failed to remove item");
+      console.error(err);
+    } finally {
+      setUpdatingKey(null);
     }
   };
 
-  if (loading) return <div>Loading cart...</div>;
+  // ---------------- Checkout ----------------
+  const handleCheckout = async () => {
+    await loadCart();
+
+    if (cart.items.length === 0) {
+      alert("Your cart is empty!");
+      return;
+    }
+
+    navigate("/orderaddress");
+  };
+
+  if (loading) return <div className="text-center mt-5">Loading cart...</div>;
 
   return (
     <>
       <Header />
-
-      <main style={{ paddingTop: "180px", backgroundColor: "#D5D4D3" }}>
+      <main style={{ paddingTop: "180px", backgroundColor: "#f2f2f2" }}>
         <AccountPageLayout
           pageTitle="Cart"
           breadcrumbPath={["Home Page", "My Account", "Cart"]}
         >
-          <div className="container">
-            <h5 className="mb-3" style={{ color: "#4e5954", fontWeight: 600 }}>
-              My Cart ({cart.items.length})
-            </h5>
+          <h5 className="mb-4 fw-bold">My Cart ({cart.items.length})</h5>
 
-            {cart.items.length === 0 ? (
-              <p>Your cart is empty.</p>
-            ) : (
-              <>
-                <div className="row g-4">
-                  {cart.items.map((item) => {
-                    const product = item.product || {};
-                    const imgUrl = product.images?.[0]?.url || "/images/placeholder.png";
+          {cart.items.length === 0 ? (
+            <div className="alert alert-info">Your cart is empty.</div>
+          ) : (
+            <>
+              {cart.items.map((item) => {
+                const imgPath =
+                  item.images && item.images.length > 0 ? item.images[0] : null;
+                const imgUrl = imgPath
+                  ? `${BACKEND_URL}/${
+                      typeof imgPath === "string" ? imgPath : imgPath.url
+                    }`
+                  : "/images/placeholder.png";
 
-                    return (
-                      <div
-                        key={item._id}
-                        className="col-12 col-md-6 col-lg-4 d-flex flex-column align-items-center border p-3"
-                      >
+                return (
+                  <div
+                    key={`${item.product._id}-${item.variant.sku}`}
+                    className="card mb-3 shadow-sm"
+                  >
+                    <div className="card-body d-flex align-items-center justify-content-between">
+                      {/* Product Info */}
+                      <div className="d-flex align-items-center gap-3">
                         <img
                           src={imgUrl}
-                          alt={product.title}
-                          style={{ width: 150, height: 150, objectFit: "cover" }}
+                          alt={item.title}
+                          style={{ width: 90, height: 90, objectFit: "cover" }}
+                          className="rounded"
                         />
-                        <h6 className="mt-2">{product.title}</h6>
-                        <p>₹{item.priceSnapshot.toLocaleString()}</p>
-
-                        {/* Quantity controls */}
-                        <div className="d-flex align-items-center gap-2 mt-2">
-                          <button
-                            className="btn btn-sm btn-secondary"
-                            onClick={() =>
-                              handleQuantityChange(item._id, item.quantity - 1)
-                            }
-                          >
-                            -
-                          </button>
-                          <span>{item.quantity}</span>
-                          <button
-                            className="btn btn-sm btn-secondary"
-                            onClick={() =>
-                              handleQuantityChange(item._id, item.quantity + 1)
-                            }
-                          >
-                            +
-                          </button>
+                        <div>
+                          <h6 className="mb-1">{item.title}</h6>
+                          <small className="text-muted">
+                            SKU: {item.variant?.sku}
+                          </small>
+                          <p className="mb-0 fw-bold">₹{item.priceSnapshot}</p>
                         </div>
+                      </div>
 
-                        {/* Remove button */}
+                      {/* Quantity Controls */}
+                      <div className="d-flex align-items-center gap-2">
                         <button
-                          className="btn btn-sm btn-danger mt-2"
-                          onClick={() => handleRemoveItem(item._id)}
+                          className="btn btn-outline-secondary btn-sm"
+                          disabled={item.quantity <= 1 || updatingKey === `${item.product._id}-${item.variant.sku}`}
+                          onClick={() => handleQuantityChange(item, item.quantity - 1)}
                         >
-                          Remove
+                          −
+                        </button>
+                        <span className="fw-bold">{item.quantity}</span>
+                        <button
+                          className="btn btn-outline-secondary btn-sm"
+                          onClick={() => handleQuantityChange(item, item.quantity + 1)}
+                          disabled={updatingKey === `${item.product._id}-${item.variant.sku}`}
+                        >
+                          +
                         </button>
                       </div>
-                    );
-                  })}
-                </div>
 
-                {/* Subtotal & Checkout */}
-                <div className="mt-4 text-end">
-                  <h4>Total: ₹{cart.subtotal.toLocaleString()}</h4>
-                  <button className="btn btn-primary">Proceed to Checkout</button>
+                      {/* Total */}
+                      <div className="fw-bold">
+                        ₹{item.quantity * item.priceSnapshot}
+                      </div>
+
+                      {/* Remove */}
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => handleRemove(item)}
+                        disabled={updatingKey === `${item.product._id}-${item.variant.sku}`}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+
+              {/* Subtotal */}
+              <div className="card mt-4 shadow">
+                <div className="card-body">
+                  <h5 className="fw-bold">Subtotal: ₹{cart.subtotal}</h5>
+                  <button
+                    className="btn btn-dark w-100 mt-3"
+                    onClick={handleCheckout}
+                  >
+                    Proceed to Checkout
+                  </button>
                 </div>
-              </>
-            )}
-          </div>
+              </div>
+            </>
+          )}
         </AccountPageLayout>
       </main>
-
       <Footer />
     </>
   );

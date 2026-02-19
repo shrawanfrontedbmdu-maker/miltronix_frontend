@@ -1,143 +1,151 @@
-// src/components/pages/CartPage.jsx
 import React, { useEffect, useState } from "react";
-import { getCartItems, updateCartItem, removeCartItem } from "../../api/api";
+import { useNavigate } from "react-router-dom";
+import Header from "../../components/layout/Header";
+import Footer from "../../components/layout/Footer";
+import {
+  getCartItems,
+  updateCartItem,
+  removeCartItem,
+} from "../../api/api";
 
-const CartPage = () => {
+const Cart = () => {
+  const navigate = useNavigate();
+
   const [cart, setCart] = useState({ items: [], subtotal: 0 });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  // Fetch cart
-  const fetchCart = async () => {
+  const loadCart = async () => {
+    setLoading(true);
     try {
-      const data = await getCartItems();
-      // If backend returns items with price and quantity
-      const subtotal = data.items.reduce(
-        (sum, item) => sum + (item.priceSnapshot || item.price) * item.quantity,
-        0
-      );
-      setCart({ items: data.items, subtotal });
+      const res = await getCartItems();
+      setCart(res || { items: [], subtotal: 0 });
     } catch (err) {
-      console.error("Failed to fetch cart:", err);
-      alert(err.response?.data?.message || "Failed to fetch cart");
+      console.error("Failed to load cart:", err);
+      setCart({ items: [], subtotal: 0 });
+    } finally {
+      setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchCart();
+    loadCart();
   }, []);
 
-  // Update quantity
-  const handleQtyChange = async (itemId, newQty) => {
-    if (newQty < 1) return;
-    setLoading(true);
+  const handleQuantityChange = async (itemId, quantity) => {
+    if (quantity < 1) return;
     try {
-      await updateCartItem(itemId, newQty); // Backend should handle itemId & quantity
-      // Optimistically update cart locally
-      setCart((prevCart) => {
-        const updatedItems = prevCart.items.map((item) =>
-          item._id === itemId ? { ...item, quantity: newQty } : item
-        );
-        const newSubtotal = updatedItems.reduce(
-          (sum, item) => sum + (item.priceSnapshot || item.price) * item.quantity,
-          0
-        );
-        return { items: updatedItems, subtotal: newSubtotal };
-      });
+      await updateCartItem(itemId, quantity);
+      await loadCart();
     } catch (err) {
-      console.error("Update quantity failed:", err);
-      alert(err.response?.data?.message || "Failed to update quantity");
-    } finally {
-      setLoading(false);
+      console.error("Failed to update quantity:", err);
     }
   };
 
-  // Remove item
   const handleRemove = async (itemId) => {
-    if (!window.confirm("Are you sure you want to remove this item?")) return;
-    setLoading(true);
     try {
       await removeCartItem(itemId);
-      // Update cart locally without refetching
-      setCart((prevCart) => {
-        const updatedItems = prevCart.items.filter((item) => item._id !== itemId);
-        const newSubtotal = updatedItems.reduce(
-          (sum, item) => sum + (item.priceSnapshot || item.price) * item.quantity,
-          0
-        );
-        return { items: updatedItems, subtotal: newSubtotal };
-      });
+      await loadCart();
     } catch (err) {
-      console.error("Remove item failed:", err);
-      alert(err.response?.data?.message || "Failed to remove item");
-    } finally {
-      setLoading(false);
+      console.error("Failed to remove item:", err);
     }
   };
 
+  const handleCheckout = () => {
+    navigate("/checkout");
+  };
+
+  if (loading) return <div className="text-center my-5">Loading cart...</div>;
+
+  if (!cart.items.length)
+    return (
+      <>
+        <Header />
+        <div className="container my-5 text-center">
+          <h3>Your cart is empty 🛒</h3>
+          <button className="btn btn-primary mt-3" onClick={() => navigate("/")}>
+            Continue Shopping
+          </button>
+        </div>
+        <Footer />
+      </>
+    );
+
   return (
-    <div className="container my-4">
-      <h2 className="mb-4">My Cart</h2>
+    <>
+      <Header />
 
-      {cart.items.length === 0 ? (
-        <p>Your cart is empty.</p>
-      ) : (
-        <>
-          <div className="cart-items row g-3">
-            {cart.items.map((item) => (
-              <div key={item._id} className="col-12">
-                <div className="d-flex align-items-center border p-3 rounded">
-                  <img
-                    src={item.image || "/images/placeholder.png"}
-                    alt={item.title || "Product"}
-                    style={{ width: "80px", height: "80px", objectFit: "cover" }}
-                  />
+      <div className="container my-5">
+        <h2 className="mb-4">My Cart</h2>
 
-                  <div className="ms-3 flex-grow-1">
-                    <h5>{item.title}</h5>
-                    <p>₹{(item.priceSnapshot || item.price)?.toLocaleString() || 0}</p>
+        {cart.items.map((item) => {
+          const imgUrl =
+            item.images?.length > 0
+              ? item.images[0].url
+              : "/images/placeholder.png";
 
-                    <div className="d-flex align-items-center gap-2">
-                      <button
-                        className="btn btn-sm btn-outline-secondary"
-                        onClick={() => handleQtyChange(item._id, item.quantity - 1)}
-                        disabled={loading || item.quantity <= 1}
-                      >
-                        -
-                      </button>
-                      <span>{item.quantity}</span>
-                      <button
-                        className="btn btn-sm btn-outline-secondary"
-                        onClick={() => handleQtyChange(item._id, item.quantity + 1)}
-                        disabled={loading}
-                      >
-                        +
-                      </button>
-                    </div>
-                  </div>
+          return (
+            <div
+              key={item._id}
+              className="d-flex align-items-center justify-content-between border rounded p-3 mb-3"
+            >
+              {/* IMAGE */}
+              <img
+                src={imgUrl}
+                alt={item.title}
+                style={{ width: 80, height: 80, objectFit: "cover" }}
+              />
 
-                  <div>
-                    <button
-                      className="btn btn-sm btn-danger"
-                      onClick={() => handleRemove(item._id)}
-                      disabled={loading}
-                    >
-                      Remove
-                    </button>
-                  </div>
-                </div>
+              {/* DETAILS */}
+              <div className="flex-grow-1 mx-3">
+                <h6>{item.title}</h6>
+                <p className="mb-1">SKU: {item.variant?.sku}</p>
+                <p className="mb-1">Price: ₹{item.priceSnapshot}</p>
               </div>
-            ))}
-          </div>
 
-          {/* Subtotal */}
-          <div className="mt-4 d-flex justify-content-between align-items-center border-top pt-3">
-            <h4>Subtotal: ₹{cart.subtotal?.toLocaleString()}</h4>
-            <button className="btn btn-primary">Proceed to Checkout</button>
-          </div>
-        </>
-      )}
-    </div>
+              {/* QUANTITY */}
+              <div className="d-flex align-items-center">
+                <button
+                  className="btn btn-outline-secondary"
+                  onClick={() =>
+                    handleQuantityChange(item._id, item.quantity - 1)
+                  }
+                >
+                  -
+                </button>
+                <span className="mx-2">{item.quantity}</span>
+                <button
+                  className="btn btn-outline-secondary"
+                  onClick={() =>
+                    handleQuantityChange(item._id, item.quantity + 1)
+                  }
+                >
+                  +
+                </button>
+              </div>
+
+              {/* REMOVE */}
+              <button
+                className="btn btn-danger ms-3"
+                onClick={() => handleRemove(item._id)}
+              >
+                Remove
+              </button>
+            </div>
+          );
+        })}
+
+        {/* TOTAL */}
+        <div className="d-flex justify-content-between align-items-center mt-4 border-top pt-3">
+          <h4>Total: ₹{cart.subtotal.toLocaleString()}</h4>
+          <button className="btn btn-dark" onClick={handleCheckout}>
+            Proceed to Checkout
+          </button>
+        </div>
+      </div>
+
+      <Footer />
+    </>
   );
 };
 
-export default CartPage;
+export default Cart;

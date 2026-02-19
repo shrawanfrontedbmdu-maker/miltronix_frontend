@@ -1,0 +1,157 @@
+body {
+  margin: 0;
+  font-family: "Georgia", serif;
+  background: #f5f4f2;
+  color: #5a5a5a;
+}
+
+.container-2 {
+  max-width: 1200px;
+  margin: auto;
+  padding: 40px 20px;
+}
+
+/* Review Section */
+.review-section-2 {
+  display: flex;
+  gap: 40px;
+  /* background: #f0eee9; */
+  padding: 30px;
+  flex-wrap: wrap;
+}
+
+.review-left-2 {
+  width: 35%;
+  min-width: 280px;
+}
+
+.review-right-2 {
+  width: 60%;
+  min-width: 280px;
+}
+
+.rating {
+  font-size: 18px;
+  margin: 10px 0;
+}
+
+.total-review {
+  font-size: 14px;
+  color: #888;
+}
+
+.rating-bar {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  margin: 6px 0;
+}
+
+.bar {
+  flex: 1;
+  height: 8px;
+  background: #ddd;
+  margin: 0 10px;
+}
+
+.fill {
+  height: 100%;
+  background: #a9a08b;
+}
+
+.w60 { width: 60%; }
+.w20 { width: 20%; }
+.w8 { width: 8%; }
+.w2 { width: 2%; }
+.w10 { width: 10%; }
+
+.review-images-2 {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  flex-wrap: wrap;
+}
+
+.review-images-2 img {
+  width: 120px;
+  height: 80px;
+  object-fit: cover;
+}
+
+/* Similar Products */
+.similar-title-2 {
+  margin: 40px 0 20px;
+  font-size: 28px;
+}
+
+.product-grid-2 {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.product-card-2 {
+  background: #e9e6df;
+  padding: 15px;
+  text-align: center;
+  width: calc(25% - 15px);
+}
+
+.product-card-2 img {
+  width: 100%;
+  height: 160px;
+  object-fit: cover;
+}
+
+.product-card-2 p {
+  margin: 10px 0 5px;
+}
+
+.product-card-2 span {
+  color: #7a6f5a;
+  font-weight: bold;
+}
+
+/* ========================= */
+/* Tablet (max-width: 992px) */
+/* ========================= */
+@media (max-width: 992px) {
+  .review-left-2,
+  .review-right-2 {
+    width: 100%;
+  }
+
+  .product-card-2 {
+    width: calc(50% - 10px);
+  }
+}
+
+/* ========================= */
+/* Mobile (max-width: 600px) */
+/* ========================= */
+@media (max-width: 600px) {
+  .container-2 {
+    padding: 20px 15px;
+  }
+
+  .review-section-2 {
+    padding: 20px;
+  }
+
+  .review-images-2 img {
+    width: 100%;
+    height: 140px;
+  }
+
+  .similar-title-2 {
+    font-size: 22px;
+  }
+
+  .product-card-2 {
+    width: 100%;
+  }
+
+  .product-card-2 img {
+    height: 200px;
+  }
+}
