@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import "./Pay.css";
+import "./pay.css";
 import { createOrderApi } from "../../api/api";
 
 export default function Pay() {
