@@ -12,50 +12,67 @@ import RecommendationSection from "./components/RecommendationSection";
 import PageHeader from "./components/PageHeader";
 import ResolutionInfo from "./components/ResolutionInfo";
 
-import { fetchCategories } from "../../api/api";
+import {
+  fetchCategories,
+  fetchSubcategories,
+  fetchProducts,
+  getFilterGroupsByCategory,
+} from "../../api/api";
 
 const ProductListingPage = () => {
   const { categoryName } = useParams();
 
   const [pageData, setPageData] = useState(null);
+  const [subcategories, setSubcategories] = useState([]);
+  const [recommendations, setRecommendations] = useState([]);
+  const [filterGroups, setFilterGroups] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  console.log("🔍 URL categoryName:", categoryName);
-
   useEffect(() => {
-    const loadCategory = async () => {
+    const loadCategoryData = async () => {
       try {
         setLoading(true);
         setError(null);
 
+        // 1️⃣ Fetch all categories
         const categories = await fetchCategories();
-        console.log("📦 All Categories:", categories);
 
-        // ✅ categoryKey se match karo
+        // 2️⃣ Match category by URL
         const category = categories.find(
           (c) =>
             c.categoryKey?.toLowerCase() ===
             decodeURIComponent(categoryName || "").toLowerCase()
         );
 
-        console.log("✅ Matched Category:", category);
-
-        if (!category) {
-          setError("Category not found");
-          return;
-        }
+        if (!category) throw new Error("Category not found");
 
         setPageData(category);
+
+        // 3️⃣ Fetch subcategories
+        const subRes = await fetchSubcategories(category._id);
+        setSubcategories(subRes?.subcategories || []);
+
+        // 4️⃣ Fetch recommended products for this category
+        const recommendedRes = await fetchProducts({
+          category: category._id,
+          isRecommended: true,
+          limit: 8,
+        });
+        setRecommendations(recommendedRes?.products || []);
+
+        // 5️⃣ Fetch filters for this category
+        const filters = await getFilterGroupsByCategory(category._id);
+        setFilterGroups(filters || []);
       } catch (err) {
-        console.error("🔥 Error:", err);
-        setError("Failed to load category");
+        console.error("🔥 Error loading category page:", err);
+        setError(err.message || "Failed to load category");
       } finally {
         setLoading(false);
       }
     };
 
-    loadCategory();
+    loadCategoryData();
   }, [categoryName]);
 
   if (loading) {
@@ -73,7 +90,6 @@ const ProductListingPage = () => {
     return (
       <div className="container text-center py-5">
         <div className="alert alert-danger" role="alert">
-          <i className="bi bi-exclamation-triangle-fill me-2"></i>
           {error}
         </div>
       </div>
@@ -98,25 +114,35 @@ const ProductListingPage = () => {
         <div className="container">
           <div className="row">
             <div className="col-md-3">
-              <FilterSidebar
-                categoryId={pageData?._id}
-                filters={pageData?.filterOptions}
-              />
+              <FilterSidebar categoryId={pageData?._id} filters={filterGroups} />
             </div>
 
             <div className="col-md-9">
-              {/* ✅ categoryId pass karo, not products */}
               <ProductGrid categoryId={pageData?._id} />
             </div>
           </div>
         </div>
 
-        {pageData?.infoSection && (
-          <ResolutionInfo info={pageData.infoSection} />
+        {/* ✅ SUBCATEGORIES SECTION */}
+        {subcategories.length > 0 && (
+          <ResolutionInfo
+            info={{
+              title: pageData?.pageTitle,
+              subtitle: "Sub Categories",
+              description: pageData?.description,
+              cards: subcategories.map((sub) => ({
+                _id: sub._id,
+                title: sub.name,
+                description: sub.description,
+                image: sub.image,
+              })),
+            }}
+          />
         )}
 
-        {pageData?.recommendations?.length > 0 && (
-          <RecommendationSection products={pageData.recommendations} />
+        {/* ✅ RECOMMENDATIONS SECTION */}
+        {recommendations.length > 0 && (
+          <RecommendationSection products={recommendations} />
         )}
       </main>
 

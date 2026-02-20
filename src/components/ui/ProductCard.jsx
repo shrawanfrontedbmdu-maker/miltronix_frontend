@@ -1,96 +1,84 @@
-import React, { useState, useEffect } from "react";
-import { addItemToWishlist, removeWishlistItem, addItemToCart, getCartItems } from "../../api/api";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { addItemToCart, addItemToWishlist, getCartItems } from "../../api/api";
 
-const BACKEND_URL = "https://miltronix-backend-2.onrender.com";
+const starIconFull = "/src/assets/icon 7.svg";
+const starIconHalf = "/src/assets/icon 9.svg";
+const starIconEmpty = "/src/assets/icon 8.svg";
+const cartIcon = "/src/assets/cart.png";
+const wishlistIcon = "/src/assets/icon 9.svg";
 
-// Icons
-const starFull = "/assets/icon7.svg";
-const starEmpty = "/assets/icon8.svg";
-const cartIcon = "/assets/cart.png";
-const wishlistIcon = "/assets/icon9.svg";
-
-function ProductCard({ product, onCartUpdate, wishlistItems = [], onWishlistUpdate }) {
+const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
   const [loadingCart, setLoadingCart] = useState(false);
   const [addedCart, setAddedCart] = useState(false);
-
   const [loadingWishlist, setLoadingWishlist] = useState(false);
   const [addedWishlist, setAddedWishlist] = useState(false);
 
-  const userId = localStorage.getItem("userId");
-
+  const navigate = useNavigate();
   if (!product) return null;
 
-  const rating = product.rating || 0;
+  const resolvedUserId =
+    userId || JSON.parse(localStorage.getItem("user") || "null")?._id || "";
+
+  const imageUrl = product.images?.[0]?.url || "/images/placeholder.png";
+
+  const variant = product.variants?.[0];
+  const price = variant?.price || 0;
+  const oldPrice = variant?.compareAtPrice || price + 5000;
+
+  const rating = Math.min(5, product.avgRating || 0);
   const fullStars = Math.floor(rating);
-  const emptyStars = 5 - fullStars;
+  const halfStar = rating - fullStars >= 0.5;
+  const emptyStars = 5 - fullStars - (halfStar ? 1 : 0);
+  const reviews = product.reviewCount || 0;
 
-  const imageUrl = product.image
-    ? `${BACKEND_URL}${product.image}`
-    : `${BACKEND_URL}/images/placeholder.png`;
+  const hasStock = variant?.hasStock && variant?.stockQuantity > 0;
 
-  // Check if product is already in wishlist
-  useEffect(() => {
-    if (wishlistItems && product._id) {
-      const exists = wishlistItems.some((item) => item.product._id === product._id);
-      setAddedWishlist(exists);
-    }
-  }, [wishlistItems, product._id]);
-
-  // ---------------- ADD TO CART ----------------
+  // ---- Add to Cart ----
   const handleAddToCart = async () => {
-    if (!product._id) return alert("Product ID not found");
+    if (!product._id || !variant?.sku)
+      return alert("Product/variant not found");
 
     setLoadingCart(true);
     try {
       await addItemToCart({
         productId: product._id,
+        sku: variant.sku,
         quantity: 1,
-        variant: product.variant || {},
       });
 
       setAddedCart(true);
 
       if (onCartUpdate) {
         const updatedCart = await getCartItems();
-        onCartUpdate(updatedCart.items || []);
+        onCartUpdate(updatedCart);
       }
+
+      setTimeout(() => navigate("/cart"), 500);
     } catch (err) {
-      console.error("Failed to add to cart:", err);
-      alert(err?.response?.data?.message || "Failed to add item to cart");
+      alert(err.message || "Failed to add to cart");
     } finally {
       setLoadingCart(false);
     }
   };
 
-  // ---------------- TOGGLE WISHLIST ----------------
-  const handleToggleWishlist = async () => {
-    if (!userId) return alert("Please login to manage wishlist");
-    if (!product._id) return;
+  // ---- Add to Wishlist ----
+  const handleAddToWishlist = async () => {
+    if (!resolvedUserId) return alert("Please login");
 
     setLoadingWishlist(true);
     try {
-      if (!addedWishlist) {
-        await addItemToWishlist({
-          productId: product._id,
-          title: product.title || product.name,
-          images: product.images?.map((img) => img.url) || [],
-          category: product.category || product.categoryKey || "Uncategorized",
-          priceSnapshot: product.price || 0,
-          variant: product.variant ? { sku: product.variant.sku } : undefined,
-        });
-        setAddedWishlist(true);
-      } else {
-        const wishlistItem = wishlistItems.find((item) => item.product._id === product._id);
-        if (wishlistItem) {
-          await removeWishlistItem(userId, wishlistItem._id);
-          setAddedWishlist(false);
-        }
-      }
+      await addItemToWishlist({
+        userId: resolvedUserId,
+        productId: product._id,
+        priceSnapshot: price,
+        variant: { sku: variant?.sku },
+      });
 
-      if (onWishlistUpdate) onWishlistUpdate(); // refresh parent
+      setAddedWishlist(true);
+      if (onWishlistUpdate) onWishlistUpdate();
     } catch (err) {
-      console.error("Failed to update wishlist:", err);
-      alert(err?.message || "Failed to update wishlist");
+      alert(err.message || "Failed to add to wishlist");
     } finally {
       setLoadingWishlist(false);
     }
@@ -98,63 +86,63 @@ function ProductCard({ product, onCartUpdate, wishlistItems = [], onWishlistUpda
 
   return (
     <div className="col-12 col-sm-6 col-lg-4">
-      <div className="product-card h-100 text-center position-relative">
-        {product.saveAmount && (
-          <span className="product-badge">
-            Save ₹{Number(product.saveAmount).toLocaleString()}
-          </span>
-        )}
+      <div className="product-card h-100">
 
-        <img src={imageUrl} className="product-img" alt={product.title || "Product"} />
+        <img
+          src={imageUrl}
+          className="product-img"
+          alt={product.name}
+          onClick={() => navigate(`/checkout/${product._id}`)}
+          style={{ cursor: "pointer" }}
+        />
 
-        <div className="product-body mt-2">
-          <h6 className="product-category">{product.category || product.categoryKey}</h6>
-          <h5 className="product-title">{product.title}</h5>
+        <div className="product-body text-center">
+          {/* <h6 className="product-category">{product.category?.pageTitle || "Category"}</h6> */}
+          <h5 className="product-title">{product.name}</h5>
 
-          <p className="product-price">₹{product.price?.toLocaleString() || 0}</p>
-          {product.oldPrice && (
-            <p className="product-old-price">₹{product.oldPrice.toLocaleString()}</p>
-          )}
+          <p className="product-price">₹{price}</p>
+          <p className="product-old-price">₹{oldPrice}</p>
 
-          <div className="product-rating d-flex align-items-center justify-content-center gap-1">
+          {/* Rating */}
+          <div className="product-rating">
             {[...Array(fullStars)].map((_, i) => (
-              <img key={`full-${i}`} src={starFull} alt="star" className="star" />
+              <img key={i} src={starIconFull} className="star" />
             ))}
+            {halfStar && <img src={starIconHalf} className="star" />}
             {[...Array(emptyStars)].map((_, i) => (
-              <img key={`empty-${i}`} src={starEmpty} alt="star" className="star" />
+              <img key={i} src={starIconEmpty} className="star" />
             ))}
-            <span> {rating.toFixed(1)} ({product.reviews || 0})</span>
+            <span> {rating.toFixed(1)} ({reviews})</span>
           </div>
         </div>
 
-        <div className="product-footer d-flex justify-content-between mt-2">
+        <div className="product-footer">
           <button
-            className={`btn-add-cart w-75 ${addedCart ? "btn-success" : ""}`}
+            className="btn-add-cart"
             onClick={handleAddToCart}
-            disabled={loadingCart || addedCart}
+            disabled={loadingCart || addedCart || !hasStock}
           >
-            <img src={cartIcon} alt="Cart" width="16" height="16" className="me-2" />
-            {loadingCart ? "Adding..." : addedCart ? "Added" : "Add to Cart"}
+            <img src={cartIcon} alt="Cart" width="16" height="16" />{" "}
+            {loadingCart
+              ? "Adding..."
+              : addedCart
+              ? "Added"
+              : !hasStock
+              ? "Out of Stock"
+              : "Add to Cart"}
           </button>
 
           <button
-            className={`btn-wishlist ${addedWishlist ? "btn-danger" : ""}`}
-            onClick={handleToggleWishlist}
-            disabled={loadingWishlist}
+            className="btn-wishlist"
+            onClick={handleAddToWishlist}
+            disabled={loadingWishlist || addedWishlist}
           >
-            <img
-              src={wishlistIcon}
-              alt="Wishlist"
-              width="19"
-              height="19"
-              className={`me-1 ${addedWishlist ? "filled" : ""}`}
-            />
-            {addedWishlist ? " Added" : ""}
+            <img src={wishlistIcon} alt="Wishlist" width="19" height="19" />
           </button>
         </div>
       </div>
     </div>
   );
-}
+};
 
 export default ProductCard;
