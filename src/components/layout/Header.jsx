@@ -119,12 +119,12 @@ function Header() {
         <div className="header-container bg-transparent d-flex justify-content-between align-items-center px-4 py-2">
           
           {/* Cart */}
-          <Link to="/cart" className="text-decoration-none see-more main">
-            <div className="cart-box d-flex align-items-center justify-content-center">
-              <img src={cartIcon} alt="Cart" width="16" height="16" />
-              <span className="d-none d-lg-block ms-2">Cart</span>
-            </div>
-          </Link>
+      <Link to="/cart" className="text-decoration-none see-more main">
+        <div className="cart-box d-flex align-items-center justify-content-center">
+          <img src={cartIcon} alt="Cart" width="16" height="16" />
+          <span className="d-none d-lg-block ms-2">Cart</span>
+        </div>
+      </Link>
 
           {/* 🔥 Search Bar */}
           <div

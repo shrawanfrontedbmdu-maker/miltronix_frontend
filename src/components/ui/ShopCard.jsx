@@ -151,7 +151,7 @@ const ShopCard = ({
           onClick={() => navigate(`/checkout/${product._id}`)}
         />
 
-        <h6 className="product-category2">{categoryName}</h6>
+        {/* <h6 className="product-category2">{categoryName}</h6> */}
 
         <h5
           className="product-title2"

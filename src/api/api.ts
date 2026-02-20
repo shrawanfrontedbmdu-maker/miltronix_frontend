@@ -268,18 +268,18 @@ export const fetchProductBySlug = async (slug: string) => {
   }
 };
 
-export const fetchRecommendedProducts = async (limit: number = 10) => {
+export const fetchRecommendedProducts = async () => {
   try {
-    const res = await API.get(`/products?isRecommended=true&limit=${limit}`);
+    const res = await API.get(`/products/recommended`);
     return res.data;
   } catch (error) {
     handleError(error);
   }
 };
 
-export const fetchFeaturedProducts = async (limit: number = 10) => {
+export const fetchFeaturedProducts = async () => {
   try {
-    const res = await API.get(`/products?isFeatured=true&limit=${limit}`);
+    const res = await API.get(`/products/featured`);
     return res.data;
   } catch (error) {
     handleError(error);
@@ -653,19 +653,109 @@ export const fetchBanners = async () => {
 // ================== SUBCATEGORIES ==================
 export const fetchSubcategories = async (categoryId: string) => {
   if (!categoryId) throw new Error("categoryId is required");
+
   try {
     const res = await API.get(`/subcategory?category=${categoryId}`);
+
     return res.data as {
       success: boolean;
       count: number;
       subcategories: Array<{
         _id: string;
         name: string;
-        description?: string;
         slug?: string;
+        description?: string;
+        image?: string;
         status?: string;
+        displayOrder?: number;
         createdAt: string;
         updatedAt: string;
+      }>;
+    };
+  } catch (error) {
+    handleError(error);
+    throw error; 
+  }
+};
+// ================== FILTER GROUPS ==================
+// ---------------- Types ----------------
+export type FilterOptionType = {
+  _id: string;
+  label: string;
+  value: string;
+};
+
+export type FilterGroupType = {
+  _id: string;
+  name: string;
+  category: {
+    _id: string;
+    categoryKey: string;
+    pageTitle: string;
+  };
+  filterType: "checkbox" | "range";
+  options: FilterOptionType[];
+  createdAt: string;
+  updatedAt: string;
+};
+
+// ---------------- API Call ----------------
+export const getFilterGroupsByCategory = async (categoryId: string) => {
+  if (!categoryId) throw new Error("categoryId is required");
+
+  try {
+    const res = await API.get<{ success: boolean; filterGroups: FilterGroupType[] }>(
+      `/filter-groups/category/${categoryId}`
+    );
+
+    if (!res.data.success) {
+      throw new Error("Failed to fetch filter groups");
+    }
+
+    return res.data.filterGroups;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+
+// ================== COUPONS ==================
+
+// Fetch coupons applicable for current order/cart
+export const getApplicableCouponsApi = async (orderAmount: number) => {
+  if (!orderAmount) throw new Error("orderAmount is required");
+
+  try {
+    const res = await API.post("/coupons/applicable", {
+      orderAmount,
+    });
+
+    // Response example: { success, totalPrice, applicableCoupons: [...] }
+    return res.data as {
+      success: boolean;
+      totalPrice: number;
+      applicableCoupons: Array<{
+        _id: string;
+        title: string;
+        code: string;
+        description: string;
+        discountType: string;
+        discountValue: number;
+        minOrderValue: number;
+        maxDiscount?: number | null;
+        startDate: string;
+        expiryDate: string;
+        totalUsage: number;
+        perCustomerLimit: number;
+        visibility: string;
+        platform: string;
+        firstPurchaseOnly: boolean;
+        status: string;
+        usedCount: number;
+        createdAt: string;
+        updatedAt: string;
+        effectiveDiscount: number;
+        newTotalPrice: number;
       }>;
     };
   } catch (error) {
@@ -673,7 +763,29 @@ export const fetchSubcategories = async (categoryId: string) => {
   }
 };
 
+// Apply a coupon to the current order/cart
+export const applyCouponApi = async (orderAmount: number, code: string) => {
+  if (!orderAmount || !code) throw new Error("orderAmount and code are required");
 
+  try {
+    const res = await API.post("/coupons/apply", {
+      orderAmount,
+      code,
+    });
+
+    return res.data as {
+      success: boolean;
+      appliedCoupon?: {
+        code: string;
+        discountAmount: number;
+        newTotalPrice: number;
+      };
+      message?: string;
+    };
+  } catch (error) {
+    handleError(error);
+  }
+};
 
 
 // ---------------- EXPORT ----------------
