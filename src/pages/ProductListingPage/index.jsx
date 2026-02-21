@@ -75,27 +75,6 @@ const ProductListingPage = () => {
     loadCategoryData();
   }, [categoryName]);
 
-  if (loading) {
-    return (
-      <div className="text-center py-5">
-        <div className="spinner-border text-primary" role="status">
-          <span className="visually-hidden">Loading...</span>
-        </div>
-        <h5 className="mt-3">Loading category...</h5>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="container text-center py-5">
-        <div className="alert alert-danger" role="alert">
-          {error}
-        </div>
-      </div>
-    );
-  }
-
   return (
     <>
       <Header />
@@ -103,46 +82,61 @@ const ProductListingPage = () => {
       <main style={{ backgroundColor: "#D5D4D3" }}>
         <CategorySlider />
 
-        <Breadcrumb path={pageData?.breadcrumb || []} />
-
-        <PageHeader
-          title={pageData?.pageTitle}
-          subtitle={pageData?.pageSubtitle}
-          description={pageData?.description}
-        />
-
-        <div className="container">
-          <div className="row">
-            <div className="col-md-3">
-              <FilterSidebar categoryId={pageData?._id} filters={filterGroups} />
-            </div>
-
-            <div className="col-md-9">
-              <ProductGrid categoryId={pageData?._id} />
+        {error && (
+          <div className="container text-center py-5">
+            <div className="alert alert-danger" role="alert">
+              {error}
             </div>
           </div>
-        </div>
-
-        {/* ✅ SUBCATEGORIES SECTION */}
-        {subcategories.length > 0 && (
-          <ResolutionInfo
-            info={{
-              title: pageData?.pageTitle,
-              subtitle: "Sub Categories",
-              description: pageData?.description,
-              cards: subcategories.map((sub) => ({
-                _id: sub._id,
-                title: sub.name,
-                description: sub.description,
-                image: sub.image,
-              })),
-            }}
-          />
         )}
 
-        {/* ✅ RECOMMENDATIONS SECTION */}
-        {recommendations.length > 0 && (
-          <RecommendationSection products={recommendations} />
+        {!error && (
+          <>
+            <Breadcrumb path={pageData?.breadcrumb || []} />
+
+            <PageHeader
+              title={pageData?.pageTitle}
+              subtitle={pageData?.pageSubtitle}
+              description={pageData?.description}
+            />
+
+            <div className="container">
+              <div className="row">
+                <div className="col-md-3">
+                  <FilterSidebar
+                    categoryId={pageData?._id}
+                    filters={filterGroups}
+                  />
+                </div>
+
+                <div className="col-md-9">
+                  <ProductGrid categoryId={pageData?._id} />
+                </div>
+              </div>
+            </div>
+
+            {/* ✅ SUBCATEGORIES SECTION */}
+            {subcategories.length > 0 && (
+              <ResolutionInfo
+                info={{
+                  title: pageData?.pageTitle,
+                  subtitle: "Sub Categories",
+                  description: pageData?.description,
+                  cards: subcategories.map((sub) => ({
+                    _id: sub._id,
+                    title: sub.name,
+                    description: sub.description,
+                    image: sub.image,
+                  })),
+                }}
+              />
+            )}
+
+            {/* ✅ RECOMMENDATIONS SECTION */}
+            {recommendations.length > 0 && (
+              <RecommendationSection products={recommendations} />
+            )}
+          </>
         )}
       </main>
 

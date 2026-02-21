@@ -21,11 +21,10 @@ API.interceptors.request.use(
     }
     return config;
   },
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 // ---------------- RESPONSE INTERCEPTOR ----------------
-
 
 API.interceptors.response.use(
   (response) => response,
@@ -39,9 +38,8 @@ API.interceptors.response.use(
     }
 
     return Promise.reject(error);
-  }
+  },
 );
-
 
 // ---------------- ERROR HANDLER ----------------
 const handleError = (error: unknown): never => {
@@ -127,7 +125,7 @@ export type OrderItemType = {
   taxAmount?: number;
   discountAmount?: number;
   lineTotal?: number;
-  image?: string; 
+  image?: string;
 };
 
 export type OrderType = {
@@ -231,17 +229,21 @@ export const fetchProducts = async (params?: {
 }) => {
   try {
     const query = new URLSearchParams();
-    if (params?.category)    query.append("category", params.category);
+    if (params?.category) query.append("category", params.category);
     if (params?.categoryKey) query.append("categoryKey", params.categoryKey);
-    if (params?.search)      query.append("search", params.search);
-    if (params?.minPrice !== undefined) query.append("minPrice", params.minPrice.toString());
-    if (params?.maxPrice !== undefined) query.append("maxPrice", params.maxPrice.toString());
-    if (params?.sort)        query.append("sort", params.sort);
-    if (params?.page)        query.append("page", params.page.toString());
-    if (params?.limit)       query.append("limit", params.limit.toString());
-    if (params?.isRecommended !== undefined) query.append("isRecommended", params.isRecommended.toString());
-    if (params?.isFeatured !== undefined)    query.append("isFeatured", params.isFeatured.toString());
-    if (params?.status)      query.append("status", params.status);
+    if (params?.search) query.append("search", params.search);
+    if (params?.minPrice !== undefined)
+      query.append("minPrice", params.minPrice.toString());
+    if (params?.maxPrice !== undefined)
+      query.append("maxPrice", params.maxPrice.toString());
+    if (params?.sort) query.append("sort", params.sort);
+    if (params?.page) query.append("page", params.page.toString());
+    if (params?.limit) query.append("limit", params.limit.toString());
+    if (params?.isRecommended !== undefined)
+      query.append("isRecommended", params.isRecommended.toString());
+    if (params?.isFeatured !== undefined)
+      query.append("isFeatured", params.isFeatured.toString());
+    if (params?.status) query.append("status", params.status);
 
     const res = await API.get(`/products?${query.toString()}`);
     return res.data;
@@ -422,7 +424,10 @@ export const clearCart = async (): Promise<any> => {
 export const getCartCount = async (): Promise<number> => {
   try {
     const cart = await getCartItems();
-    return (cart?.items || []).reduce((sum, item) => sum + (item.quantity || 0), 0);
+    return (cart?.items || []).reduce(
+      (sum, item) => sum + (item.quantity || 0),
+      0,
+    );
   } catch (error) {
     handleError(error);
     throw error;
@@ -435,7 +440,11 @@ export const addItemToWishlist = async (data: WishlistItemType) => {
     throw new Error("productId and priceSnapshot are required");
   try {
     const res = await API.post("/wishlist/items", data);
-    return res.data as { success: boolean; wishlist: WishlistType; message: string };
+    return res.data as {
+      success: boolean;
+      wishlist: WishlistType;
+      message: string;
+    };
   } catch (error) {
     handleError(error);
   }
@@ -455,7 +464,11 @@ export const removeWishlistItem = async (userId: string, itemId: string) => {
   if (!userId || !itemId) throw new Error("userId and itemId are required");
   try {
     const res = await API.delete(`/wishlist/items/${userId}/${itemId}`);
-    return res.data as { success: boolean; wishlist?: WishlistType; message: string };
+    return res.data as {
+      success: boolean;
+      wishlist?: WishlistType;
+      message: string;
+    };
   } catch (error) {
     handleError(error);
   }
@@ -536,7 +549,6 @@ export const deleteAddressApi = async (id: string) => {
   }
 };
 
-
 // ─── Create order from cart ────────────────────────────────────────
 export const createOrderApi = async (data: CreateOrderPayloadType) => {
   try {
@@ -578,7 +590,6 @@ export const getOrdersByUserApi = async (params?: {
   }
 };
 
-
 // Get single order by id
 export const getOrderByIdApi = async (orderId: string) => {
   if (!orderId) throw new Error("orderId is required");
@@ -595,7 +606,6 @@ export const getOrderByIdApi = async (orderId: string) => {
     throw error;
   }
 };
-
 
 // Cancel order
 export const cancelOrderApi = async (orderId: string, reason?: string) => {
@@ -614,7 +624,6 @@ export const cancelOrderApi = async (orderId: string, reason?: string) => {
     throw error;
   }
 };
-
 
 // ================== PROFILE ==================
 export const getUserProfileApi = async () => {
@@ -674,7 +683,7 @@ export const fetchSubcategories = async (categoryId: string) => {
     };
   } catch (error) {
     handleError(error);
-    throw error; 
+    throw error;
   }
 };
 // ================== FILTER GROUPS ==================
@@ -704,9 +713,10 @@ export const getFilterGroupsByCategory = async (categoryId: string) => {
   if (!categoryId) throw new Error("categoryId is required");
 
   try {
-    const res = await API.get<{ success: boolean; filterGroups: FilterGroupType[] }>(
-      `/filter-groups/category/${categoryId}`
-    );
+    const res = await API.get<{
+      success: boolean;
+      filterGroups: FilterGroupType[];
+    }>(`/filter-groups/category/${categoryId}`);
 
     if (!res.data.success) {
       throw new Error("Failed to fetch filter groups");
@@ -718,19 +728,103 @@ export const getFilterGroupsByCategory = async (categoryId: string) => {
   }
 };
 
+// ================== REVIEWS (User-Facing) ==================
 
+export type ReviewType = {
+  _id: string;
+  product: string;
+  customer: { _id: string; fullName: string; email: string } | string;
+  reviewText: string;
+  rating: number;
+  status: "pending" | "approved" | "rejected";
+  flaggedKeywords: string[];
+  images: { url: string; public_id: string; _id: string }[];
+  videos: { url: string; public_id: string; _id: string }[];
+  createdAt: string;
+};
+
+export type CreateReviewPayload = {
+  product: string;
+  reviewText: string;
+  rating: number;
+  images?: File[];
+  videos?: File[];
+};
+
+export type ReviewsResponseType = {
+  reviews: ReviewType[];
+  averageRating: number;
+  totalReviews: number;
+};
+
+// ✅ FIXED: /reviews/:productId  (bina /product/ ke)
+export const getReviewsByProductApi = async (productId: string) => {
+  if (!productId) throw new Error("productId is required");
+  try {
+    const res = await API.get(`/reviews/${productId}`);
+    return res.data as ReviewsResponseType;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// GET single review by ID
+export const getReviewByIdApi = async (reviewId: string) => {
+  if (!reviewId) throw new Error("reviewId is required");
+  try {
+    const res = await API.get(`/reviews/${reviewId}`);
+    return res.data as ReviewType;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// POST new review (auth + multipart)
+export const createReviewApi = async (data: CreateReviewPayload) => {
+  if (!data.product || !data.reviewText || !data.rating)
+    throw new Error("product, reviewText aur rating required hain");
+  try {
+    const formData = new FormData();
+    formData.append("product", data.product);
+    formData.append("reviewText", data.reviewText);
+    formData.append("rating", data.rating.toString());
+    if (data.images?.length)
+      data.images.slice(0, 5).forEach((img) => formData.append("images", img));
+    if (data.videos?.length)
+      data.videos.slice(0, 2).forEach((vid) => formData.append("videos", vid));
+    const res = await API.post("/reviews", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data as ReviewType;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// DELETE own review (auth)
+export const deleteReviewApi = async (reviewId: string) => {
+  if (!reviewId) throw new Error("reviewId is required");
+  try {
+    const res = await API.delete(`/reviews/${reviewId}`);
+    return res.data as { message: string };
+  } catch (error) {
+    handleError(error);
+  }
+};
 // ================== COUPONS ==================
 
-// Fetch coupons applicable for current order/cart
+// Fetch top applicable coupons for current order/cart
 export const getApplicableCouponsApi = async (orderAmount: number) => {
-  if (!orderAmount) throw new Error("orderAmount is required");
+  if (orderAmount === undefined || orderAmount <= 0)
+    throw new Error("A valid orderAmount is required");
 
   try {
+    // Backend expects 'totalPrice' in body
     const res = await API.post("/coupons/applicable", {
-      orderAmount,
+      totalPrice: orderAmount,
     });
 
-    // Response example: { success, totalPrice, applicableCoupons: [...] }
+    // Backend returns { success, totalPrice, applicableCoupons: [...] }
     return res.data as {
       success: boolean;
       totalPrice: number;
@@ -739,7 +833,7 @@ export const getApplicableCouponsApi = async (orderAmount: number) => {
         title: string;
         code: string;
         description: string;
-        discountType: string;
+        discountType: string; // "percentage" | "flat"
         discountValue: number;
         minOrderValue: number;
         maxDiscount?: number | null;
@@ -765,15 +859,29 @@ export const getApplicableCouponsApi = async (orderAmount: number) => {
 
 // Apply a coupon to the current order/cart
 export const applyCouponApi = async (orderAmount: number, code: string) => {
-  if (!orderAmount || !code) throw new Error("orderAmount and code are required");
+  if (!orderAmount || !code)
+    throw new Error("Both orderAmount and coupon code are required");
 
   try {
     const res = await API.post("/coupons/apply", {
       orderAmount,
-      code,
+      code: code.toUpperCase().trim(), // Ensure uppercase to match backend
     });
 
-    return res.data as {
+    // Backend returns { success, discount, finalAmount, message }
+    const data = res.data;
+
+    return {
+      success: data.success,
+      appliedCoupon: data.success
+        ? {
+            code,
+            discountAmount: data.discount,
+            newTotalPrice: data.finalAmount,
+          }
+        : undefined,
+      message: data.message,
+    } as {
       success: boolean;
       appliedCoupon?: {
         code: string;
@@ -786,7 +894,6 @@ export const applyCouponApi = async (orderAmount: number, code: string) => {
     handleError(error);
   }
 };
-
 
 // ---------------- EXPORT ----------------
 export default API;

@@ -1,0 +1,603 @@
+@import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,200..800&display=swap');
+
+/* ─── Base ─── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Bricolage Grotesque', sans-serif;
+  background: #e4e3e1;
+}
+
+/* ─── Animations ─── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Page Layout ─── */
+.cart-page {
+  min-height: 100vh;
+  background-color: #e4e3e1;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.cart-main {
+  padding-top: 106px; /* matches .main-content-padding */
+  padding-bottom: 60px;
+}
+
+.cart-wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 20px 20px 0;
+  display: grid;
+  grid-template-columns: 1fr 310px;
+  gap: 20px;
+  align-items: start;
+}
+
+/* ─── Step Indicator ─── */
+.step-indicator {
+  background: #D5D4D3;
+  padding: 13px 0;
+}
+
+.step-indicator-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+}
+
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex-shrink: 0;
+}
+
+.step-circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 2px solid #aaa9a8;
+  background: transparent;
+}
+
+.step-circle.active,
+.step-circle.done {
+  background: #616D6B;
+  border-color: #616D6B;
+}
+
+.step-circle-num {
+  font-size: 12px;
+  font-weight: 700;
+  color: #7E7E7E;
+  line-height: 1;
+}
+
+.step-circle.active .step-circle-num {
+  color: #ffffff;
+}
+
+.step-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #7E7E7E;
+  white-space: nowrap;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+.step-label.active,
+.step-label.done {
+  font-weight: 700;
+  color: #2c2c2c;
+}
+
+.step-connector {
+  flex: 1;
+  height: 1.5px;
+  background: #bbbab8;
+  margin: 0 14px;
+  border-radius: 2px;
+}
+
+.step-connector.done {
+  background: #616D6B;
+}
+
+/* ─── Section Heading ─── */
+.section-head {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7E7E7E;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  margin-top: 18px;
+}
+
+/* ─── Coupon Card ─── */
+.coupon-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 16px 18px;
+  margin-bottom: 10px;
+  border: 1px solid #c8c7c5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.coupon-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2c2c2c;
+}
+
+.coupon-top {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.coupon-input {
+  flex: 1;
+  border: 1.5px solid #c8c7c5;
+  border-radius: 50px;
+  padding: 9px 16px;
+  font-size: 13px;
+  color: #2c2c2c;
+  outline: none;
+  background: #fafaf8;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  transition: border-color 0.15s;
+}
+
+.coupon-input:focus {
+  border-color: #616D6B;
+}
+
+.apply-btn {
+  background: #616D6B;
+  border: none;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 12px;
+  cursor: pointer;
+  padding: 9px 20px;
+  border-radius: 50px;
+  letter-spacing: 0.8px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.apply-btn:hover {
+  background: #4f5a58;
+}
+
+.available-title {
+  font-size: 10px;
+  font-weight: 700;
+  color: #7E7E7E;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-bottom: 8px;
+}
+
+.coupon-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 14px;
+}
+
+.coupon-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1.5px dashed #616D6B;
+  border-radius: 4px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #616D6B;
+  background: #ecefee;
+  cursor: pointer;
+  margin-right: 6px;
+  margin-bottom: 6px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  transition: background 0.15s;
+}
+
+.coupon-pill:hover {
+  background: #dde5e2;
+}
+
+.coupon-pill-discount {
+  font-weight: 400;
+  font-size: 10px;
+}
+
+.success-msg {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #3d7a65;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.error-msg {
+  color: #b94040;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+/* ─── Cart Item Card ─── */
+.cart-item {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 8px;
+  border: 1px solid #c8c7c5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  position: relative;
+  animation: fadeUp 0.3s ease both;
+}
+
+.item-img {
+  width: 88px;
+  height: 98px;
+  object-fit: cover;
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: #D5D4D3;
+  border: 1px solid #c8c7c5;
+}
+
+.item-info {
+  flex: 1;
+}
+
+.item-brand {
+  font-size: 14px;
+  font-weight: 700;
+  color: #2c2c2c;
+  margin-bottom: 2px;
+}
+
+.item-title {
+  font-size: 12px;
+  color: #7E7E7E;
+  margin-bottom: 8px;
+  line-height: 1.45;
+}
+
+.item-sku {
+  display: inline-block;
+  font-size: 10px;
+  background: #D5D4D3;
+  color: #7E7E7E;
+  border-radius: 20px;
+  padding: 2px 8px;
+  margin-bottom: 10px;
+  letter-spacing: 0.3px;
+}
+
+.price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.item-price {
+  font-size: 15px;
+  font-weight: 800;
+  color: #2c2c2c;
+}
+
+.item-price-unit {
+  font-size: 11px;
+  color: #7E7E7E;
+}
+
+.qty-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qty-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7E7E7E;
+  letter-spacing: 0.5px;
+}
+
+.qty-control {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #c8c7c5;
+  border-radius: 50px;
+  overflow: hidden;
+}
+
+.qty-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  font-size: 16px;
+  font-weight: 700;
+  color: #2c2c2c;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+
+.qty-btn:hover {
+  background: #D5D4D3;
+}
+
+.qty-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.qty-num {
+  min-width: 30px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2c2c2c;
+  border-left: 1.5px solid #c8c7c5;
+  border-right: 1.5px solid #c8c7c5;
+  line-height: 26px;
+}
+
+.remove-btn {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: none;
+  color: #aaaaaa;
+  cursor: pointer;
+  padding: 3px 7px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: inherit;
+  transition: color 0.15s, background 0.15s;
+}
+
+.remove-btn:hover {
+  color: #b94040;
+  background: #f5eded;
+}
+
+/* ─── Summary Card ─── */
+.summary-card {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 18px;
+  border: 1px solid #c8c7c5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 160px;
+}
+
+.summary-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: #7E7E7E;
+  letter-spacing: 1.3px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  border-bottom: 1px solid #c8c7c5;
+  padding-bottom: 12px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #2c2c2c;
+  margin-bottom: 10px;
+}
+
+.summary-label {
+  color: #7E7E7E;
+}
+
+.summary-val {
+  font-weight: 700;
+}
+
+.summary-val.free {
+  color: #3d7a65;
+}
+
+.discount-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: #3d7a65;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.summary-divider {
+  border: none;
+  border-top: 1px solid #c8c7c5;
+  margin: 12px 0;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 800;
+  color: #2c2c2c;
+  margin-bottom: 16px;
+}
+
+/* ─── Checkout Button ─── */
+.checkout-btn {
+  width: 100%;
+  padding: 13px 0;
+  background: #616D6B;
+  color: #ffffff;
+  border: none;
+  border-radius: 50px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  transition: background 0.2s;
+}
+
+.checkout-btn:hover {
+  background: #4f5a58;
+}
+
+.savings-badge {
+  background: #ecefee;
+  border: 1px solid #c5d5cf;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 12px;
+  color: #3d7a65;
+  font-weight: 700;
+}
+
+.cart-secure-text {
+  text-align: center;
+  font-size: 11px;
+  color: #bbbbbb;
+  margin-top: 10px;
+}
+
+/* ─── Empty State ─── */
+.empty-wrap {
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.empty-emoji {
+  font-size: 50px;
+  margin-bottom: 14px;
+}
+
+.empty-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #2c2c2c;
+  margin-bottom: 8px;
+}
+
+.empty-subtitle {
+  font-size: 13px;
+  color: #7E7E7E;
+  margin-bottom: 24px;
+}
+
+.shop-btn {
+  display: inline-block;
+  background: #616D6B;
+  color: #ffffff;
+  padding: 12px 36px;
+  border-radius: 50px;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 1px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+  font-family: 'Bricolage Grotesque', sans-serif;
+  transition: background 0.2s;
+}
+
+.shop-btn:hover {
+  background: #4f5a58;
+}
+
+/* ─── Loading Spinner ─── */
+.loading-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.loading-inner {
+  text-align: center;
+}
+
+.spinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid #616D6B;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin: 0 auto 12px;
+}
+
+.loading-text {
+  color: #7E7E7E;
+  font-size: 13px;
+  font-family: 'Bricolage Grotesque', sans-serif;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .cart-wrap {
+    grid-template-columns: 1fr;
+  }
+
+  .summary-card {
+    position: static;
+  }
+
+  .step-label {
+    display: none;
+  }
+
+  .step-label.active {
+    display: inline;
+  }
+}

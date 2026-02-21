@@ -1,14 +1,132 @@
 import React, { useEffect, useState } from "react";
 import "./secendaddress.css";
-import Header from "../layout/Header";
-import Footer from "../layout/Footer";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation, Link } from "react-router-dom";
 import {
   getAddressesApi,
   addAddressApi,
   getCheckoutDetailsApi,
+  getCartItems,
 } from "../../api/api";
+import logoBanner from "../../assets/MILTRONIX APP DESIGN 3.png";
 
+/* ─── Icons ─── */
+const CheckIconWhite = () => (
+  <svg
+    width="11"
+    height="11"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="white"
+    strokeWidth="3"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <polyline points="20 6 9 17 4 12" />
+  </svg>
+);
+const PlusIcon = () => (
+  <svg
+    width="13"
+    height="13"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2.5"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+const LocationIcon = () => (
+  <svg
+    width="14"
+    height="14"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+  >
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+    <circle cx="12" cy="10" r="3" />
+  </svg>
+);
+
+/* ─── Header ─── */
+const ShippingHeader = () => (
+  <div className="fixed-top">
+    <section className="miltronix-banner d-flex justify-content-center align-items-center">
+      <Link to="/">
+        <img
+          src={logoBanner}
+          alt="Miltronix Logo"
+          className="img-fluid miltronix-logo"
+        />
+      </Link>
+    </section>
+  </div>
+);
+
+/* ─── Step Indicator ─── */
+const StepIndicator = ({ currentStep = 2 }) => {
+  const steps = [
+    { num: 1, label: "Shopping Cart" },
+    { num: 2, label: "Shipping Detail" },
+    { num: 3, label: "Preview your order" },
+  ];
+  return (
+    <div className="step-indicator">
+      <div className="step-indicator-inner">
+        {steps.map((step, idx) => {
+          const done = step.num < currentStep;
+          const active = step.num === currentStep;
+          return (
+            <React.Fragment key={step.num}>
+              <div className="step-item">
+                <div
+                  className={`step-circle ${done ? "done" : active ? "active" : ""}`}
+                >
+                  {done ? (
+                    <CheckIconWhite />
+                  ) : (
+                    <span className="step-circle-num">{step.num}</span>
+                  )}
+                </div>
+                <span
+                  className={`step-label ${done ? "done" : active ? "active" : ""}`}
+                >
+                  {step.label}
+                </span>
+              </div>
+              {idx < steps.length - 1 && (
+                <div className={`step-connector ${done ? "done" : ""}`} />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+/* ─── Price Row helper ─── */
+const PriceRow = ({ label, value, green = false, bold = false }) => (
+  <div className="sa-price-row">
+    <span className="sa-price-label" style={{ fontWeight: bold ? 800 : 400 }}>
+      {label}
+    </span>
+    <span
+      className={`sa-price-val ${green ? "green" : ""} ${bold ? "bold" : ""}`}
+    >
+      {value}
+    </span>
+  </div>
+);
+
+/* ─── Empty Form ─── */
 const EMPTY_FORM = {
   fullName: "",
   houseFlatNo: "",
@@ -21,6 +139,7 @@ const EMPTY_FORM = {
   isDefault: false,
 };
 
+/* ─── Main Component ─── */
 function SecendAddress() {
   const [showModal, setShowModal] = useState(false);
   const [addresses, setAddresses] = useState([]);
@@ -29,15 +148,21 @@ function SecendAddress() {
   const [checkoutData, setCheckoutData] = useState(null);
   const [checkoutLoading, setCheckoutLoading] = useState(true);
   const [formData, setFormData] = useState(EMPTY_FORM);
+  // ─── NEW: Cart items store karo ───
+  const [cartItems, setCartItems] = useState([]);
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Coupon passed from CartPage
+  const couponCode = location.state?.coupon || null;
+  const couponDiscount = Number(location.state?.discountAmount || 0);
 
   const fetchAddresses = async () => {
     try {
       const data = await getAddressesApi();
       const list = data || [];
       setAddresses(list);
-      // Auto-select default address, otherwise first one
       const def = list.find((a) => a.isDefault) || list[0] || null;
       setSelectedAddress(def);
     } catch (error) {
@@ -57,9 +182,20 @@ function SecendAddress() {
     }
   };
 
+  // ─── NEW: CartPage se same cart items fetch karo ───
+  const fetchCartItems = async () => {
+    try {
+      const data = await getCartItems();
+      setCartItems(data?.items || []);
+    } catch {
+      setCartItems([]);
+    }
+  };
+
   useEffect(() => {
     fetchAddresses();
     fetchCheckoutDetails();
+    fetchCartItems(); // ← cart items bhi load karo
   }, []);
 
   const handleChange = (e) => {
@@ -74,8 +210,6 @@ function SecendAddress() {
     e.preventDefault();
     try {
       setLoading(true);
-
-      // NOTE: userId NOT sent — backend controller uses req.user.id from JWT token
       const newAddress = await addAddressApi(formData);
       setAddresses((prev) => [newAddress, ...prev]);
       setSelectedAddress(newAddress);
@@ -93,188 +227,193 @@ function SecendAddress() {
       alert("Please select a delivery address");
       return;
     }
-    navigate("/pay", { state: { selectedAddress, checkoutData } });
+    navigate("/pay", {
+      state: {
+        selectedAddress,
+        checkoutData,
+        cartItems, // ← CartPage ke items Pass karo
+        coupon: couponCode, // ← Coupon code pass karo
+        discountAmount: couponDiscount, // ← Discount pass karo
+      },
+    });
   };
 
   const pricing = checkoutData?.pricing;
 
   return (
     <>
-      <Header />
+      <ShippingHeader />
 
-      <div className="has">
-        <div className="add-address-wrapper top-btn">
-          <button
-            className="add-address-btn"
-            onClick={() => setShowModal(true)}
-          >
-            + Add New Address
-          </button>
-        </div>
+      <div className="sa-page">
+        <main className="sa-main">
+          <StepIndicator currentStep={2} />
 
-        <div
-          style={{
-            display: "flex",
-            gap: "12px",
-            alignItems: "flex-start",
-            padding: "20px",
-            flexWrap: "wrap",
-          }}
-        >
-          {/* ── LEFT: Address List ──────────────────────────────────────── */}
-          <div style={{ flex: "1 1 55%", minWidth: "280px" }}>
-            {addresses.length === 0 ? (
-              <p style={{ color: "#888" }}>
-                No saved addresses. Add one above.
-              </p>
-            ) : (
-              addresses.map((address) => {
-                const isSelected = selectedAddress?._id === address._id;
-                return (
-                  <div
-                    key={address._id}
-                    onClick={() => setSelectedAddress(address)}
-                    style={{
-                      border: isSelected ? "2px solid green" : "1px solid #ccc",
-                      borderRadius: "8px",
-                      padding: "14px 16px",
-                      marginBottom: "12px",
-                      cursor: "pointer",
-                      background: isSelected ? "#f6fff6" : "#fff",
-                      boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-                    }}
-                  >
+          <div className="sa-wrap">
+            {/* ── LEFT — Addresses ── */}
+            <div>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  marginBottom: 16,
+                }}
+              >
+                <div className="sa-section-head" style={{ marginBottom: 0 }}>
+                  Select Delivery Address
+                </div>
+                <button
+                  className="sa-add-btn"
+                  onClick={() => setShowModal(true)}
+                >
+                  <PlusIcon />
+                  Add New Address
+                </button>
+              </div>
+
+              {addresses.length === 0 ? (
+                <div className="sa-empty">
+                  <LocationIcon />
+                  <p style={{ marginTop: 10 }}>No saved addresses yet.</p>
+                  <p>Add one to continue.</p>
+                </div>
+              ) : (
+                addresses.map((address, idx) => {
+                  const isSelected = selectedAddress?._id === address._id;
+                  return (
                     <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
+                      key={address._id}
+                      className={`sa-address-card ${isSelected ? "selected" : ""}`}
+                      style={{ animationDelay: `${idx * 50}ms` }}
+                      onClick={() => setSelectedAddress(address)}
                     >
-                      <h3 style={{ margin: "0 0 4px", fontSize: "15px" }}>
-                        {address.fullName}
-                        {address.isDefault && (
-                          <span
-                            style={{
-                              marginLeft: 8,
-                              fontSize: 11,
-                              color: "green",
-                              fontWeight: "normal",
-                            }}
-                          >
-                            (Default)
+                      <div className="sa-address-top">
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                          <span className="sa-address-name">
+                            {address.fullName}
                           </span>
+                          {address.isDefault && (
+                            <span className="sa-default-badge">DEFAULT</span>
+                          )}
+                        </div>
+                        {isSelected && (
+                          <div className="sa-selected-check">
+                            <CheckIconWhite />
+                          </div>
                         )}
-                      </h3>
-                      {isSelected && (
-                        <span style={{ color: "green", fontSize: 18 }}>✓</span>
-                      )}
+                      </div>
+                      <p className="sa-address-text">
+                        {address.houseFlatNo}
+                        {address.buildingApartment
+                          ? `, ${address.buildingApartment}`
+                          : ""}
+                        {", "}
+                        {address.streetLocality}
+                        {address.landmark ? `, Near ${address.landmark}` : ""}
+                        <br />
+                        {address.city}, {address.state} — {address.pinCode}
+                      </p>
                     </div>
+                  );
+                })
+              )}
+            </div>
 
-                    <p
-                      style={{
-                        margin: 0,
-                        fontSize: "13px",
-                        color: "#555",
-                        lineHeight: 1.6,
-                      }}
-                    >
-                      {address.houseFlatNo}
-                      {address.buildingApartment
-                        ? `, ${address.buildingApartment}`
-                        : ""}
-                      {", "}
-                      {address.streetLocality}
-                      {address.landmark ? `, Near ${address.landmark}` : ""}
-                      <br />
-                      {address.city}, {address.state} — {address.pinCode}
-                    </p>
+            {/* ── RIGHT — Payment Summary ── */}
+            <div>
+              <div className="sa-summary-card">
+                <div className="sa-summary-title">Payment Summary</div>
+
+                {checkoutLoading ? (
+                  <div className="sa-loading">
+                    <div className="sa-spinner" />
                   </div>
-                );
-              })
-            )}
-          </div>
-
-          {/* ── RIGHT: Payment Summary ──────────────────────────────────── */}
-          <div
-            className="payment-card"
-            style={{
-              flex: "1 1 30%",
-              minWidth: "260px",
-              border: "1px solid #e0e0e0",
-              borderRadius: "10px",
-              padding: "20px",
-              background: "#fff",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.07)",
-              position: "sticky",
-              top: "20px",
-            }}
-          >
-            <h3 style={{ marginBottom: "16px", fontSize: "16px" }}>
-              Payment Summary
-            </h3>
-
-            {checkoutLoading ? (
-              <p>Loading...</p>
-            ) : pricing ? (
-              <>
-                <PriceRow
-                  label="Total MRP"
-                  value={`₹${pricing.totalCutPrice.toLocaleString("en-IN")}`}
-                />
-                <PriceRow
-                  label="Discount"
-                  value={`-₹${pricing.totalDiscount.toLocaleString("en-IN")}`}
-                  green
-                />
-                {pricing.couponDiscount > 0 && (
-                  <PriceRow
-                    label="Coupon Discount"
-                    value={`-₹${pricing.couponDiscount.toLocaleString("en-IN")}`}
-                    green
-                  />
+                ) : pricing ? (
+                  <>
+                    <PriceRow
+                      label="Total MRP"
+                      value={`₹${pricing.totalCutPrice.toLocaleString("en-IN")}`}
+                    />
+                    <PriceRow
+                      label="Discount"
+                      value={`− ₹${pricing.totalDiscount.toLocaleString("en-IN")}`}
+                      green
+                    />
+                    {couponDiscount > 0 && (
+                      <PriceRow
+                        label={`Coupon${couponCode ? ` (${couponCode})` : ""}`}
+                        value={`− ₹${couponDiscount.toLocaleString("en-IN")}`}
+                        green
+                      />
+                    )}
+                    <PriceRow label="Delivery" value="FREE" green />
+                    <hr className="sa-divider" />
+                    <div className="sa-total-row">
+                      <span>Total Amount</span>
+                      <span>
+                        ₹
+                        {Math.max(
+                          0,
+                          pricing.finalAmount - couponDiscount,
+                        ).toLocaleString("en-IN")}
+                      </span>
+                    </div>
+                    {couponDiscount > 0 && (
+                      <div className="sa-savings-badge">
+                        🎉 You save ₹{couponDiscount.toLocaleString("en-IN")}{" "}
+                        with coupon!
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <p style={{ color: "var(--muted)", fontSize: 13 }}>
+                    Could not load pricing
+                  </p>
                 )}
-                <PriceRow label="Delivery" value="FREE" green />
-                <hr style={{ margin: "12px 0" }} />
-                <PriceRow
-                  label="Total Amount"
-                  value={`₹${pricing.finalAmount.toLocaleString("en-IN")}`}
-                  bold
-                />
-              </>
-            ) : (
-              <p style={{ color: "#888", fontSize: 14 }}>
-                Could not load pricing
-              </p>
-            )}
 
-            <button
-              className="checkout-btn"
-              onClick={handleCheckout}
-              style={{ width: "100%", marginTop: 16 }}
-            >
-              Proceed to Payment
-            </button>
+                <button
+                  className="sa-proceed-btn"
+                  onClick={handleCheckout}
+                  disabled={!selectedAddress}
+                >
+                  Proceed to Payment
+                </button>
+                <p className="sa-secure-text">
+                  Safe &amp; Secure Payments. Easy returns.
+                </p>
+              </div>
+            </div>
           </div>
-        </div>
+        </main>
+      </div>
 
-        {/* ── MODAL ───────────────────────────────────────────────────────── */}
-        {showModal && (
-          <div className="modal active">
-            <div className="modal-content">
-              <button className="close-btn" onClick={() => setShowModal(false)}>
-                ✕
-              </button>
-              <h2>Add New Address</h2>
+      {/* ── MODAL — Add New Address ── */}
+      {showModal && (
+        <div
+          className="sa-modal-overlay"
+          onClick={(e) => e.target === e.currentTarget && setShowModal(false)}
+        >
+          <div className="sa-modal">
+            <button
+              className="sa-modal-close"
+              onClick={() => setShowModal(false)}
+            >
+              ✕
+            </button>
+            <div className="sa-modal-title">Add New Address</div>
 
-              <form onSubmit={handleSubmit}>
+            <form className="sa-form" onSubmit={handleSubmit}>
+              <input
+                className="sa-input"
+                name="fullName"
+                placeholder="Full Name *"
+                value={formData.fullName}
+                onChange={handleChange}
+                required
+              />
+              <div className="sa-form-row">
                 <input
-                  name="fullName"
-                  placeholder="Full Name *"
-                  value={formData.fullName}
-                  onChange={handleChange}
-                  required
-                />
-                <input
+                  className="sa-input"
                   name="houseFlatNo"
                   placeholder="House / Flat No. *"
                   value={formData.houseFlatNo}
@@ -282,25 +421,31 @@ function SecendAddress() {
                   required
                 />
                 <input
+                  className="sa-input"
                   name="buildingApartment"
-                  placeholder="Building / Apartment (Optional)"
+                  placeholder="Building / Apartment"
                   value={formData.buildingApartment}
                   onChange={handleChange}
                 />
+              </div>
+              <input
+                className="sa-input"
+                name="streetLocality"
+                placeholder="Street / Locality *"
+                value={formData.streetLocality}
+                onChange={handleChange}
+                required
+              />
+              <input
+                className="sa-input"
+                name="landmark"
+                placeholder="Landmark (Optional)"
+                value={formData.landmark}
+                onChange={handleChange}
+              />
+              <div className="sa-form-row">
                 <input
-                  name="streetLocality"
-                  placeholder="Street / Locality *"
-                  value={formData.streetLocality}
-                  onChange={handleChange}
-                  required
-                />
-                <input
-                  name="landmark"
-                  placeholder="Landmark (Optional)"
-                  value={formData.landmark}
-                  onChange={handleChange}
-                />
-                <input
+                  className="sa-input"
                   name="pinCode"
                   placeholder="Pin Code *"
                   value={formData.pinCode}
@@ -309,66 +454,40 @@ function SecendAddress() {
                   required
                 />
                 <input
+                  className="sa-input"
                   name="city"
                   placeholder="City *"
                   value={formData.city}
                   onChange={handleChange}
                   required
                 />
+              </div>
+              <input
+                className="sa-input"
+                name="state"
+                placeholder="State *"
+                value={formData.state}
+                onChange={handleChange}
+                required
+              />
+              <label className="sa-checkbox-label">
                 <input
-                  name="state"
-                  placeholder="State *"
-                  value={formData.state}
+                  type="checkbox"
+                  name="isDefault"
+                  checked={formData.isDefault}
                   onChange={handleChange}
-                  required
                 />
-
-                <label
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    margin: "10px 0",
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    name="isDefault"
-                    checked={formData.isDefault}
-                    onChange={handleChange}
-                  />
-                  Set as Default Address
-                </label>
-
-                <button type="submit" className="save-btn" disabled={loading}>
-                  {loading ? "Saving..." : "Save Address"}
-                </button>
-              </form>
-            </div>
+                Set as Default Address
+              </label>
+              <button type="submit" className="sa-save-btn" disabled={loading}>
+                {loading ? "Saving..." : "Save Address"}
+              </button>
+            </form>
           </div>
-        )}
-      </div>
-
-      <Footer />
+        </div>
+      )}
     </>
   );
 }
-
-const PriceRow = ({ label, value, green = false, bold = false }) => (
-  <div
-    style={{
-      display: "flex",
-      justifyContent: "space-between",
-      marginBottom: 10,
-    }}
-  >
-    <span style={{ color: "#555", fontWeight: bold ? 700 : 400 }}>{label}</span>
-    <span
-      style={{ color: green ? "green" : "#222", fontWeight: bold ? 700 : 400 }}
-    >
-      {value}
-    </span>
-  </div>
-);
 
 export default SecendAddress;

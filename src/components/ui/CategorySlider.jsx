@@ -28,12 +28,9 @@ function CategorySlider() {
     navigate(`/category/${categoryKey}`);
   };
 
-  if (loading) {
-    return <div style={{ padding: "2rem", textAlign: "center" }}>Loading...</div>;
-  }
 
   if (!categories.length) {
-    return <div style={{ padding: "2rem", textAlign: "center" }}>No categories found</div>;
+    return null; 
   }
 
   return (

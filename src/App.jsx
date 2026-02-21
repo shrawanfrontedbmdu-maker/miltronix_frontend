@@ -25,6 +25,8 @@ import Pay from "./components/ui/Pay";
 import OrderConfirmPage from "./components/ui/orderConfirm";
 import SearchPage from "./pages/search/SearchPage";
 import Cart from "./components/ui/cart";
+import ReviewForm from "./components/ui/reviewForm";
+
 function App() {
   return (
     <Router>
@@ -56,6 +58,7 @@ function App() {
         <Route path="/pay" element={<Pay />} />
         <Route path="/order-confirm" element={<OrderConfirmPage />} />
          <Route path="/cart" element={<Cart />} />
+           <Route path="/review/:id" element={<ReviewForm />} />
       </Routes>
     </Router>
   );
