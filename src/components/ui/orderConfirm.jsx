@@ -4,6 +4,20 @@ import logoBanner from "../../assets/MILTRONIX APP DESIGN 3.png";
 
 const BACKEND_URL = "https://miltronix-backend-2.onrender.com";
 
+// ── Colors (Miltronix palette) ──────────────────────────────
+const C = {
+  pageBg: "#D5D4D3",
+  banner: "#616D6B",
+  bannerDark: "#495654",
+  cardBg: "rgb(255 255 255 / 24%)",
+  secondary: "#dddddc",
+  border: "#908a8a",
+  text: "#2d2a2a",
+  muted: "#6c757d",
+  discount: "#3d7a65",
+  white: "#ffffff",
+};
+
 const ConfirmHeader = () => (
   <div className="fixed-top">
     <section className="miltronix-banner d-flex justify-content-center align-items-center">
@@ -18,7 +32,6 @@ const ConfirmHeader = () => (
   </div>
 );
 
-// CartPage ka EXACT SAME getImageUrl
 const getImageUrl = (item) => {
   if (!item.images?.length) return "/images/placeholder.png";
   const img = item.images[0];
@@ -29,7 +42,6 @@ const getImageUrl = (item) => {
   return "/images/placeholder.png";
 };
 
-// CartPage ka EXACT SAME getProductName
 const getProductName = (item) =>
   item?.product?.name ||
   item?.product?.title ||
@@ -42,12 +54,16 @@ const Row = ({ label, value, bold = false, valueStyle = {} }) => (
     style={{
       display: "flex",
       justifyContent: "space-between",
-      marginBottom: 8,
-      fontSize: 14,
+      marginBottom: 7,
+      fontSize: 13,
     }}
   >
-    <span style={{ color: "#555" }}>{label} :</span>
-    <span style={{ fontWeight: bold ? 700 : 500, ...valueStyle }}>{value}</span>
+    <span style={{ color: C.muted }}>{label} :</span>
+    <span
+      style={{ fontWeight: bold ? 700 : 500, color: C.text, ...valueStyle }}
+    >
+      {value}
+    </span>
   </div>
 );
 
@@ -55,16 +71,29 @@ const OrderConfirmPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const order = state?.order || null;
-  // ✅ Pay.jsx se ab cartItems aata hai — real images wala
   const cartItems = state?.cartItems || [];
 
   if (!order) {
     return (
       <>
         <ConfirmHeader />
-        <div style={{ textAlign: "center", marginTop: 120 }}>
+        <div style={{ textAlign: "center", marginTop: 120, color: C.text }}>
           <p>No order data found.</p>
-          <button onClick={() => navigate("/")}>Go Home</button>
+          <button
+            onClick={() => navigate("/")}
+            style={{
+              marginTop: 12,
+              background: C.banner,
+              color: C.white,
+              border: "none",
+              borderRadius: 9,
+              padding: "10px 28px",
+              cursor: "pointer",
+              fontWeight: 700,
+            }}
+          >
+            Go Home
+          </button>
         </div>
       </>
     );
@@ -73,11 +102,8 @@ const OrderConfirmPage = () => {
   const orderItems = order.items || [];
   const extraItems = orderItems.length - 1;
   const shipping = order.shippingAddress || {};
-
-  // ✅ Image + Name: cartItems[0] se lo (CartPage jaisa real data)
   const firstCartItem = cartItems[0] || null;
   const firstOrderItem = orderItems[0] || {};
-
   const imgSrc = firstCartItem
     ? getImageUrl(firstCartItem)
     : "/images/placeholder.png";
@@ -119,63 +145,72 @@ const OrderConfirmPage = () => {
       <div
         style={{
           minHeight: "100vh",
-          background: "#e0e0e0",
+          background: C.pageBg, // updated: #D5D4D3
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          padding: "100px 16px 40px",
-          fontFamily: "sans-serif",
+          padding: "90px 16px 30px", // updated: reduced top/bottom padding
+          fontFamily: "'Bricolage Grotesque', sans-serif",
         }}
       >
-        <div style={{ textAlign: "center", marginBottom: 24 }}>
+        {/* ── Success badge ── */}
+        <div style={{ textAlign: "center", marginBottom: 16 }}>
           <div
             style={{
-              width: 56,
-              height: 56,
+              width: 48, // updated: smaller circle
+              height: 48,
               borderRadius: "50%",
-              border: "3px solid #555",
+              border: `2.5px solid ${C.banner}`,
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              margin: "0 auto 16px",
-              fontSize: 26,
-              color: "#555",
+              margin: "0 auto 12px",
+              fontSize: 22,
+              color: C.banner, // updated: #616D6B
             }}
           >
             ✓
           </div>
-          <h2 style={{ color: "#4a6741", fontWeight: 700, margin: "0 0 8px" }}>
+          <h2
+            style={{
+              color: C.banner,
+              fontWeight: 800,
+              margin: "0 0 6px",
+              fontSize: 20,
+            }}
+          >
             Order Confirmed!
           </h2>
-          <p style={{ color: "#555", margin: "0 0 4px" }}>
+          <p style={{ color: C.muted, margin: "0 0 2px", fontSize: 13 }}>
             Thank you. Your order has been placed successfully.
           </p>
-          <p style={{ color: "#555", margin: 0 }}>
+          <p style={{ color: C.muted, margin: 0, fontSize: 13 }}>
             You'll receive tracking information once your order ships.
           </p>
         </div>
 
+        {/* ── Main card ── */}
         <div
           style={{
-            background: "#fff",
+            background: C.cardBg, // updated: frosted glass
+            border: `1px solid ${C.border}`,
             borderRadius: 12,
-            padding: "28px",
+            padding: "20px 22px", // updated: reduced padding
             width: "100%",
             maxWidth: 620,
-            boxShadow: "0 2px 16px rgba(0,0,0,0.09)",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.08)",
           }}
         >
           {/* Product Row */}
           <div
             style={{
               display: "flex",
-              gap: 16,
+              gap: 14,
               alignItems: "flex-start",
-              marginBottom: 20,
+              marginBottom: 14,
             }}
           >
-            {/* ✅ Image: cartItems[0] se — CartPage jaisa same getImageUrl */}
             <img
               src={imgSrc}
               alt={productName}
@@ -183,83 +218,132 @@ const OrderConfirmPage = () => {
                 e.target.src = "/images/placeholder.png";
               }}
               style={{
-                width: 120,
-                height: 90,
+                width: 90, // updated: smaller image
+                height: 72,
                 objectFit: "contain",
                 borderRadius: 8,
-                background: "#f5f5f5",
+                background: C.secondary, // updated: #dddddc
+                border: `1px solid ${C.border}`,
                 flexShrink: 0,
               }}
             />
             <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 600, fontSize: 16, marginBottom: 4 }}>
+              <div
+                style={{
+                  fontWeight: 700,
+                  fontSize: 14,
+                  marginBottom: 3,
+                  color: C.text,
+                }}
+              >
                 {productName}
               </div>
-              <div style={{ color: "#777", fontSize: 13, marginBottom: 8 }}>
+              <div style={{ color: C.muted, fontSize: 12, marginBottom: 6 }}>
                 SKU: {itemSku}
               </div>
-              <div style={{ fontWeight: 700, fontSize: 20 }}>
+              <div style={{ fontWeight: 800, fontSize: 18, color: C.banner }}>
                 ₹{fmt(itemPrice)}
               </div>
             </div>
-            <div style={{ color: "#555", fontSize: 14, whiteSpace: "nowrap" }}>
+            <div style={{ color: C.muted, fontSize: 13, whiteSpace: "nowrap" }}>
               Qty: {itemQty}
             </div>
           </div>
 
           {extraItems > 0 && (
-            <div style={{ color: "#888", fontSize: 13, marginBottom: 12 }}>
+            <div
+              style={{
+                color: C.banner,
+                fontSize: 12,
+                marginBottom: 10,
+                fontWeight: 600,
+              }}
+            >
               +{extraItems} more item{extraItems > 1 ? "s" : ""}
             </div>
           )}
 
-          <hr style={{ margin: "8px 0 20px" }} />
+          <hr style={{ margin: "6px 0 16px", borderColor: C.border }} />
 
-          <div style={{ display: "flex", gap: 24, flexWrap: "wrap" }}>
+          <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
             {/* Delivery Info */}
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 10 }}>
+            <div style={{ flex: 1, minWidth: 190 }}>
+              <div
+                style={{
+                  fontWeight: 700,
+                  fontSize: 13,
+                  marginBottom: 8,
+                  color: C.banner,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.8px",
+                }}
+              >
                 Delivery Information
               </div>
-              <div style={{ fontWeight: 600, marginBottom: 4 }}>
+              <div
+                style={{
+                  fontWeight: 700,
+                  marginBottom: 3,
+                  fontSize: 13,
+                  color: C.text,
+                }}
+              >
                 {shipping.fullName || "—"}
               </div>
-              <div style={{ color: "#555", fontSize: 14, lineHeight: 1.7 }}>
+              <div style={{ color: C.muted, fontSize: 12, lineHeight: 1.65 }}>
                 {shipping.houseFlatNo}
                 {shipping.buildingApartment
                   ? ", " + shipping.buildingApartment
                   : ""}
               </div>
-              <div style={{ color: "#555", fontSize: 14 }}>
+              <div style={{ color: C.muted, fontSize: 12 }}>
                 {shipping.streetLocality}
               </div>
               {shipping.landmark && (
-                <div style={{ color: "#555", fontSize: 14 }}>
+                <div style={{ color: C.muted, fontSize: 12 }}>
                   Near: {shipping.landmark}
                 </div>
               )}
-              <div style={{ color: "#555", fontSize: 14 }}>
+              <div style={{ color: C.muted, fontSize: 12 }}>
                 {shipping.city}, {shipping.state} – {shipping.pinCode}
               </div>
               {shipping.mobile && (
-                <div style={{ color: "#555", fontSize: 14, marginTop: 4 }}>
+                <div style={{ color: C.muted, fontSize: 12, marginTop: 3 }}>
                   📞 {shipping.mobile}
                 </div>
               )}
-              <div style={{ marginTop: 12, fontSize: 14 }}>
-                <strong>Estimated Delivery</strong> –{" "}
-                <span style={{ color: "#555" }}>{estimatedDelivery()}</span>
+              <div
+                style={{
+                  marginTop: 10,
+                  fontSize: 12,
+                  background: C.secondary, // updated: #dddddc
+                  borderRadius: 6,
+                  padding: "6px 10px",
+                  color: C.text,
+                }}
+              >
+                <strong style={{ color: C.banner }}>Est. Delivery</strong>{" "}
+                <span style={{ color: C.muted }}>– {estimatedDelivery()}</span>
               </div>
               {order.trackingnumber && (
-                <div style={{ marginTop: 6, fontSize: 13, color: "#888" }}>
+                <div style={{ marginTop: 5, fontSize: 12, color: C.muted }}>
                   Tracking: {order.trackingnumber}
                 </div>
               )}
             </div>
 
             {/* Order Details */}
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <div style={{ fontWeight: 700, fontSize: 15, marginBottom: 10 }}>
+            <div style={{ flex: 1, minWidth: 190 }}>
+              <div
+                style={{
+                  fontWeight: 700,
+                  fontSize: 13,
+                  marginBottom: 8,
+                  color: C.banner,
+                  textTransform: "uppercase",
+                  letterSpacing: "0.8px",
+                }}
+              >
                 Order Details
               </div>
               <Row
@@ -270,13 +354,13 @@ const OrderConfirmPage = () => {
                 label="Payment"
                 value={order.payment?.method || order.paymentMethod || "COD"}
               />
-              <hr style={{ margin: "10px 0" }} />
+              <hr style={{ margin: "8px 0", borderColor: C.border }} />
               <Row label="Subtotal" value={`₹${fmt(subtotal)}`} />
               {couponDiscount > 0 && (
                 <Row
                   label={`Coupon (${order.couponCode || ""})`}
                   value={`−₹${fmt(couponDiscount)}`}
-                  valueStyle={{ color: "green" }}
+                  valueStyle={{ color: C.discount }}
                 />
               )}
               {taxAmount > 0 && (
@@ -285,25 +369,38 @@ const OrderConfirmPage = () => {
               <Row
                 label="Shipping"
                 value={shippingCost === 0 ? "Free" : `₹${fmt(shippingCost)}`}
+                valueStyle={shippingCost === 0 ? { color: C.discount } : {}}
               />
-              <hr style={{ margin: "10px 0" }} />
-              <Row label="Total" value={`₹${fmt(totalAmount)}`} bold />
+              <hr style={{ margin: "8px 0", borderColor: C.border }} />
+              <Row
+                label="Total"
+                value={`₹${fmt(totalAmount)}`}
+                bold
+                valueStyle={{ color: C.banner }}
+              />
             </div>
           </div>
 
-          <div style={{ textAlign: "center", marginTop: 28 }}>
+          {/* Continue Shopping Button */}
+          <div style={{ textAlign: "center", marginTop: 20 }}>
             <button
               onClick={() => navigate("/")}
               style={{
-                background: "#4a5568",
-                color: "#fff",
+                background: C.banner, // updated: #616D6B
+                color: C.white,
                 border: "none",
-                borderRadius: 6,
-                padding: "10px 36px",
-                fontSize: 14,
+                borderRadius: 9, // updated: matched site .custom-btn
+                padding: "10px 32px",
+                fontSize: 13,
+                fontWeight: 700,
                 cursor: "pointer",
-                letterSpacing: 0.3,
+                letterSpacing: "0.8px",
+                textTransform: "uppercase",
+                fontFamily: "'Bricolage Grotesque', sans-serif",
+                transition: "background 0.2s",
               }}
+              onMouseEnter={(e) => (e.target.style.background = C.bannerDark)}
+              onMouseLeave={(e) => (e.target.style.background = C.banner)}
             >
               Continue Shopping
             </button>

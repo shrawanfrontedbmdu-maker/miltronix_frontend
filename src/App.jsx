@@ -17,7 +17,7 @@ import CorporateSalesPage from "./pages/CorporateSalesPage";
 import HelpSupportPage from "./pages/HelpSupportPage";
 import ContactUsPage from "./pages/ContactUsPage";
 // import CartPage from "./pages/cartpage";
-import Checkout from "./components/ui/Checkout";
+// import Checkout from "./components/ui/Checkout";
 import OrderAddress from "./components/ui/OrderAddress";
 import SecendAddress from "./components/ui/SecendAddress";
 import Pay from "./components/ui/Pay";
@@ -32,7 +32,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
-        <Route path="/product-details" element={<ProductDetailPage />} />
+  <Route path="/product-details/:id" element={<ProductDetailPage />} />
         <Route
           path="/category/:categoryName"
           element={<ProductListingPage />}
@@ -51,7 +51,7 @@ function App() {
         <Route path="/help-support" element={<HelpSupportPage />} />
         <Route path="/contact-us" element={<ContactUsPage />} />
         {/* <Route path="/cart" element={<CartPage />} /> */}
-      <Route path="/checkout/:id" element={<Checkout />} />
+      {/* <Route path="/checkout/:id" element={<Checkout />} /> */}
         <Route path="/orderaddress" element={<OrderAddress />} />
         <Route path="/search" element={<SearchPage />} />
         <Route path="/secendaddress" element={<SecendAddress />} />

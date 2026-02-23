@@ -26,6 +26,9 @@ const ProductListingPage = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [filterGroups, setFilterGroups] = useState([]);
+
+  const [products, setProducts] = useState([]); // ⭐ shared state
+
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -35,10 +38,8 @@ const ProductListingPage = () => {
         setLoading(true);
         setError(null);
 
-        // 1️⃣ Fetch all categories
         const categories = await fetchCategories();
 
-        // 2️⃣ Match category by URL
         const category = categories.find(
           (c) =>
             c.categoryKey?.toLowerCase() ===
@@ -49,11 +50,16 @@ const ProductListingPage = () => {
 
         setPageData(category);
 
-        // 3️⃣ Fetch subcategories
         const subRes = await fetchSubcategories(category._id);
         setSubcategories(subRes?.subcategories || []);
 
-        // 4️⃣ Fetch recommended products for this category
+        // ⭐ Initial products load
+        const productRes = await fetchProducts({
+          category: category._id,
+          limit: 12,
+        });
+        setProducts(productRes?.products || []);
+
         const recommendedRes = await fetchProducts({
           category: category._id,
           isRecommended: true,
@@ -61,7 +67,6 @@ const ProductListingPage = () => {
         });
         setRecommendations(recommendedRes?.products || []);
 
-        // 5️⃣ Fetch filters for this category
         const filters = await getFilterGroupsByCategory(category._id);
         setFilterGroups(filters || []);
       } catch (err) {
@@ -84,9 +89,7 @@ const ProductListingPage = () => {
 
         {error && (
           <div className="container text-center py-5">
-            <div className="alert alert-danger" role="alert">
-              {error}
-            </div>
+            <div className="alert alert-danger">{error}</div>
           </div>
         )}
 
@@ -102,20 +105,25 @@ const ProductListingPage = () => {
 
             <div className="container">
               <div className="row">
+
                 <div className="col-md-3">
                   <FilterSidebar
                     categoryId={pageData?._id}
-                    filters={filterGroups}
+                    setProducts={setProducts}   // ⭐ important
                   />
                 </div>
 
                 <div className="col-md-9">
-                  <ProductGrid categoryId={pageData?._id} />
+                  <ProductGrid
+                    categoryId={pageData?._id}
+                    products={products}        // ⭐ important
+                    setProducts={setProducts}
+                  />
                 </div>
+
               </div>
             </div>
 
-            {/* ✅ SUBCATEGORIES SECTION */}
             {subcategories.length > 0 && (
               <ResolutionInfo
                 info={{
@@ -132,7 +140,6 @@ const ProductListingPage = () => {
               />
             )}
 
-            {/* ✅ RECOMMENDATIONS SECTION */}
             {recommendations.length > 0 && (
               <RecommendationSection products={recommendations} />
             )}

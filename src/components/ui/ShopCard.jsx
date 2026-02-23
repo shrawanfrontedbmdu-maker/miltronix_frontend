@@ -48,7 +48,9 @@ const ShopCard = ({
   const hasStock = variant?.hasStock && variant?.stockQuantity > 0;
 
   // ---------------- ADD TO CART ----------------
-  const handleAddToCart = async () => {
+  const handleAddToCart = async (e) => {
+    e.stopPropagation();
+
     if (!product._id || !variant?.sku)
       return alert("Product/variant not found");
 
@@ -113,11 +115,18 @@ const ShopCard = ({
 
   return (
     <div className="col-md-6 col-lg-4">
-      <div className="shop-card text-center position-relative">
-
+      <div
+        className="shop-card text-center position-relative"
+        style={{ cursor: "pointer" }}
+        onClick={() => navigate(`/product-details/${product._id}`)}
+      >
+        {/* Remove button (wishlist page) */}
         {onRemove && (
           <button
-            onClick={onRemove}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
             title="Remove from wishlist"
             style={{
               position: "absolute",
@@ -147,65 +156,68 @@ const ShopCard = ({
           src={imageUrl}
           alt={product.name || "Product"}
           className="img-fluid shop-card-img"
-          style={{ cursor: "pointer" }}
-          onClick={() => navigate(`/checkout/${product._id}`)}
         />
 
-        {/* <h6 className="product-category2">{categoryName}</h6> */}
-
-        <h5
-          className="product-title2"
-          style={{ cursor: "pointer" }}
-          onClick={() => navigate(`/checkout/${product._id}`)}
-        >
-          {product.name}
-        </h5>
+        <h5 className="product-title2">{product.name}</h5>
 
         <p className="product-price2">₹{price.toLocaleString()}</p>
 
         {oldPrice > price && (
-          <p className="product-old-price2">
-            ₹{oldPrice.toLocaleString()}
-          </p>
+          <p className="product-old-price2">₹{oldPrice.toLocaleString()}</p>
         )}
 
         <div className="product-rating1">
           {[...Array(fullStars)].map((_, i) => (
-            <img key={`full-${i}`} src={starIconFull} alt="star" className="star1" />
+            <img
+              key={`full-${i}`}
+              src={starIconFull}
+              alt="star"
+              className="star1"
+            />
           ))}
           {halfStar && (
             <img src={starIconHalf} alt="half-star" className="star1" />
           )}
           {[...Array(emptyStars)].map((_, i) => (
-            <img key={`empty-${i}`} src={starIconEmpty} alt="star" className="star1" />
+            <img
+              key={`empty-${i}`}
+              src={starIconEmpty}
+              alt="star"
+              className="star1"
+            />
           ))}
           <span>
             {rating.toFixed(1)} ({reviews})
           </span>
         </div>
 
-        <div className="d-flex justify-content-between">
+        <div className="d-flex justify-content-between mt-2">
           <button
-            className={`shop-card-btn-cart w-75 ${addedCart ? "btn-success" : ""}`}
+            className={`shop-card-btn-cart btn ${
+              addedCart ? "btn-success" : "btn-primary"
+            }`}
+            style={{ width: "75%", marginLeft: "5%" }} // ← increased width and slight left offset
             onClick={handleAddToCart}
             disabled={loadingCart || addedCart || !hasStock}
           >
-            {loadingCart
-              ? "Adding..."
-              : addedCart
-              ? "Added"
-              : !hasStock
-              ? "Out of Stock"
-              : (
-                <>
-                  <i className="bi bi-cart"></i> Add to Cart
-                </>
-              )}
+            {loadingCart ? (
+              "Adding..."
+            ) : addedCart ? (
+              "Added"
+            ) : !hasStock ? (
+              "Out of Stock"
+            ) : (
+              <>
+                <i className="bi bi-cart"></i> Add to Cart
+              </>
+            )}
           </button>
 
           {!onRemove && (
             <button
-              className={`btn shop-card-btn-wishlist ${addedWishlist ? "btn-danger" : ""}`}
+              className={`btn shop-card-btn-wishlist ${
+                addedWishlist ? "btn-danger" : ""
+              }`}
               onClick={handleAddToWishlist}
               disabled={loadingWishlist || addedWishlist}
             >

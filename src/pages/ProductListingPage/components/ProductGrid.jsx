@@ -9,7 +9,6 @@ const ProductGrid = ({ categoryId }) => {
   const search = searchParams.get("search") || "";
   const sort = searchParams.get("sort") || "latest";
   const page = Number(searchParams.get("page")) || 1;
-
   const limit = 12;
 
   const [products, setProducts] = useState([]);
@@ -25,17 +24,10 @@ const ProductGrid = ({ categoryId }) => {
         setLoading(true);
         setError("");
 
-        const params = {
-          page,
-          limit,
-        };
-
+        const params = { page, limit };
         if (search) params.search = search;
         if (sort) params.sort = sort;
-
-        if (categoryId) {
-          params.category = categoryId;
-        }
+        if (categoryId) params.category = categoryId;
 
         const data = await fetchProducts(params);
 
@@ -62,56 +54,37 @@ const ProductGrid = ({ categoryId }) => {
   const updateSearchParams = (newParams) => {
     const params = new URLSearchParams(searchParams);
     Object.entries(newParams).forEach(([key, value]) => {
-      if (value) {
-        params.set(key, value);
-      } else {
-        params.delete(key);
-      }
+      if (value) params.set(key, value);
+      else params.delete(key);
     });
     setSearchParams(params);
   };
 
   const handlePrevPage = () => {
-    if (page > 1) {
-      updateSearchParams({ search, sort, page: page - 1 });
-    }
+    if (page > 1) updateSearchParams({ search, sort, page: page - 1 });
   };
 
   const handleNextPage = () => {
-    if (products.length === limit) {
-      updateSearchParams({ search, sort, page: page + 1 });
-    }
+    if (products.length === limit) updateSearchParams({ search, sort, page: page + 1 });
   };
 
-  if (loading) {
-    return (
-      <div style={{ padding: "2rem", textAlign: "center" }}>
-        Loading products...
-      </div>
-    );
-  }
+  if (loading)
+    return <p style={{ textAlign: "center", padding: "2rem" }}>Loading products...</p>;
 
-  if (error) {
+  if (error)
     return (
-      <div style={{ padding: "2rem", textAlign: "center", color: "red" }}>
+      <p style={{ textAlign: "center", padding: "2rem", color: "red" }}>
         {error}
-      </div>
+      </p>
     );
-  }
 
   return (
     <div>
-      {/* SORT & COUNT */}
-
       {/* PRODUCT GRID */}
       <div className="row g-4">
         {products.length > 0 ? (
           products.map((product) => (
-            <ShopCard
-              key={product._id}
-              product={product}
-              userId={userId}  // ← FIX: userId pass kiya
-            />
+            <ShopCard key={product._id} product={product} userId={userId} />
           ))
         ) : (
           <div className="col-12">

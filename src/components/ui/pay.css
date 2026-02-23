@@ -2,16 +2,16 @@
 
 :root {
   --banner:      #616D6B;
-  --banner-dark: #4f5a58;
+  --banner-dark: #495654;   /* updated: matched to site hover */
   --header-bg:   #D5D4D3;
-  --page-bg:     #e4e3e1;
+  --page-bg:     #D5D4D3;   /* updated: was #e4e3e1, matched to site bg */
   --white:       #ffffff;
-  --text:        #2c2c2c;
-  --muted:       #7E7E7E;
-  --border:      #c8c7c5;
+  --text:        #2d2a2a;   /* updated: matched to site dark text */
+  --muted:       #6c757d;   /* updated: matched to site muted text */
+  --border:      #908a8a;   /* updated: matched to site border */
   --discount:    #3d7a65;
-  --sage-light:  #ecefee;
-  --radius:      8px;
+  --sage-light:  #dddddc;   /* updated: matched to site secondary bg */
+  --radius:      12px;      /* updated: matched to site card radius */
   --radius-pill: 50px;
 }
 
@@ -46,14 +46,14 @@
 .step-circle {
   width: 30px; height: 30px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  flex-shrink: 0; border: 2px solid #aaa9a8; background: transparent;
+  flex-shrink: 0; border: 2px solid var(--border); background: transparent; /* updated */
 }
 .step-circle.active, .step-circle.done { background: var(--banner); border-color: var(--banner); }
 .step-circle-num { font-size: 12px; font-weight: 700; color: var(--muted); line-height: 1; }
 .step-circle.active .step-circle-num { color: var(--white); }
 .step-label { font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap; }
 .step-label.active, .step-label.done { font-weight: 700; color: var(--text); }
-.step-connector { flex: 1; height: 1.5px; background: #bbbab8; margin: 0 14px; border-radius: 2px; }
+.step-connector { flex: 1; height: 1.5px; background: var(--border); margin: 0 14px; border-radius: 2px; } /* updated */
 .step-connector.done { background: var(--banner); }
 
 /* ─── Wrap ─── */
@@ -69,20 +69,21 @@
 
 /* ─── LEFT Panel ─── */
 .pay-left {
-  background: var(--white);
+  background: rgb(255 255 255 / 24%); /* updated: frosted glass like site cards */
   border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  border: 1px solid var(--border);    /* updated */
+  box-shadow: 0 2px 6px rgba(0,0,0,.05); /* updated: matched site card shadow */
   overflow: hidden;
   animation: fadeUp .3s ease both;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .pay-left-title {
   font-size: 18px;
   font-weight: 800;
-  color: var(--text);
+  color: var(--banner); /* updated: matched to site heading color */
   padding: 20px 22px 16px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border); /* updated */
 }
 
 /* Error */
@@ -99,8 +100,8 @@
 /* Delivery address strip */
 .pay-address-strip {
   margin: 16px 22px;
-  background: var(--sage-light);
-  border: 1px solid #c5d5cf;
+  background: var(--sage-light); /* updated: #dddddc */
+  border: 1px solid var(--border); /* updated */
   border-radius: var(--radius);
   padding: 12px 16px;
   display: flex;
@@ -142,7 +143,7 @@
 .pay-methods {
   width: 170px;
   flex-shrink: 0;
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--border); /* updated */
   padding: 8px 0;
 }
 .pay-method-item {
@@ -157,10 +158,13 @@
   border-left: 3px solid transparent;
   transition: color .15s, background .15s, border-color .15s;
 }
-.pay-method-item:hover { background: var(--sage-light); color: var(--text); }
+.pay-method-item:hover {
+  background: var(--sage-light); /* updated: #dddddc */
+  color: var(--text);
+}
 .pay-method-item.active {
   color: var(--text);
-  background: var(--sage-light);
+  background: var(--sage-light); /* updated */
   border-left-color: var(--banner);
   font-weight: 700;
 }
@@ -173,18 +177,18 @@
 .pay-form-title {
   font-size: 14px;
   font-weight: 700;
-  color: var(--text);
+  color: var(--banner); /* updated: matched site form label color */
   margin-bottom: 16px;
 }
 .pay-input {
   width: 100%;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 10px 14px;
+  border: 1.5px solid var(--border); /* updated */
+  border-radius: var(--radius-pill); /* updated: matched site pill inputs */
+  padding: 10px 16px;                /* updated: matched site input padding */
   font-size: 13px;
   color: var(--text);
   font-family: 'Bricolage Grotesque', sans-serif;
-  background: #fafaf8;
+  background: var(--white);          /* updated: matched site form-control */
   outline: none;
   margin-bottom: 10px;
   transition: border-color .15s;
@@ -201,13 +205,13 @@
 
 .pay-select {
   width: 100%;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 10px 14px;
+  border: 1.5px solid var(--border); /* updated */
+  border-radius: var(--radius-pill); /* updated: matched site pill inputs */
+  padding: 10px 16px;                /* updated */
   font-size: 13px;
   color: var(--text);
   font-family: 'Bricolage Grotesque', sans-serif;
-  background: #fafaf8;
+  background: var(--white);          /* updated */
   outline: none;
   margin-bottom: 10px;
   cursor: pointer;
@@ -219,7 +223,7 @@
   color: var(--muted);
   margin-bottom: 20px;
   line-height: 1.6;
-  background: var(--page-bg);
+  background: var(--sage-light); /* updated: #dddddc */
   border-radius: var(--radius);
   padding: 12px 14px;
 }
@@ -230,7 +234,7 @@
   height: 140px;
   object-fit: cover;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: 1px solid var(--border); /* updated */
   display: block;
   margin-bottom: 14px;
 }
@@ -242,7 +246,7 @@
   background: var(--banner);
   color: var(--white);
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: 9px; /* updated: matched site .save-btn / .custom-btn */
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 1.2px;
@@ -266,10 +270,10 @@
 
 /* Order summary card */
 .pay-order-card {
-  background: var(--white);
+  background: rgb(255 255 255 / 24%); /* updated: frosted glass */
   border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  border: 1px solid var(--border);    /* updated */
+  box-shadow: 0 2px 6px rgba(0,0,0,.05); /* updated */
   padding: 18px;
   animation: fadeUp .3s ease .05s both;
 }
@@ -280,7 +284,7 @@
   letter-spacing: 1.3px;
   text-transform: uppercase;
   margin-bottom: 14px;
-  border-bottom: 1px solid var(--border);
+  border-bottom: 1px solid var(--border); /* updated */
   padding-bottom: 12px;
 }
 
@@ -296,7 +300,7 @@
   height: 70px;
   object-fit: cover;
   border-radius: 6px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--border); /* updated */
   flex-shrink: 0;
   background: var(--header-bg);
 }
@@ -334,7 +338,7 @@
 
 /* Shipping address in right panel */
 .pay-shipping-box {
-  background: var(--page-bg);
+  background: var(--sage-light); /* updated: #dddddc */
   border-radius: 6px;
   padding: 10px 12px;
   margin-top: 4px;
@@ -361,10 +365,10 @@
 
 /* Price summary card */
 .pay-price-card {
-  background: var(--white);
+  background: rgb(255 255 255 / 24%); /* updated: frosted glass */
   border-radius: var(--radius);
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 4px rgba(0,0,0,.04);
+  border: 1px solid var(--border);    /* updated */
+  box-shadow: 0 2px 6px rgba(0,0,0,.05); /* updated */
   padding: 18px;
   animation: fadeUp .3s ease .1s both;
 }
@@ -378,17 +382,17 @@
 .pay-price-label { color: var(--muted); }
 .pay-price-val   { font-weight: 700; }
 .pay-price-val.green { color: var(--discount); }
-.pay-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+.pay-divider { border: none; border-top: 1px solid var(--border); margin: 10px 0; } /* updated */
 .pay-total-row {
   display: flex;
   justify-content: space-between;
   font-size: 14px;
   font-weight: 800;
-  color: var(--text);
+  color: var(--banner); /* updated: matched to site price color */
 }
 .pay-savings-badge {
-  background: var(--sage-light);
-  border: 1px solid #c5d5cf;
+  background: var(--sage-light); /* updated: #dddddc */
+  border: 1px solid var(--border); /* updated */
   border-radius: 6px;
   padding: 7px 12px;
   margin-top: 10px;
@@ -403,7 +407,14 @@
   .pay-wrap { grid-template-columns: 1fr; }
   .pay-right { position: static; }
   .pay-content { flex-direction: column; }
-  .pay-methods { width: 100%; border-right: none; border-bottom: 1px solid var(--border); display: flex; overflow-x: auto; padding: 0; }
+  .pay-methods {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid var(--border); /* updated */
+    display: flex;
+    overflow-x: auto;
+    padding: 0;
+  }
   .pay-method-item { border-left: none; border-bottom: 3px solid transparent; white-space: nowrap; }
   .pay-method-item.active { border-left-color: transparent; border-bottom-color: var(--banner); }
   .step-label { display: none; }

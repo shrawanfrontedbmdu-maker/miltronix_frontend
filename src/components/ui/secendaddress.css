@@ -3,16 +3,16 @@
 /* ─── Variables ─── */
 :root {
   --banner:      #616D6B;
-  --banner-dark: #4f5a58;
+  --banner-dark: #495654;   /* updated: matched to site hover #495654 */
   --header-bg:   #D5D4D3;
-  --page-bg:     #e4e3e1;
+  --page-bg:     #D5D4D3;   /* updated: was #e4e3e1, matched to site bg */
   --white:       #ffffff;
-  --text:        #2c2c2c;
-  --muted:       #7E7E7E;
-  --border:      #c8c7c5;
+  --text:        #2d2a2a;   /* updated: matched to site dark text */
+  --muted:       #6c757d;   /* updated: matched to site muted text */
+  --border:      #908a8a;   /* updated: matched to site border */
   --discount:    #3d7a65;
-  --sage-light:  #ecefee;
-  --radius:      8px;
+  --sage-light:  #dddddc;   /* updated: matched to site secondary bg */
+  --radius:      12px;      /* updated: matched to site card radius */
   --radius-pill: 50px;
 }
 
@@ -44,7 +44,7 @@
   padding-bottom: 60px;
 }
 
-/* ─── Step Indicator (shared with CartPage) ─── */
+/* ─── Step Indicator ─── */
 .step-indicator {
   background: var(--header-bg);
   padding: 13px 0;
@@ -70,7 +70,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 2px solid #aaa9a8;
+  border: 2px solid var(--border); /* updated */
   background: transparent;
 }
 .step-circle.active,
@@ -96,7 +96,7 @@
 .step-connector {
   flex: 1;
   height: 1.5px;
-  background: #bbbab8;
+  background: var(--border); /* updated */
   margin: 0 14px;
   border-radius: 2px;
 }
@@ -152,24 +152,25 @@
 
 /* ─── Address Card ─── */
 .sa-address-card {
-  background: var(--white);
+  background: rgb(255 255 255 / 24%); /* updated: frosted glass like site */
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
   padding: 16px 18px;
   margin-bottom: 10px;
   cursor: pointer;
-  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s, transform 0.2s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05); /* updated: matched site card shadow */
   animation: fadeUp 0.3s ease both;
   position: relative;
 }
 .sa-address-card:hover {
   border-color: var(--banner);
-  box-shadow: 0 2px 8px rgba(97,109,107,0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* updated: matched site hover shadow */
+  transform: translateY(-4px); /* updated: matched site card hover */
 }
 .sa-address-card.selected {
   border-color: var(--banner);
-  background: var(--sage-light);
+  background: var(--sage-light); /* updated: #dddddc */
   box-shadow: 0 2px 10px rgba(97,109,107,0.15);
 }
 
@@ -221,7 +222,7 @@
 
 /* ─── Summary Card (RIGHT) ─── */
 .sa-summary-card {
-  background: var(--white);
+  background: rgb(255 255 255 / 24%); /* updated: frosted glass */
   border-radius: var(--radius);
   padding: 18px;
   border: 1px solid var(--border);
@@ -260,7 +261,7 @@
   justify-content: space-between;
   font-size: 14px;
   font-weight: 800;
-  color: var(--text);
+  color: var(--banner); /* updated: matched to site price color */
   margin-bottom: 16px;
 }
 
@@ -288,12 +289,12 @@
 .sa-secure-text {
   text-align: center;
   font-size: 11px;
-  color: #bbb;
+  color: var(--border); /* updated: matched to muted border tone */
   margin-top: 10px;
 }
 .sa-savings-badge {
-  background: var(--sage-light);
-  border: 1px solid #c5d5cf;
+  background: var(--sage-light); /* updated: #dddddc */
+  border: 1px solid var(--border);
   border-radius: 6px;
   padding: 8px 12px;
   margin-top: 10px;
@@ -331,8 +332,9 @@
   padding: 20px;
 }
 .sa-modal {
-  background: var(--white);
+  background: #D5D4D3; /* updated: matched to site modal bg (.custom-modal) */
   border-radius: 12px;
+  border: 1px solid var(--border); /* updated: matched to site modal border */
   padding: 28px 28px 24px;
   width: 100%;
   max-width: 480px;
@@ -345,13 +347,13 @@
 .sa-modal-title {
   font-size: 16px;
   font-weight: 800;
-  color: var(--text);
+  color: var(--banner); /* updated: matched to site .custom-modal .modal-title */
   margin-bottom: 20px;
 }
 .sa-modal-close {
   position: absolute;
   top: 16px; right: 16px;
-  background: var(--page-bg);
+  background: var(--sage-light); /* updated: #dddddc */
   border: none;
   width: 30px; height: 30px;
   border-radius: 50%;
@@ -361,7 +363,10 @@
   display: flex; align-items: center; justify-content: center;
   transition: background 0.15s, color 0.15s;
 }
-.sa-modal-close:hover { background: var(--border); color: var(--text); }
+.sa-modal-close:hover {
+  background: var(--border);
+  color: var(--text);
+}
 
 /* ─── Form ─── */
 .sa-form {
@@ -377,12 +382,12 @@
 .sa-input {
   width: 100%;
   border: 1.5px solid var(--border);
-  border-radius: var(--radius);
-  padding: 10px 14px;
+  border-radius: var(--radius-pill); /* updated: matched to site pill inputs */
+  padding: 10px 16px;               /* updated: matched to site input padding */
   font-size: 13px;
   color: var(--text);
   font-family: 'Bricolage Grotesque', sans-serif;
-  background: #fafaf8;
+  background: var(--white);         /* updated: matched to site form-control bg */
   outline: none;
   transition: border-color 0.15s;
 }
@@ -410,7 +415,7 @@
   background: var(--banner);
   color: var(--white);
   border: none;
-  border-radius: var(--radius-pill);
+  border-radius: 9px; /* updated: matched to site .custom-btn / .save-btn */
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 1px;

@@ -81,7 +81,7 @@ const CheckIconWhite = () => (
   </svg>
 );
 
-/* ─── Header — SIRF LOGO ─── */
+/* ─── Header ─── */
 const CartHeader = () => {
   return (
     <div className="fixed-top">
@@ -151,15 +151,16 @@ const CartPage = () => {
   const [couponError, setCouponError] = useState("");
   const [applicableCoupons, setApplicableCoupons] = useState([]);
 
-  const loadCart = async () => {
+  // ✅ showLoader flag — qty/remove pe poora page reload nahi hoga
+  const loadCart = async (showLoader = false) => {
     try {
-      setLoading(true);
+      if (showLoader) setLoading(true);
       const data = await getCartItems();
       setCart(data || { items: [], subtotal: 0 });
     } catch {
       setCart({ items: [], subtotal: 0 });
     } finally {
-      setLoading(false);
+      if (showLoader) setLoading(false);
     }
   };
 
@@ -174,8 +175,9 @@ const CartPage = () => {
   };
 
   useEffect(() => {
-    loadCart();
+    loadCart(true); // sirf pehli baar loader
   }, []);
+
   useEffect(() => {
     if (cart.subtotal > 0) loadApplicableCoupons(cart.subtotal);
   }, [cart.subtotal]);
@@ -192,7 +194,7 @@ const CartPage = () => {
         sku: item.variant?.sku,
         quantity: qtyDiff,
       });
-      await loadCart();
+      await loadCart(false); // loader nahi, sirf data refresh
       setCouponApplied(null);
     } catch {
       alert("Failed to update cart item");
@@ -209,7 +211,7 @@ const CartPage = () => {
         productId: item.product?._id,
         sku: item.variant?.sku,
       });
-      await loadCart();
+      await loadCart(false);
       setCouponApplied(null);
     } catch {
       alert("Failed to remove item");
@@ -238,7 +240,7 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
-    await loadCart();
+    await loadCart(false);
     if (!cart.items?.length) return alert("Your cart is empty!");
     navigate("/secendaddress", {
       state: {
@@ -248,23 +250,30 @@ const CartPage = () => {
     });
   };
 
+  // ✅ FIX: images product ke andar hoti hain — item.product.images check karo
   const getImageUrl = (item) => {
-    if (!item.images?.length) return "/images/placeholder.png";
-    const img = item.images[0];
-    if (img.url && /^https?:\/\//.test(img.url)) return img.url;
-    if (img.url) return `${BACKEND_URL}/${img.url.replace(/^\/+/, "")}`;
-    if (typeof img === "string")
-      return `${BACKEND_URL}/${img.replace(/^\/+/, "")}`;
+    const images =
+      item.product?.images ||   
+      item.images ||            
+      [];
+
+    if (!images.length) return "/images/placeholder.png";
+
+    const img = images[0];
+    if (img?.url && /^https?:\/\//.test(img.url)) return img.url;
+    if (img?.url) return `${BACKEND_URL}/${img.url.replace(/^\/+/, "")}`;
+    if (typeof img === "string") return `${BACKEND_URL}/${img.replace(/^\/+/, "")}`;
     return "/images/placeholder.png";
   };
 
-  // ✅ Product ka naam dhundho — saare possible fields check karo
+  // ✅ FIX: Product name — ID nahi, actual name dikhao
+  // Cart item mein product populate hota hai — name wahan se lo
   const getProductName = (item) => {
     return (
-      item.product?.name || // product.name
-      item.product?.title || // product.title
-      item.title || // item.title
-      item.name || // item.name
+      item.product?.name ||       // ✅ populated product ka naam
+      item.product?.title ||      // ✅ agar title field ho
+      item.name ||                // direct item pe naam ho toh
+      item.title ||
       "Unnamed Product"
     );
   };
@@ -301,15 +310,12 @@ const CartPage = () => {
 
   return (
     <>
-      {/* ── HEADER — sirf logo ── */}
       <CartHeader />
 
       <div className="cart-page">
         <main className="cart-main">
-          {/* Step Indicator */}
           <StepIndicator currentStep={1} />
 
-          {/* Empty State */}
           {cart.items.length === 0 ? (
             <div className="empty-wrap">
               <div className="empty-emoji">🛍️</div>
@@ -323,7 +329,7 @@ const CartPage = () => {
             <div className="cart-wrap">
               {/* ── LEFT ── */}
               <div>
-                {/* Coupon */}
+                {/* Coupon Card */}
                 <div className="coupon-card">
                   <div className="coupon-card-title">
                     <TagIcon />
@@ -360,6 +366,7 @@ const CartPage = () => {
                     </div>
                   )}
 
+                  {/* Available coupon pills */}
                   {applicableCoupons.length > 0 && (
                     <div className="coupon-pills-wrap">
                       <div className="available-title">
@@ -388,13 +395,13 @@ const CartPage = () => {
                   )}
                 </div>
 
-                {/* Item Count */}
+                {/* Order Summary heading */}
                 <div className="section-head">
                   Order Summary ({cart.items.length} item
                   {cart.items.length !== 1 ? "s" : ""})
                 </div>
 
-                {/* Items */}
+                {/* Cart Items */}
                 {cart.items.map((item, idx) => {
                   const key = `${item.product?._id}-${item.variant?.sku || "default"}`;
                   const busy = updatingKey === key;
@@ -415,7 +422,7 @@ const CartPage = () => {
                       />
 
                       <div className="item-info">
-                        {/* ✅ Name dikhao, ID nahi */}
+                        {/* ✅ FIX: ID nahi, actual product name dikhega */}
                         <div className="item-brand">{getProductName(item)}</div>
                         <div className="item-title">
                           {getProductCategory(item)}
@@ -483,7 +490,7 @@ const CartPage = () => {
                 })}
               </div>
 
-              {/* ── RIGHT — Summary ── */}
+              {/* ── RIGHT — Price Summary ── */}
               <div>
                 <div className="summary-card">
                   <div className="summary-title">Price Details</div>
