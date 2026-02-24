@@ -225,6 +225,7 @@ export const fetchProducts = async (params?: {
   limit?: number;
   isRecommended?: boolean;
   isFeatured?: boolean;
+  isTopDeal?: boolean;   // ✅ ADDED
   status?: string;
 }) => {
   try {
@@ -243,6 +244,8 @@ export const fetchProducts = async (params?: {
       query.append("isRecommended", params.isRecommended.toString());
     if (params?.isFeatured !== undefined)
       query.append("isFeatured", params.isFeatured.toString());
+    if (params?.isTopDeal !== undefined)
+      query.append("isTopDeal", params.isTopDeal.toString()); // ✅ ADDED
     if (params?.status) query.append("status", params.status);
 
     const res = await API.get(`/products?${query.toString()}`);
@@ -251,7 +254,6 @@ export const fetchProducts = async (params?: {
     handleError(error);
   }
 };
-
 export const fetchProductById = async (productId: string) => {
   try {
     const res = await API.get(`/products/${productId}`);
@@ -282,6 +284,15 @@ export const fetchRecommendedProducts = async () => {
 export const fetchFeaturedProducts = async () => {
   try {
     const res = await API.get(`/products/featured`);
+    return res.data;
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+export const fetchTopDealProducts = async () => {
+  try {
+    const res = await API.get(`/products/top-deals`);
     return res.data;
   } catch (error) {
     handleError(error);
@@ -889,6 +900,31 @@ export const applyCouponApi = async (orderAmount: number, code: string) => {
         newTotalPrice: number;
       };
       message?: string;
+    };
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// ================== TOP DEALS (User) ==================
+
+export type TopDealType = {
+  _id: string;
+  title: string;
+  description: string;
+  products: any[];
+  image?: {
+    url: string;
+    alt: string;
+  };
+};
+
+export const fetchTopDealsApi = async () => {
+  try {
+    const res = await API.get("/products/top-deals"); // ✅ FIXED
+    return res.data as {
+      success: boolean;
+      products: TopDealType[];
     };
   } catch (error) {
     handleError(error);

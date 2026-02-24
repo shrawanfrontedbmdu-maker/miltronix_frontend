@@ -1,44 +1,58 @@
-import React from 'react';
-import './qled.css'
-
-// --- Data for the Feature Icons ---
-// Place your image paths here. This makes it easy to add or remove features.
-const featureIcons = [
-  { src: '/src/assets/image 2.png', alt: 'Quantum Dot Technology' },
-  { src: '/src/assets/image 3.png', alt: 'Direct Full Array' },
-  { src: '/src/assets/image 4.png', alt: 'Quantum HDR' },
-  { src: '/src/assets/image 5.png', alt: '100% Color Volume' },
-  { src: '/src/assets/image 6.png', alt: 'Ultra Viewing Angle' },
-  { src: '/src/assets/image 7.png', alt: 'Object Tracking Sound' },
-  { src: '/src/assets/image 8.png', alt: 'Adaptive Picture' },
-  { src: '/src/assets/image 9.png', alt: 'AI Upscaling' },
-];
+import React, { useEffect, useState } from 'react';
+import './qled.css';
+import { fetchCategories } from "../../../api/api";
 
 const QledFeatures = () => {
+  const [featureImages, setFeatureImages] = useState([]);
+  const [title, setTitle] = useState("QLED");
+  const [description, setDescription] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadQledCategory = async () => {
+      try {
+        const categories = await fetchCategories();
+        const qled = categories.find((cat) => cat.categoryKey === "qled");
+
+        if (qled) {
+          setTitle(qled.features?.title || "QLED");
+          setDescription(qled.features?.description || "");
+          const images = (qled.features?.images || []).map((src, i) => ({
+            src,
+            alt: `Feature ${i + 1}`,
+          }));
+          setFeatureImages(images);
+        }
+      } catch (error) {
+        console.error("Failed to load QLED category:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadQledCategory();
+  }, []);
+
+  if (loading) return <p>Loading...</p>;
+
   return (
     <section className="qled-features">
       <div className="container-fluid px-4">
 
-        {/* Heading Section */}
         <div className="row align-items-end heading-row">
           <div className="col-md-4">
             <h2 className="qled-title ff2">
-              <div className="qled-top">QLED</div>
+              <div className="qled-top">{title}</div>
               <em>Features</em>
             </h2>
           </div>
           <div className="col-md-8">
-            {/* <p className="qled-desc d-none d-md-block line"> */}
-            <p className='line'>
-              QLED delivers vibrant colors, deeper contrast, and brighter visuals with long-lasting <br />
-              performance for an immersive viewing experience.
-            </p>
+            <p className='line'>{description}</p>
           </div>
         </div>
 
-        {/* Icons Grid: Mapped from the data array */}
         <div className="features-grid">
-          {featureIcons.map((icon, index) => (
+          {featureImages.map((icon, index) => (
             <div key={index} className="feature-item">
               <div className="circle">
                 <img src={icon.src} alt={icon.alt} />
@@ -46,7 +60,7 @@ const QledFeatures = () => {
             </div>
           ))}
         </div>
-        
+
       </div>
     </section>
   );
