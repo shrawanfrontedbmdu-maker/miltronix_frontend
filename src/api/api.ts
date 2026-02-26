@@ -289,16 +289,6 @@ export const fetchFeaturedProducts = async () => {
     handleError(error);
   }
 };
-
-export const fetchTopDealProducts = async () => {
-  try {
-    const res = await API.get(`/products/top-deals`);
-    return res.data;
-  } catch (error) {
-    handleError(error);
-  }
-};
-
 // ================== AUTH ==================
 export const signup = async (data: {
   fullName: string;
@@ -906,30 +896,96 @@ export const applyCouponApi = async (orderAmount: number, code: string) => {
   }
 };
 
-// ================== TOP DEALS (User) ==================
+
+// ================== TOP DEALS ==================
 
 export type TopDealType = {
   _id: string;
   title: string;
   description: string;
+  isActive: boolean;
   products: any[];
   image?: {
     url: string;
-    alt: string;
+    public_id?: string;
+    alt?: string;
   };
+  images?: {
+    url: string;
+    public_id?: string;
+    alt?: string;
+  }[];
+  createdAt?: string;
+  updatedAt?: string;
 };
 
-export const fetchTopDealsApi = async () => {
+// Frontend — active top deal with products (product.controller.js)
+export const fetchTopDealProducts = async () => {
   try {
-    const res = await API.get("/products/top-deals"); // ✅ FIXED
+    const res = await API.get("/products/top-deals");
     return res.data as {
       success: boolean;
-      products: TopDealType[];
+      deal: TopDealType | null;
     };
   } catch (error) {
     handleError(error);
   }
 };
 
+// Admin — all top deals list (topDeal.controller.js)
+export const fetchAllTopDealsApi = async () => {
+  try {
+    const res = await API.get("/top-deals");
+    return res.data as {
+      success: boolean;
+      topDeals: TopDealType[];
+    };
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// Admin — single top deal by id
+export const fetchTopDealByIdApi = async (id: string) => {
+  if (!id) throw new Error("id is required");
+  try {
+    const res = await API.get(`/top-deals/${id}`);
+    return res.data as {
+      success: boolean;
+      topDeal: TopDealType;
+    };
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// Admin — toggle active status
+export const toggleTopDealStatusApi = async (id: string) => {
+  if (!id) throw new Error("id is required");
+  try {
+    const res = await API.patch(`/top-deals/${id}/toggle-status`);
+    return res.data as {
+      success: boolean;
+      message: string;
+      isActive: boolean;
+    };
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// Admin — delete top deal
+export const deleteTopDealApi = async (id: string) => {
+  if (!id) throw new Error("id is required");
+  try {
+    const res = await API.delete(`/top-deals/${id}`);
+    return res.data as {
+      success: boolean;
+      message: string;
+    };
+  } catch (error) {
+    handleError(error);
+  }
+};
 // ---------------- EXPORT ----------------
 export default API;
