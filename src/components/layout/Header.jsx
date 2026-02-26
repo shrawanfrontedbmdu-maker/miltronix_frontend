@@ -5,14 +5,14 @@ import "./header.css";
 import { Bell } from "lucide-react";
 import axios from "axios";
 
-// Assets
+// Assets ✅ spaces hataaye
 import logoBanner from "../../assets/MILTRONIX APP DESIGN 3.png";
 import cartIcon from "../../assets/SVG.svg";
-import userIcon from "../../assets/icon 6.svg";
-import locationIcon from "../../assets/Icon 2.svg";
-import searchIcon from "../../assets/Icon 3.svg";
-import dropdownIcon from "../../assets/icon 4.svg";
-import wishlistIcon from "../../assets/icon 5.svg";
+import userIcon from "../../assets/icon6.svg";
+import locationIcon from "../../assets/icon2.svg";
+import searchIcon from "../../assets/icon3.svg";
+import dropdownIcon from "../../assets/icon4.svg";
+import wishlistIcon from "../../assets/icon5.svg";
 import Notifications from "../../pages/Notification/Notifications";
 
 function Header() {
@@ -38,7 +38,6 @@ function Header() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  /* ✅ search API use kar rhe hain - suggestions nahi */
   useEffect(() => {
     const fetchSuggestions = async () => {
       if (!debouncedQuery || debouncedQuery.length < 2) {
@@ -71,7 +70,6 @@ function Header() {
     };
   }, []);
 
-  /* ✅ Navigate nahi karega - sirf dropdown show karega */
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
     setShowDropdown(true);
@@ -126,7 +124,6 @@ function Header() {
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
 
-            {/* ✅ Dropdown - Same page pe results */}
             {showDropdown && suggestions.length > 0 && (
               <div
                 className="position-absolute bg-white shadow rounded mt-2"
@@ -139,7 +136,6 @@ function Header() {
                   overflowY: "auto",
                 }}
               >
-                {/* Result Count */}
                 <div
                   className="px-3 py-2 border-bottom text-muted"
                   style={{ fontSize: "13px" }}
@@ -168,7 +164,7 @@ function Header() {
                         (e.currentTarget.style.backgroundColor = "white")
                       }
                       onClick={() => {
-                        navigate(`/product-details/${product._id}`); // ✅ sahi route
+                        navigate(`/product-details/${product._id}`);
                         setShowDropdown(false);
                         setSearchQuery("");
                       }}
@@ -204,7 +200,6 @@ function Header() {
                   );
                 })}
 
-                {/* Close */}
                 <div
                   className="text-center p-2 text-muted"
                   style={{ cursor: "pointer", fontSize: "13px" }}

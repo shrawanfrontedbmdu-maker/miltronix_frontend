@@ -221,32 +221,32 @@ export const contactCards = [
 export const aboutCards = [
   {
     title: "Corporate\nOffice",
-    image: "/src/assets/image 16.png",
+    image: "/src/assets/image16.png",
     alt: "Corporate Office Building",
   },
   {
     title: "Warehouse &\nService Center",
-    image: "/src/assets/image 17.png",
+    image: "/src/assets/image17.png",
     alt: "Warehouse Interior",
   },
   {
     title: "Online Sale\nPlatform",
-    image: "/src/assets/image 18.png",
+    image: "/src/assets/image18.png",
     alt: "E-commerce Website on a Laptop",
   },
   {
     title: "Trademark",
-    image: "/src/assets/image 19.png",
+    image: "/src/assets/image19.png",
     alt: "Trademark Certificate",
   },
   {
     title: "Team Members",
-    image: "/src/assets/image 20.png",
+    image: "/src/assets/image20.png",
     alt: "A Group of Team Members",
   },
   {
     title: "Customer Support",
-    image: "/src/assets/image 21.png",
+    image: "/src/assets/image21.png",
     alt: "Customer Support Agent with Headset",
   },
 ];
@@ -288,22 +288,22 @@ export const qledDeals = [
 
 export const businessServices = [
   {
-    icon: "/src/assets/icon 11.svg",
+    icon: "/src/assets/icon11.svg",
     alt: "Installation Tools",
     label: "INSTALLATION",
   },
   {
-    icon: "/src/assets/icon 12.svg",
+    icon: "/src/assets/icon12.svg",
     alt: "Mobile App Icon",
     label: "ONE STOP SHOP & SERVICE APP",
   },
   {
-    icon: "/src/assets/icon 13.svg",
+    icon: "/src/assets/icon13.svg",
     alt: "Cash Icon",
     label: "CASH ON DELIVERY",
   },
   {
-    icon: "/src/assets/icon 14.svg",
+    icon: "/src/assets/icon14.svg",
     alt: "Location Pin Icon",
     label: "ONSITE SERVICE",
   },
@@ -354,13 +354,13 @@ export const subscriptionFeatures = [
     description: "Get access to subscriber-only discounts and flash sales",
   },
   {
-    icon: "/src/assets/icon 16.svg",
+    icon: "/src/assets/icon16.svg",
     alt: "Rocket Icon",
     title: "Early Access",
     description: "Be first to shop new product launches and limited editions",
   },
   {
-    icon: "/src/assets/icon 17.svg",
+    icon: "/src/assets/icon17.svg",
     alt: "Lightbulb Icon",
     title: "Tech Insights",
     description: "Weekly tech news, reviews, and buying guides",
