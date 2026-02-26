@@ -21,7 +21,6 @@ function Header() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  // 🔥 New states for search
   const [suggestions, setSuggestions] = useState([]);
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
@@ -32,79 +31,55 @@ function Header() {
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  /* =========================
-     🔥 Debounce Search Input
-  ========================== */
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedQuery(searchQuery);
     }, 400);
-
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  /* =========================
-     🔥 Fetch Suggestions
-  ========================== */
+  /* ✅ search API use kar rhe hain - suggestions nahi */
   useEffect(() => {
     const fetchSuggestions = async () => {
       if (!debouncedQuery || debouncedQuery.length < 2) {
         setSuggestions([]);
+        setShowDropdown(false);
         return;
       }
-
       try {
         const res = await axios.get(
-          `${baseUrl}/products/search-suggestions?q=${debouncedQuery}`
+          `${baseUrl}/products/search?q=${debouncedQuery}`
         );
-
         setSuggestions(res.data.products || []);
         setShowDropdown(true);
       } catch (err) {
         console.error("Search error:", err);
       }
     };
-
     fetchSuggestions();
   }, [debouncedQuery]);
 
-  /* =========================
-     🔥 Close Dropdown on Outside Click
-  ========================== */
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
-
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-  /* =========================
-     🔥 Handle Search Click
-  ========================== */
+  /* ✅ Navigate nahi karega - sirf dropdown show karega */
   const handleSearch = () => {
     if (!searchQuery.trim()) return;
-
-    let url = `/search?q=${encodeURIComponent(searchQuery)}`;
-
-    if (selectedCategory) {
-      url += `&category=${selectedCategory}`;
-    }
-
-    navigate(url);
-    setShowDropdown(false);
+    setShowDropdown(true);
   };
 
   return (
     <>
       <div className="fixed-top">
-        {/* Logo Section */}
         <section className="miltronix-banner d-flex justify-content-center align-items-center">
           <Link to="/">
             <img
@@ -115,18 +90,15 @@ function Header() {
           </Link>
         </section>
 
-        {/* Header Container */}
         <div className="header-container bg-transparent d-flex justify-content-between align-items-center px-4 py-2">
-          
-          {/* Cart */}
-      <Link to="/cart" className="text-decoration-none see-more main">
-        <div className="cart-box d-flex align-items-center justify-content-center">
-          <img src={cartIcon} alt="Cart" width="16" height="16" />
-          <span className="d-none d-lg-block ms-2">Cart</span>
-        </div>
-      </Link>
 
-          {/* 🔥 Search Bar */}
+          <Link to="/cart" className="text-decoration-none see-more main">
+            <div className="cart-box d-flex align-items-center justify-content-center">
+              <img src={cartIcon} alt="Cart" width="16" height="16" />
+              <span className="d-none d-lg-block ms-2">Cart</span>
+            </div>
+          </Link>
+
           <div
             ref={dropdownRef}
             className="search-bar d-lg-flex d-none align-items-center px-3 py-1 position-relative"
@@ -138,9 +110,7 @@ function Header() {
           >
             <div className="d-flex align-items-center me-2">
               <img src={locationIcon} alt="Location" width="16" height="16" />
-              <span className="text-nowrap text-muted ms-2">
-                Set location
-              </span>
+              <span className="text-nowrap text-muted ms-2">Set location</span>
             </div>
 
             <div className="vr mx-2"></div>
@@ -156,18 +126,7 @@ function Header() {
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
             />
 
-            {/* <span className="ms-2 text-nowrap">
-              <strong>All</strong>
-              <img
-                src={dropdownIcon}
-                alt="Dropdown"
-                className="ms-2"
-                width="16"
-                height="16"
-              />
-            </span> */}
-
-            {/* 🔥 Dropdown Suggestions */}
+            {/* ✅ Dropdown - Same page pe results */}
             {showDropdown && suggestions.length > 0 && (
               <div
                 className="position-absolute bg-white shadow rounded mt-2"
@@ -176,10 +135,19 @@ function Header() {
                   left: 0,
                   width: "100%",
                   zIndex: 999,
-                  maxHeight: "400px",
+                  maxHeight: "500px",
                   overflowY: "auto",
                 }}
               >
+                {/* Result Count */}
+                <div
+                  className="px-3 py-2 border-bottom text-muted"
+                  style={{ fontSize: "13px" }}
+                >
+                  <strong>{suggestions.length}</strong> results for "
+                  <strong>{searchQuery}</strong>"
+                </div>
+
                 {suggestions.map((product) => {
                   const firstVariant = product.variants?.[0];
                   const price = firstVariant?.price || 0;
@@ -193,8 +161,14 @@ function Header() {
                       key={product._id}
                       className="d-flex align-items-center p-2 border-bottom"
                       style={{ cursor: "pointer" }}
+                      onMouseEnter={(e) =>
+                        (e.currentTarget.style.backgroundColor = "#f5f5f5")
+                      }
+                      onMouseLeave={(e) =>
+                        (e.currentTarget.style.backgroundColor = "white")
+                      }
                       onClick={() => {
-                        navigate(`/product/${product._id}`);
+                        navigate(`/product-details/${product._id}`); // ✅ sahi route
                         setShowDropdown(false);
                         setSearchQuery("");
                       }}
@@ -202,42 +176,55 @@ function Header() {
                       <img
                         src={image}
                         alt={product.name}
-                        width="40"
-                        height="40"
-                        className="me-2 rounded"
+                        width="50"
+                        height="50"
+                        className="me-3 rounded"
+                        style={{ objectFit: "contain" }}
                       />
-                      <div>
+                      <div className="flex-grow-1">
                         <div style={{ fontSize: "14px", fontWeight: "500" }}>
                           {product.name}
                         </div>
-                        <div style={{ fontSize: "13px", color: "#666" }}>
-                          ₹{price}
+                        {product.brand && (
+                          <div style={{ fontSize: "12px", color: "#999" }}>
+                            {product.brand}
+                          </div>
+                        )}
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            color: "#e63946",
+                            fontWeight: "bold",
+                          }}
+                        >
+                          ₹{price.toLocaleString()}
                         </div>
                       </div>
                     </div>
                   );
                 })}
 
-                {/* View All Results */}
+                {/* Close */}
                 <div
-                  className="text-center p-2 fw-bold text-primary"
-                  style={{ cursor: "pointer" }}
-                  onClick={handleSearch}
+                  className="text-center p-2 text-muted"
+                  style={{ cursor: "pointer", fontSize: "13px" }}
+                  onClick={() => {
+                    setShowDropdown(false);
+                    setSearchQuery("");
+                  }}
                 >
-                  View all results
+                  Close ✕
                 </div>
               </div>
             )}
           </div>
 
-          {/* Wishlist */}
           <div className="wishlist-box mx-2">
             <Link to="/wishlist">
               <img src={wishlistIcon} alt="Wishlist" />
             </Link>
           </div>
 
-          {/* Notifications */}
           <div className="mx-2">
             <Bell onClick={() => setShowNotification(!showNotification)} />
             {showNotification && (
@@ -248,7 +235,6 @@ function Header() {
             )}
           </div>
 
-          {/* User / Signup */}
           {user ? (
             <Link
               to="/my-profile"
@@ -270,7 +256,6 @@ function Header() {
         </div>
       </div>
 
-      {/* Auth Modals */}
       <AuthModals modalToShow={modalToShow} setModalToShow={setModalToShow} />
     </>
   );

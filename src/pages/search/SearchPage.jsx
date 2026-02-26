@@ -1,78 +1,163 @@
-import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import API from "../../api/api";
 import Header from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 
-function SearchPage() {
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-
-  const q = params.get("q");
-  const category = params.get("category");
-  const page = params.get("page") || 1;
+const SearchPage = () => {
+  const [searchParams] = useSearchParams();
+  const query = searchParams.get("q");
+  const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const baseUrl = import.meta.env.VITE_BASE_URL;
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchResults = async () => {
+      if (!query) return;
+
       setLoading(true);
+      setError(null);
 
-      const res = await API.get(
-        `/products/search?q=${q}&category=${category || ""}&page=${page}`,
-      );
-
-      setProducts(res.data.products);
-      setLoading(false);
+      try {
+        const res = await axios.get(
+          `${baseUrl}/products/search?q=${encodeURIComponent(query)}`
+        );
+        setProducts(res.data.products || []);
+      } catch (err) {
+        console.error(err);
+        setError("Something went wrong. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    fetchProducts();
-  }, [location.search]);
+    fetchResults();
+  }, [query]);
 
   return (
     <>
       <Header />
-      <div className="container-fluid my-5 py-5 ">
-      <div className="container py-5 my-5 display-flex flex-column align-items-center">
-        <h4>
-          Results for "<strong>{q}</strong>"
-        </h4>
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : products.length === 0 ? (
-          <p>No products found</p>
-        ) : (
-          <div className="row">
-            {products.map((product) => {
-              const firstVariant = product.variants?.[0];
+      <main style={{ backgroundColor: "#D5D4D3", minHeight: "80vh", paddingTop: "120px" }}>
+        <div className="container py-4">
 
-              const price = firstVariant?.price || 0;
+          {/* Search Heading */}
+          <h5 className="mb-4">
+            Search results for: <strong>"{query}"</strong>
+            {!loading && (
+              <span className="text-muted ms-2" style={{ fontSize: "14px" }}>
+                ({products.length} products found)
+              </span>
+            )}
+          </h5>
 
-              const image =
-                firstVariant?.images?.[0]?.url ||
-                product.images?.[0]?.url ||
-                "";
+          {/* Loading */}
+          {loading && (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status" />
+              <p className="mt-2">Searching...</p>
+            </div>
+          )}
 
-              return (
-                <div key={product._id} className="col-md-3 mb-4">
-                  <div className="card p-2 h-100 d-flex flex-column">
-                    <img src={image} alt={product.name} className="img-fluid" />
-                    <h6>{product.name}</h6>
-                    <p>₹{price}</p>
+          {/* Error */}
+          {error && (
+            <div className="alert alert-danger">{error}</div>
+          )}
+
+          {/* No Results */}
+          {!loading && !error && products.length === 0 && (
+            <div className="text-center py-5">
+              <h5>No products found for "{query}"</h5>
+              <p className="text-muted">Try different keywords</p>
+            </div>
+          )}
+
+          {/* Product Grid */}
+          {!loading && products.length > 0 && (
+            <div className="row g-3">
+              {products.map((product) => {
+                const firstVariant = product.variants?.[0];
+                const price = firstVariant?.price || 0;
+                const image =
+                  firstVariant?.images?.[0]?.url ||
+                  product.images?.[0]?.url ||
+                  "";
+
+                return (
+                  <div
+                    key={product._id}
+                    className="col-6 col-md-4 col-lg-3"
+                    onClick={() => navigate(`/product/${product._id}`)}
+                    style={{ cursor: "pointer" }}
+                  >
+                    <div
+                      className="bg-white rounded shadow-sm h-100"
+                      style={{ overflow: "hidden", transition: "transform 0.2s" }}
+                      onMouseEnter={(e) => e.currentTarget.style.transform = "scale(1.02)"}
+                      onMouseLeave={(e) => e.currentTarget.style.transform = "scale(1)"}
+                    >
+                      {/* Product Image */}
+                      <div
+                        style={{
+                          height: "180px",
+                          overflow: "hidden",
+                          backgroundColor: "#f5f5f5",
+                        }}
+                      >
+                        <img
+                          src={image}
+                          alt={product.name}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                            padding: "10px",
+                          }}
+                        />
+                      </div>
+
+                      {/* Product Info */}
+                      <div className="p-3">
+                        <p
+                          className="mb-1 fw-semibold"
+                          style={{
+                            fontSize: "14px",
+                            display: "-webkit-box",
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: "vertical",
+                            overflow: "hidden",
+                          }}
+                        >
+                          {product.name}
+                        </p>
+
+                        {product.brand && (
+                          <p className="text-muted mb-1" style={{ fontSize: "12px" }}>
+                            {product.brand}
+                          </p>
+                        )}
+
+                        <p className="fw-bold mb-0" style={{ color: "#e63946" }}>
+                          ₹{price.toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                );
+              })}
+            </div>
+          )}
+
+        </div>
+      </main>
+
       <Footer />
-      </div>
     </>
   );
-}
+};
 
 export default SearchPage;
