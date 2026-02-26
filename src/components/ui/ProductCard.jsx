@@ -132,13 +132,16 @@ const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
               : "Add to Cart"}
           </button>
 
-          <button
-            className="btn-wishlist"
-            onClick={handleAddToWishlist}
-            disabled={loadingWishlist || addedWishlist}
-          >
-            <img src={wishlistIcon} alt="Wishlist" width="19" height="19" />
-          </button>
+           <button
+              className={`btn shop-card-btn-wishlist ${
+                addedWishlist ? "btn-danger" : ""
+              }`}
+              onClick={handleAddToWishlist}
+              disabled={loadingWishlist || addedWishlist}
+            >
+              <i className="bi bi-heart-fill"></i>
+              {loadingWishlist ? " Adding..." : addedWishlist ? " Added" : ""}
+            </button>
         </div>
       </div>
     </div>

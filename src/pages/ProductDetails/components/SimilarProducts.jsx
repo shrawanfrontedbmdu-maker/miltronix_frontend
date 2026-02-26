@@ -5,22 +5,39 @@ import DealCard from "../../../components/ui/DealCard";
 const SimilarProducts = ({ products = [] }) => {
   const navigate = useNavigate();
 
-  // Safety: agar products empty hai, return null
-  if (!products.length) return null;
+  if (!products || products.length === 0) return null;
 
-  // Map products to consistent structure
+  // ── Robust mapping — backend ke saare possible fields handle karta hai ──
   const mappedProducts = products.map((prod) => {
-    const sv = prod.variants?.[0];
-    const price = sv?.price ?? prod.price ?? 0;
-    const mrp = sv?.compareAtPrice ?? prod.mrp ?? 0;
-    const img = prod.images?.[0]?.url || prod.images?.[0] || "";
+    const variant = prod.variants?.[0];
+
+    // price — variant.price > prod.price > 0
+    const price =
+      Number(variant?.price ?? prod.price ?? prod.variants?.[0]?.price ?? 0);
+
+    // mrp — variant.mrp > variant.compareAtPrice > prod.mrp > price
+    const mrp =
+      Number(
+        variant?.mrp ??
+        variant?.compareAtPrice ??
+        prod.mrp ??
+        prod.cutPrice ??
+        0
+      );
+
+    // image — images[0].url > images[0] (string) > ""
+    const img =
+      prod.images?.[0]?.url ||
+      (typeof prod.images?.[0] === "string" ? prod.images[0] : "") ||
+      "";
 
     return {
       id: prod._id || prod.id,
-      title: prod.name || prod.title || "",
+      title: prod.name || prod.title || "Product",
       price,
       oldPrice: mrp > price ? mrp : null,
       image: img,
+      category: prod.category?.name || prod.category || "",
       _raw: prod,
     };
   });
@@ -28,18 +45,16 @@ const SimilarProducts = ({ products = [] }) => {
   return (
     <>
       {/* Section Header */}
-      <div className="qled-features">
+      <div className="qled-features" style={{ width: "100%" }}>
         <div className="container">
           <h2 className="qled-title1 ff2">
-            <div className="qled-top text-lg-start" style={{ position: "relative" }}>
-              Similar Products
-            </div>
+            <span className="qled-top text-lg-start">Similar Products</span>
           </h2>
         </div>
       </div>
 
       {/* Product Grid */}
-      <section className="product-section">
+      <section className="product-section" style={{ width: "100%" }}>
         <div className="container">
           <div className="row g-4">
             {mappedProducts.map((product) => (

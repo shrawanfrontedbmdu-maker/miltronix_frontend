@@ -41,6 +41,7 @@ const ProductDetailPage = () => {
     const loadProduct = async () => {
       try {
         setLoading(true);
+        setSimilarProducts([]); // reset on id change
 
         const res = await fetchProductById(id);
         const prod = res?.product || res;
@@ -53,21 +54,41 @@ const ProductDetailPage = () => {
         setProduct(prod);
         setSelectedVariant(prod?.variants?.[0] || null);
 
-        // Fetch Similar Products
+        // ── Similar Products ──────────────────────────────────────
+        // catId — populated object ya plain string dono handle
         const catId =
           typeof prod?.category === "object"
-            ? prod.category?._id
-            : prod?.category;
+            ? prod.category?._id?.toString()
+            : prod?.category?.toString();
+
+        console.log("[SimilarProducts] catId:", catId);
 
         if (catId) {
-          const simRes = await fetchProducts({ category: catId, limit: 10 });
-          const allProducts = simRes?.products || simRes?.data || [];
+          try {
+            const simRes = await fetchProducts({ category: catId });
+            console.log("[SimilarProducts] API response:", simRes);
 
-          const filtered = allProducts.filter(
-            (p) => p._id !== prod._id
-          );
+            // Backend returns { products: [...] }
+            const allProducts =
+              simRes?.products ||
+              simRes?.data?.products ||
+              simRes?.data ||
+              [];
 
-          setSimilarProducts(filtered.slice(0, 6));
+            console.log("[SimilarProducts] allProducts count:", allProducts.length);
+
+            // current product hata do
+            const filtered = allProducts.filter(
+              (p) => p._id?.toString() !== prod._id?.toString()
+            );
+
+            console.log("[SimilarProducts] filtered count:", filtered.length);
+
+            setSimilarProducts(filtered.slice(0, 6));
+          } catch (simErr) {
+            console.error("[SimilarProducts] fetch failed:", simErr);
+            setSimilarProducts([]);
+          }
         }
       } catch (error) {
         console.error("Product fetch error:", error);
@@ -100,16 +121,13 @@ const ProductDetailPage = () => {
   // ================= ADD TO CART =================
   const handleAddToCart = async () => {
     if (!product) return;
-
     try {
       setAddingToCart(true);
-
       await addItemToCart({
         productId: product._id,
         sku: selectedVariant?.sku || product?.sku || "",
         quantity: 1,
       });
-
       navigate("/cart");
     } catch (error) {
       alert(error?.message || "Failed to add to cart");
@@ -130,8 +148,16 @@ const ProductDetailPage = () => {
     return (
       <>
         <Header />
-        <div style={{ minHeight: "60vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
-          <p>Loading product...</p>
+        <div
+          style={{
+            minHeight: "60vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            background: "#D5D4D3",
+          }}
+        >
+          <p style={{ color: "#616D6B", fontWeight: 600 }}>Loading product...</p>
         </div>
         <Footer />
       </>
@@ -143,7 +169,15 @@ const ProductDetailPage = () => {
     return (
       <>
         <Header />
-        <div style={{ minHeight: "60vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <div
+          style={{
+            minHeight: "60vh",
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            background: "#D5D4D3",
+          }}
+        >
           <p style={{ color: "red", fontWeight: "bold" }}>Product not found</p>
         </div>
         <Footer />
@@ -170,6 +204,7 @@ const ProductDetailPage = () => {
               <ProductInfo
                 product={product}
                 selectedVariant={selectedVariant}
+                onVariantChange={setSelectedVariant}
                 onAddToCart={handleAddToCart}
                 onBuyNow={handleBuyNow}
                 addingToCart={addingToCart}
@@ -183,7 +218,10 @@ const ProductDetailPage = () => {
 
               <CustomerFeedback reviews={reviews} />
 
-              <SimilarProducts products={similarProducts} />
+              {/* SimilarProducts — sirf tab render ho jab products ho */}
+              {similarProducts.length > 0 && (
+                <SimilarProducts products={similarProducts} />
+              )}
 
             </div>
           </div>
