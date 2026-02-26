@@ -5,7 +5,7 @@ import { addItemToCart, addItemToWishlist, getCartItems } from "../../api/api";
 const starIconFull = "/src/assets/icon7.svg";
 const starIconHalf = "/src/assets/icon9.svg";
 const starIconEmpty = "/src/assets/icon8.svg";
-const cartIcon = "/src/assets/cart.png";
+import cartIcon from "../../assets/cart.png";
 const wishlistIcon = "/src/assets/icon9.svg";
 
 const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {

@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Define the image source
-const bannerImage = '/src/assets/b.png';
+import bannerImage from "../../../assets/b.png";
 
 const SecondaryBanner = () => {
   return (

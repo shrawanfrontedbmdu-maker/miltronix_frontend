@@ -1,6 +1,6 @@
 import React from 'react';
 
-const decoVector = '/src/assets/Vector 17.svg';
+const decoVector = '/src/assets/Vector17.svg';
 const linkIcon = '/src/assets/Frame52.png';
 
 const AboutCard = ({ card }) => {
