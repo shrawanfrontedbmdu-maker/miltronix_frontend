@@ -12,7 +12,7 @@ import 'swiper/css/pagination';
 import { customerReviews } from '../../../data/mockData';
 
 // Assume you have the star icon in your assets
-const starIcon = '/src/assets/icon7.svg';
+const starIcon = '/icon7.svg';
 
 const TestimonialSection = () => {
   return (

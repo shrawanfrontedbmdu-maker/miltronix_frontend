@@ -1,18 +1,18 @@
 export const categories = [
-  { name: 'QLED TV', img: '/src/assets/circle image 4.png', link: '/category/qled' },
-  { name: 'CCTV', img: '/src/assets/Frame 57.png', link: '/category/cctv' },
-  { name: 'VIDEO WALL', img: '/src/assets/circle image 6.png', link: '/category/videowall' },
-  { name: 'SMART BOARD', img: '/src/assets/circle image 7.png', link: '/category/smartboard' },
-  { name: 'SPY GADGET', img: '/src/assets/circle image 8.png', link: '/category/spygadget' },
-  { name: 'ADVERTISING LED', img: '/src/assets/circle image 9.png', link: '/category/advertisingled' },
-  { name: 'SERVICE', img: '/src/assets/circle image 10.png', link: '/category/service' },
+  { name: 'QLED TV', img: '/circle image 4.png', link: '/category/qled' },
+  { name: 'CCTV', img: '/Frame 57.png', link: '/category/cctv' },
+  { name: 'VIDEO WALL', img: '/circle image 6.png', link: '/category/videowall' },
+  { name: 'SMART BOARD', img: '/circle image 7.png', link: '/category/smartboard' },
+  { name: 'SPY GADGET', img: '/circle image 8.png', link: '/category/spygadget' },
+  { name: 'ADVERTISING LED', img: '/circle image 9.png', link: '/category/advertisingled' },
+  { name: 'SERVICE', img: '/circle image 10.png', link: '/category/service' },
 ];
 
 export const featuredProducts = [
   {
     id: 1,
     saveAmount: "₹300",
-    image: "/src/assets/cardimage 10.png",
+    image: "/cardimage 10.png",
     category: "Television",
     title: "QLED 40-inch",
     price: "14,444",
@@ -23,7 +23,7 @@ export const featuredProducts = [
   {
     id: 2,
     saveAmount: "₹300",
-    image: "/src/assets/image 11.png",
+    image: "/image 11.png",
     category: "Camera",
     title: "2 MP HD DOME CAMERA",
     price: "1,999",
@@ -34,7 +34,7 @@ export const featuredProducts = [
   {
     id: 3,
     saveAmount: "₹300",
-    image: "/src/assets/image 12.png",
+    image: "/image 12.png",
     category: "VIDEO WALL",
     title: "P210 OUTDOOR VIDEO WALL",
     price: "12,999",
@@ -45,7 +45,7 @@ export const featuredProducts = [
   {
     id: 4,
     saveAmount: "₹300",
-    image: "/src/assets/image 13.png",
+    image: "/image 13.png",
     category: "AIRCONDITIONER",
     title: "SPLIT AC",
     price: "25,000",
@@ -56,7 +56,7 @@ export const featuredProducts = [
   {
     id: 5,
     saveAmount: "₹300",
-    image: "/src/assets/image 14.png",
+    image: "/image 14.png",
     category: "SMART BOARD",
     title: "SMART BOARD",
     price: "2,599",
@@ -67,7 +67,7 @@ export const featuredProducts = [
   {
     id: 6,
     saveAmount: "₹300",
-    image: "/src/assets/image 15.png",
+    image: "/image 15.png",
     category: "ADVERTISING LED",
     title: "ADVERTISING LED",
     price: "28,699",
@@ -221,32 +221,32 @@ export const contactCards = [
 export const aboutCards = [
   {
     title: "Corporate\nOffice",
-    image: "/src/assets/image16.png",
+    image: "/image16.png",
     alt: "Corporate Office Building",
   },
   {
     title: "Warehouse &\nService Center",
-    image: "/src/assets/image17.png",
+   image: "/image17.png",
     alt: "Warehouse Interior",
   },
   {
     title: "Online Sale\nPlatform",
-    image: "/src/assets/image18.png",
+  image: "/image18.png",
     alt: "E-commerce Website on a Laptop",
   },
   {
     title: "Trademark",
-    image: "/src/assets/image19.png",
+   image: "/image19.png",
     alt: "Trademark Certificate",
   },
   {
     title: "Team Members",
-    image: "/src/assets/image20.png",
+   image: "/image20.png",
     alt: "A Group of Team Members",
   },
   {
     title: "Customer Support",
-    image: "/src/assets/image21.png",
+  image: "/image21.png",
     alt: "Customer Support Agent with Headset",
   },
 ];
@@ -255,7 +255,7 @@ export const qledDeals = [
   {
     id: "deal-1",
     saveAmount: "₹ 5,000",
-    image: "/src/assets/image 22.png",
+    image: "/image 22.png",
     title: "QLED 40 inches",
     price: "19,999",
     oldPrice: "25,999",
@@ -263,7 +263,7 @@ export const qledDeals = [
   {
     id: "deal-2",
     saveAmount: "₹ 5,000",
-    image: "/src/assets/image 22.png",
+    image: "/image 22.png",
     title: "QLED 43 inches",
     price: "29,999",
     oldPrice: "35,000",
@@ -271,7 +271,7 @@ export const qledDeals = [
   {
     id: "deal-3",
     saveAmount: "₹ 5,000",
-    image: "/src/assets/image 22.png",
+    image: "/image 22.png",
     title: "QLED 50 inches",
     price: "61,500",
     oldPrice: "65,500",
@@ -279,7 +279,7 @@ export const qledDeals = [
   {
     id: "deal-4",
     saveAmount: "₹ 5,000",
-    image: "/src/assets/image 22.png",
+    image: "/image 22.png",
     title: "QLED 65 inches",
     price: "60,000",
     oldPrice: "80,000",
@@ -288,22 +288,22 @@ export const qledDeals = [
 
 export const businessServices = [
   {
-    icon: "/src/assets/icon11.svg",
+   icon: "/icon11.svg",
     alt: "Installation Tools",
     label: "INSTALLATION",
   },
   {
-    icon: "/src/assets/icon12.svg",
+   icon: "/icon12.svg",
     alt: "Mobile App Icon",
     label: "ONE STOP SHOP & SERVICE APP",
   },
   {
-    icon: "/src/assets/icon13.svg",
+  icon: "/icon13.svg",
     alt: "Cash Icon",
     label: "CASH ON DELIVERY",
   },
   {
-    icon: "/src/assets/icon14.svg",
+   icon: "/icon14.svg",
     alt: "Location Pin Icon",
     label: "ONSITE SERVICE",
   },
@@ -348,19 +348,19 @@ export const customerReviews = [
 
 export const subscriptionFeatures = [
   {
-    icon: "/src/assets/icon15.svg",
+    icon: "/icon15.svg",
     alt: "Tag Icon",
     title: "Exclusive Deals",
     description: "Get access to subscriber-only discounts and flash sales",
   },
   {
-    icon: "/src/assets/icon16.svg",
+  icon: "/icon16.svg",
     alt: "Rocket Icon",
     title: "Early Access",
     description: "Be first to shop new product launches and limited editions",
   },
   {
-    icon: "/src/assets/icon17.svg",
+  icon: "/icon17.svg",
     alt: "Lightbulb Icon",
     title: "Tech Insights",
     description: "Weekly tech news, reviews, and buying guides",
@@ -371,10 +371,10 @@ export const subscriptionFeatures = [
 export const productData = {
   breadcrumb: ["Home Page", "QLED TV", "Full HD TV"],
   images: [
-    "/src/assets/my-order-img.png",
-    "/src/assets/my-order-img.png",
-    "/src/assets/my-order-img.png",
-    "/src/assets//my-order-img.png",
+    "/my-order-img.png",
+    "/my-order-img.png",
+    "/my-order-img.png",
+    "//my-order-img.png",
   ],
   title: "Miltronix 189cm (75 inch) 4K Ultra HD Quantum Dot LED Google TV",
   description:
@@ -411,8 +411,8 @@ export const productData = {
       { star: 1, percentage: 10 },
     ],
     images: [
-      "/src/assets/card 1 (4).png",
-      "/src/assets/card 1 (4).png",
+      "/card 1 (4).png",
+      "/card 1 (4).png",
       // ... more images
     ],
   },
@@ -420,7 +420,7 @@ export const productData = {
     {
       id: "sim-1",
       saveAmount: "₹ 5,000",
-      image: "/src/assets/image 22.png",
+      image: "/image 22.png",
       title: "QLED 40 inches",
       price: "19,999",
       oldPrice: "25,999",
@@ -428,7 +428,7 @@ export const productData = {
     {
       id: "sim-2",
       saveAmount: "₹ 5,000",
-      image: "/src/assets/image 22.png",
+      image: "/image 22.png",
       title: "QLED 43 inches",
       price: "29,999",
       oldPrice: "35,000",
@@ -436,7 +436,7 @@ export const productData = {
     {
       id: "sim-3",
       saveAmount: "₹ 5,000",
-      image: "/src/assets/image 22.png",
+      image: "/image 22.png",
       title: "QLED 50 inches",
       price: "61,500",
       oldPrice: "65,500",
@@ -444,7 +444,7 @@ export const productData = {
     {
       id: "sim-4",
       saveAmount: "₹ 5,000",
-      image: "/src/assets/image 22.png",
+      image: "/image 22.png",
       title: "QLED 65 inches",
       price: "60,000",
       oldPrice: "80,000",
@@ -509,12 +509,12 @@ export const productReviewsData = {
       { star: 1, percentage: 15 },
     ],
     images: [
-      "/src/assets/card 1 (4).png",
-      "/src/assets/card 1 (4).png",
-      "/src/assets/card 1 (4).png",
-      "/src/assets/card 1 (4).png",
-      "/src/assets/card 1 (4).png",
-      "/src/assets/card 1 (4).png",
+      "/card 1 (4).png",
+      "/card 1 (4).png",
+      "/card 1 (4).png",
+      "/card 1 (4).png",
+      "/card 1 (4).png",
+      "/card 1 (4).png",
     ],
   },
   // ... rest of product data
@@ -549,7 +549,7 @@ export const qledTvProducts = [
   {
     id: "qled-1",
     saveAmount: "₹300",
-    image: "/src/assets/image 10.png",
+    image: "/image 10.png",
     category: "Television",
     title: "QLED 40-inch",
     price: "14,444",
@@ -561,7 +561,7 @@ export const qledTvProducts = [
   {
     id: "qled-2",
     saveAmount: "₹300",
-    image: "/src/assets/image 10.png",
+    image: "/image 10.png",
     category: "Television",
     title: "QLED 43-inch Ultra HD",
     price: "21,999",
@@ -573,7 +573,7 @@ export const qledTvProducts = [
   {
     id: "qled-3",
     saveAmount: "₹300",
-    image: "/src/assets/image 10.png",
+    image: "/image 10.png",
     category: "Television",
     title: "QLED 50-inch HD Ready",
     price: "32,999",
@@ -585,7 +585,7 @@ export const qledTvProducts = [
   {
     id: "qled-4",
     saveAmount: "₹300",
-    image: "/src/assets/image 10.png",
+    image: "/image 10.png",
     category: "Television",
     title: "QLED 55-inch 4k/ Ultra HD",
     price: "45,999",
@@ -597,7 +597,7 @@ export const qledTvProducts = [
   {
     id: "qled-5",
     saveAmount: "₹300",
-    image: "/src/assets/image 10.png",
+    image: "/image 10.png",
     category: "Television",
     title: "QLED 65-inch Ultra HD",
     price: "68,999",
@@ -609,7 +609,7 @@ export const qledTvProducts = [
   {
     id: "qled-6",
     saveAmount: "₹300",
-    image: "/src/assets/image 10.png",
+    image: "/image 10.png",
     category: "Television",
     title: "QLED 32-inch HD",
     price: "11,999",
@@ -621,7 +621,7 @@ export const qledTvProducts = [
   {
     id: "qled-7",
     saveAmount: "₹300",
-    image: "/src/assets/image 10.png",
+    image: "/image 10.png",
     category: "Television",
     title: "QLED 75-inch Ultra HD",
     price: "89,999",
@@ -633,7 +633,7 @@ export const qledTvProducts = [
   {
     id: "qled-8",
     saveAmount: "₹300",
-    image: "/src/assets/image 10.png",
+    image: "/image 10.png",
     category: "Television",
     title: "QLED 48-inch Full HD",
     price: "28,999",
@@ -649,22 +649,22 @@ export const resolutionInfo = [
   {
     title: "HD READY",
     description: "Best for watching your favourite show on DTH",
-    image: "/src/assets/card 1 (1).png",
+    image: "/card 1 (1).png",
   },
   {
     title: "FULL HD",
     description: "Best for gaming and OTT",
-    image: "/src/assets/card 1 (2).png",
+    image: "/card 1 (2).png",
   },
   {
     title: "4K ULTRA",
     description: "Do what you love Best in 4k",
-    image: "/src/assets/card 1 (3).png",
+    image: "/card 1 (3).png",
   },
   {
     title: "8K ULTRA",
     description: "For enthralling and immersive viewing experience",
-    image: "/src/assets/card 1 (4).png",
+    image: "/card 1 (4).png",
   },
 ];
 
@@ -679,7 +679,7 @@ export const categoriesData = {
       {
         id: "qled-1",
         saveAmount: "₹300",
-        image: "/src/assets/image 10.png",
+        image: "/image 10.png",
         category: "Television",
         title: "QLED 40-inch",
         price: "14,444",
@@ -691,7 +691,7 @@ export const categoriesData = {
       {
         id: "qled-2",
         saveAmount: "₹300",
-        image: "/src/assets/image 10.png",
+        image: "/image 10.png",
         category: "Television",
         title: "QLED 43-inch Ultra HD",
         price: "21,999",
@@ -703,7 +703,7 @@ export const categoriesData = {
       {
         id: "qled-3",
         saveAmount: "₹300",
-        image: "/src/assets/image 10.png",
+        image: "/image 10.png",
         category: "Television",
         title: "QLED 50-inch HD Ready",
         price: "32,999",
@@ -715,7 +715,7 @@ export const categoriesData = {
       {
         id: "qled-4",
         saveAmount: "₹300",
-        image: "/src/assets/image 10.png",
+        image: "/image 10.png",
         category: "Television",
         title: "QLED 55-inch 4k/ Ultra HD",
         price: "45,999",
@@ -727,7 +727,7 @@ export const categoriesData = {
       {
         id: "qled-5",
         saveAmount: "₹300",
-        image: "/src/assets/image 10.png",
+        image: "/image 10.png",
         category: "Television",
         title: "QLED 65-inch Ultra HD",
         price: "68,999",
@@ -739,7 +739,7 @@ export const categoriesData = {
       {
         id: "qled-6",
         saveAmount: "₹300",
-        image: "/src/assets/image 10.png",
+        image: "/image 10.png",
         category: "Television",
         title: "QLED 32-inch HD",
         price: "11,999",
@@ -751,7 +751,7 @@ export const categoriesData = {
       {
         id: "qled-7",
         saveAmount: "₹300",
-        image: "/src/assets/image 10.png",
+        image: "/image 10.png",
         category: "Television",
         title: "QLED 75-inch Ultra HD",
         price: "89,999",
@@ -763,7 +763,7 @@ export const categoriesData = {
       {
         id: "qled-8",
         saveAmount: "₹300",
-        image: "/src/assets/image 10.png",
+        image: "/image 10.png",
         category: "Television",
         title: "QLED 48-inch Full HD",
         price: "28,999",
@@ -809,26 +809,26 @@ export const categoriesData = {
         {
           title: "HD READY",
           description: "Best for watching your favourite show on DTH",
-          image: "/src/assets/card 1 (1).png",
+          image: "/card 1 (1).png",
           alt: "HD Ready TV",
         },
         {
           title: "FULL HD",
           description: "Best for gaming and OTT",
-          image: "/src/assets/card 1 (2).png",
+          image: "/card 1 (2).png",
           alt: "Full HD TV",
         },
         {
           title: "4K ULTRA",
           description: "Do what you love Best in 4k",
-          image: "/src/assets/card 1 (3).png",
+          image: "/card 1 (3).png",
           alt: "4K Ultra HD TV",
         },
         {
           title: "8K ULTRA",
           description:
             "For enthralling and immersive viewing experience",
-          image: "/src/assets/card 1 (4).png",
+          image: "/card 1 (4).png",
           alt: "8K Ultra HD TV",
         },
       ],
@@ -846,7 +846,7 @@ export const categoriesData = {
       {
         id: "cctv-1",
         saveAmount: "₹1,000",
-        image: "/src/assets/image 11.png",
+        image: "/image 11.png",
         category: "CAMERA",
         title: "2 MP HD DOME CAMERA",
         price: "1,999",
@@ -858,7 +858,7 @@ export const categoriesData = {
       {
         id: "cctv-2",
         saveAmount: "₹1,000",
-        image: "/src/assets/image 11.png",
+        image: "/image 11.png",
         category: "CAMERA",
         title: "3 MP Bullet Camera",
         price: "2,499",
@@ -870,7 +870,7 @@ export const categoriesData = {
       {
         id: "cctv-3",
         saveAmount: "₹1,000",
-        image: "/src/assets/image 11.png",
+        image: "/image 11.png",
         category: "CAMERA",
         title: "5 MP PTZ Camera",
         price: "4,999",
@@ -882,7 +882,7 @@ export const categoriesData = {
       {
         id: "cctv-4",
         saveAmount: "₹1,000",
-        image: "/src/assets/image 11.png",
+        image: "/image 11.png",
         category: "CAMERA",
         title: "Wireless IP Camera",
         price: "3,299",
@@ -894,7 +894,7 @@ export const categoriesData = {
       {
         id: "cctv-5",
         saveAmount: "₹700",
-        image: "/src/assets/image 11.png",
+        image: "/image 11.png",
         category: "CAMERA",
         title: "Portable Spy Camera",
         price: "1,499",
@@ -906,7 +906,7 @@ export const categoriesData = {
       {
         id: "cctv-6",
         saveAmount: "₹1,000",
-        image: "/src/assets/image 11.png",
+        image: "/image 11.png",
         category: "CAMERA",
         title: "Outdoor Security Camera",
         price: "3,999",
@@ -918,7 +918,7 @@ export const categoriesData = {
       {
         id: "cctv-7",
         saveAmount: "₹1,000",
-        image: "/src/assets/image 11.png",
+        image: "/image 11.png",
         category: "CAMERA",
         title: "4K Night Vision Camera",
         price: "5,499",
@@ -930,7 +930,7 @@ export const categoriesData = {
       {
         id: "cctv-8",
         saveAmount: "₹1,000",
-        image: "/src/assets/image 11.png",
+        image: "/image 11.png",
         category: "CAMERA",
         title: "360° Panoramic Camera",
         price: "4,599",
@@ -978,28 +978,28 @@ export const categoriesData = {
           title: "WALL MOUNT",
           description:
             "Wall mount camera – fixed on walls for side-view surveillance",
-          image: "/src/assets/cam1.png",
+          image: "/cam1.png",
           alt: "Wall Mount Camera",
         },
         {
           title: "TABLE TOP",
           description:
             "Table top camera – placed on flat surfaces for flexible monitoring.",
-          image: "/src/assets/cam2.png",
+          image: "/cam2.png",
           alt: "Table Top Camera",
         },
         {
           title: "CELLING MOUNT",
           description:
             "Celling mount camera – fixed overhead for wide-area coverage",
-          image: "/src/assets/cam3.png",
+          image: "/cam3.png",
           alt: "Ceiling Mount Camera",
         },
         {
           title: "PORTABLE",
           description:
             "Portable camera – easy to carry for on-the-go surveillance.",
-          image: "/src/assets/camera4.png",
+          image: "/camera4.png",
           alt: "Portable Camera",
         },
       ],
@@ -1009,7 +1009,7 @@ export const categoriesData = {
         id: "rec-cctv-2",
         saveAmount: "₹500",
         title: "Ceiling Camera 2",
-        image: "/src/assets/ceiling-cam.png",
+        image: "/ceiling-cam.png",
         price: "2,999",
         oldPrice: "3,499",
       },
@@ -1017,7 +1017,7 @@ export const categoriesData = {
         id: "rec-cctv-3",
         saveAmount: "₹500",
         title: "Ceiling Camera 3",
-        image: "/src/assets/ceiling-cam.png",
+        image: "/ceiling-cam.png",
         price: "3,999",
         oldPrice: "4,499",
       },
@@ -1025,7 +1025,7 @@ export const categoriesData = {
         id: "rec-cctv-4",
         saveAmount: "₹500",
         title: "Ceiling Camera 4",
-        image: "/src/assets/ceiling-cam.png",
+        image: "/ceiling-cam.png",
         price: "4,999",
         oldPrice: "5,499",
       },
@@ -1042,7 +1042,7 @@ export const categoriesData = {
       {
         id: "vw-1",
         saveAmount: "₹300",
-        image: "/src/assets/image 12.png",
+        image: "/image 12.png",
         category: "VIDEO WALL",
         title: "P210 Outdoor Video Wall",
         price: "12,999",
@@ -1054,7 +1054,7 @@ export const categoriesData = {
       {
         id: "vw-2",
         saveAmount: "₹300",
-        image: "/src/assets/image 12.png",
+        image: "/image 12.png",
         category: "VIDEO WALL",
         title: "P210 Outdoor Video Wall",
         price: "12,999",
@@ -1066,7 +1066,7 @@ export const categoriesData = {
       {
         id: "vw-3",
         saveAmount: "₹300",
-        image: "/src/assets/image 12.png",
+        image: "/image 12.png",
         category: "VIDEO WALL",
         title: "P210 Outdoor Video Wall",
         price: "12,999",
@@ -1078,7 +1078,7 @@ export const categoriesData = {
       {
         id: "vw-4",
         saveAmount: "₹300",
-        image: "/src/assets/image 12.png",
+        image: "/image 12.png",
         category: "VIDEO WALL",
         title: "P210 Outdoor Video Wall",
         price: "12,999",
@@ -1090,7 +1090,7 @@ export const categoriesData = {
       {
         id: "vw-5",
         saveAmount: "₹300",
-        image: "/src/assets/image 12.png",
+        image: "/image 12.png",
         category: "VIDEO WALL",
         title: "P210 Outdoor Video Wall",
         price: "12,999",
@@ -1102,7 +1102,7 @@ export const categoriesData = {
       {
         id: "vw-6",
         saveAmount: "₹300",
-        image: "/src/assets/image 12.png",
+        image: "/image 12.png",
         category: "VIDEO WALL",
         title: "P210 Outdoor Video Wall",
         price: "12,999",
@@ -1114,7 +1114,7 @@ export const categoriesData = {
       {
         id: "vw-7",
         saveAmount: "₹300",
-        image: "/src/assets/image 12.png",
+        image: "/image 12.png",
         category: "VIDEO WALL",
         title: "P210 Outdoor Video Wall",
         price: "12,999",
@@ -1126,7 +1126,7 @@ export const categoriesData = {
       {
         id: "vw-8",
         saveAmount: "₹300",
-        image: "/src/assets/image 12.png",
+        image: "/image 12.png",
         category: "VIDEO WALL",
         title: "P210 Outdoor Video Wall",
         price: "12,999",
@@ -1166,28 +1166,28 @@ export const categoriesData = {
           title: "LED VIDEO WALL",
           description:
             "Wall mount camera – fixed on walls for side-view surveillance.",
-          image: "/src/assets/vid4.png",
+          image: "/vid4.png",
           alt: "LED Video Wall",
         },
         {
           title: "PROJECTION WALL",
           description:
             "Table top camera – placed on flat surfaces for flexible monitoring.",
-          image: "/src/assets/vid3.png",
+          image: "/vid3.png",
           alt: "Projection Wall",
         },
         {
           title: "LCD VIDEO WALL",
           description:
             "Celling mount camera – fixed overhead for wide-area coverage",
-          image: "/src/assets/vid2.png",
+          image: "/vid2.png",
           alt: "LCD Video Wall",
         },
         {
           title: "INTERACTIVE WALL",
           description:
             "Portable camera – easy to carry for on-the-go surveillance.",
-          image: "/src/assets/video1.png",
+          image: "/video1.png",
           alt: "Interactive Wall",
         },
       ],
@@ -1196,7 +1196,7 @@ export const categoriesData = {
       {
         id: "rec-vw-1",
         saveAmount: "₹ 5,000",
-        image: "/src/assets/led.png",
+        image: "/led.png",
         title: "Video Wall Rec 1",
         price: "19,999",
         oldPrice: "25,999",
@@ -1204,7 +1204,7 @@ export const categoriesData = {
       {
         id: "rec-vw-2",
         saveAmount: "₹ 5,000",
-        image: "/src/assets/led.png",
+        image: "/led.png",
         title: "Video Wall Rec 2",
         price: "29,999",
         oldPrice: "35,000",
@@ -1212,7 +1212,7 @@ export const categoriesData = {
       {
         id: "rec-vw-3",
         saveAmount: "₹ 5,000",
-        image: "/src/assets/led.png",
+        image: "/led.png",
         title: "Video Wall Rec 3",
         price: "61,500",
         oldPrice: "65,500",
@@ -1220,7 +1220,7 @@ export const categoriesData = {
       {
         id: "rec-vw-4",
         saveAmount: "₹ 5,000",
-        image: "/src/assets/led.png",
+        image: "/led.png",
         title: "Video Wall Rec 4",
         price: "60,000",
         oldPrice: "80,000",
@@ -1240,7 +1240,7 @@ export const categoriesData = {
       {
         id: "sb-1",
         saveAmount: "₹5,000",
-        image: "/src/assets/smartboard img..avif",
+        image: "/smartboard img..avif",
         category: "SMART BOARD",
         title: "65 inch Interactive Smart Board",
         price: "1,25,000",
@@ -1256,7 +1256,7 @@ export const categoriesData = {
       {
         id: "sb-2",
         saveAmount: "₹4,000",
-        image: "/src/assets/smartboard img..avif",
+        image: "/smartboard img..avif",
         category: "SMART BOARD",
         title: "75 inch Smart Interactive Panel",
         price: "1,75,000",
@@ -1272,7 +1272,7 @@ export const categoriesData = {
       {
         id: "sb-3",
         saveAmount: "₹6,000",
-        image: "/src/assets/smartboard img..avif",
+        image: "/smartboard img..avif",
         category: "SMART BOARD",
         title: "86 inch Ultra HD Smart Board",
         price: "2,25,000",
@@ -1288,7 +1288,7 @@ export const categoriesData = {
       {
         id: "sb-4",
         saveAmount: "₹5,000",
-        image: "/src/assets/smartboard img..avif",
+        image: "/smartboard img..avif",
         category: "SMART BOARD",
         title: "75 inch Interactive Smart Board",
         price: "1,85,000",
@@ -1304,7 +1304,7 @@ export const categoriesData = {
       {
         id: "sb-5",
         saveAmount: "₹8,000",
-        image: "/src/assets/smartboard img..avif",
+        image: "/smartboard img..avif",
         category: "SMART BOARD",
         title: "65 inch Smart Interactive Panel",
         price: "1,45,000",
@@ -1320,7 +1320,7 @@ export const categoriesData = {
       {
         id: "sb-6",
         saveAmount: "₹10,000",
-        image: "/src/assets/smartboard img..avif",
+        image: "/smartboard img..avif",
         category: "SMART BOARD",
         title: "98 inch Ultra Large Smart Board",
         price: "3,80,000",
@@ -1336,7 +1336,7 @@ export const categoriesData = {
       {
         id: "sb-7",
         saveAmount: "₹7,500",
-        image: "/src/assets/smartboard img..avif",
+        image: "/smartboard img..avif",
         category: "SMART BOARD",
         title: "70 inch Digital Smart Board",
         price: "1,65,000",
@@ -1352,7 +1352,7 @@ export const categoriesData = {
       {
         id: "sb-8",
         saveAmount: "₹12,000",
-        image: "/src/assets/smartboard img..avif",
+        image: "/smartboard img..avif",
         category: "SMART BOARD",
         title: "85 inch Advanced Smart Board Pro",
         price: "2,90,000",
@@ -1411,25 +1411,25 @@ export const categoriesData = {
         {
           title: "EDUCATION",
           description: "Interactive teaching for schools & colleges",
-          image: "/src/assets/educationpng images.jpg",
+          image: "/educationpng images.jpg",
           alt: "Education Smart Board",
         },
         {
           title: "CORPORATE",
           description: "Meetings, presentations & collaboration",
-          image: "/src/assets/corprate smartbord png.jpg",
+          image: "/corprate smartbord png.jpg",
           alt: "Corporate Smart Board",
         },
         {
           title: "TRAINING",
           description: "Skill development & workshops",
-          image: "/src/assets/traningsmartboard.jpg",
+          image: "/traningsmartboard.jpg",
           alt: "Training Smart Board",
         },
         {
           title: "CONFERENCE",
           description: "Large scale discussions & brainstorming",
-          image: "/src/assets/confrence smartboard.avif",
+          image: "/confrence smartboard.avif",
           alt: "Conference Smart Board",
         },
       ],
@@ -1438,7 +1438,7 @@ export const categoriesData = {
       {
         id: "rec-sb-1",
         saveAmount: "₹10,000",
-        image: "/src/assets/smart-board-gx-65-inch.png",
+        image: "/smart-board-gx-65-inch.png",
         title: "65 inch Smart Board",
         price: "1,19,999",
         oldPrice: "1,29,999",
@@ -1446,7 +1446,7 @@ export const categoriesData = {
       {
         id: "rec-sb-2",
         saveAmount: "₹15,000",
-        image: "/src/assets/75 inch smart bard.webp",
+        image: "/75 inch smart bard.webp",
         title: "75 inch Smart Board",
         price: "1,69,999",
         oldPrice: "1,84,999",
@@ -1454,7 +1454,7 @@ export const categoriesData = {
       {
         id: "rec-sb-3",
         saveAmount: "9,500",
-        image: "/src/assets/75 inch smart bard.webp",
+        image: "/75 inch smart bard.webp",
         title: "55 inch Smart Board",
         price: "1,89,235",
         oldPrice: "1,29,999",
@@ -1462,7 +1462,7 @@ export const categoriesData = {
       {
         id: "rec-sb-4",
         saveAmount: "₹20,000",
-        image: "/src/assets/75 inch smart bard.webp",
+        image: "/75 inch smart bard.webp",
         title: "86 inch Smart Board",
         price: "3,00,000",
         oldPrice: "1,84,999",
@@ -1480,7 +1480,7 @@ export const categoriesData = {
       {
         id: "spy-1",
         saveAmount: "₹500",
-        image: "/src/assets/SPY GADGET images png.png",
+        image: "/SPY GADGET images png.png",
         category: "SPY GADGET",
         title: "Hidden Pen Camera HD",
         price: "2,499",
@@ -1494,7 +1494,7 @@ export const categoriesData = {
       {
         id: "spy-2",
         saveAmount: "₹700",
-        image: "/src/assets/spy_charger.png",
+        image: "/spy_charger.png",
         category: "SPY GADGET",
         title: "USB Wall Charger Camera",
         price: "3,199",
@@ -1508,7 +1508,7 @@ export const categoriesData = {
       {
         id: "spy-3",
         saveAmount: "₹400",
-        image: "/src/assets/spy_clock.png",
+        image: "/spy_clock.png",
         category: "SPY GADGET",
         title: "Digital Clock Spy Camera",
         price: "2,999",
@@ -1522,7 +1522,7 @@ export const categoriesData = {
       {
         id: "spy-4",
         saveAmount: "₹1,000",
-        image: "/src/assets/spy_glasses.png",
+        image: "/spy_glasses.png",
         category: "SPY GADGET",
         title: "Video Recording Glasses",
         price: "4,500",
@@ -1536,7 +1536,7 @@ export const categoriesData = {
       {
         id: "spy-5",
         saveAmount: "₹600",
-        image: "/src/assets/spy_button.png",
+        image: "/spy_button.png",
         category: "SPY GADGET",
         title: "Mini Button Camera",
         price: "1,899",
@@ -1550,7 +1550,7 @@ export const categoriesData = {
       {
         id: "spy-6",
         saveAmount: "₹800",
-        image: "/src/assets/spy_powerbank.png",
+        image: "/spy_powerbank.png",
         category: "SPY GADGET",
         title: "Power Bank Spy Camera",
         price: "3,999",
@@ -1564,7 +1564,7 @@ export const categoriesData = {
       {
         id: "spy-7",
         saveAmount: "₹500",
-        image: "/src/assets/spy_keychain.png",
+        image: "/spy_keychain.png",
         category: "SPY GADGET",
         title: "Keychain Voice Recorder",
         price: "2,199",
@@ -1578,7 +1578,7 @@ export const categoriesData = {
       {
         id: "spy-8",
         saveAmount: "₹900",
-        image: "/src/assets/spy_frame.png",
+        image: "/spy_frame.png",
         category: "SPY GADGET",
         title: "Photo Frame Hidden IP Camera",
         price: "4,299",
@@ -1632,25 +1632,25 @@ export const categoriesData = {
         {
           title: "HOME SECURITY",
           description: "Monitor your home discreetly without visible cameras",
-          image: "/src/assets/spy_home.png",
+          image: "/spy_home.png",
           alt: "Home Spy Camera",
         },
         {
           title: "OFFICE MONITORING",
           description: "Keep track of workplace activity without disturbance",
-          image: "/src/assets/spy_office.png",
+          image: "/spy_office.png",
           alt: "Office Spy Camera",
         },
         {
           title: "PERSONAL SAFETY",
           description: "Record evidence for personal protection",
-          image: "/src/assets/spy_personal.png",
+          image: "/spy_personal.png",
           alt: "Personal Safety Spy Gadget",
         },
         {
           title: "TRAVEL SECURITY",
           description: "Compact gadgets ideal for travel surveillance",
-          image: "/src/assets/spy_travel.png",
+          image: "/spy_travel.png",
           alt: "Travel Spy Camera",
         },
       ],
@@ -1660,7 +1660,7 @@ export const categoriesData = {
       {
         id: "rec-spy-1",
         saveAmount: "₹700",
-        image: "/src/assets/spy_pen.png",
+        image: "/spy_pen.png",
         title: "Pen Camera Pro",
         price: "2,799",
         oldPrice: "3,499",
@@ -1668,7 +1668,7 @@ export const categoriesData = {
       {
         id: "rec-spy-2",
         saveAmount: "₹1,000",
-        image: "/src/assets/spy_charger.png",
+        image: "/spy_charger.png",
         title: "Charger Camera Plus",
         price: "3,499",
         oldPrice: "4,499",
@@ -1676,7 +1676,7 @@ export const categoriesData = {
       {
         id: "rec-spy-3",
         saveAmount: "₹900",
-        image: "/src/assets/spy_clock.png",
+        image: "/spy_clock.png",
         title: "Clock Camera HD",
         price: "3,199",
         oldPrice: "4,099",
@@ -1684,7 +1684,7 @@ export const categoriesData = {
       {
         id: "rec-spy-4",
         saveAmount: "₹1,200",
-        image: "/src/assets/spy_frame.png",
+        image: "/spy_frame.png",
         title: "Frame Camera 4K",
         price: "4,999",
         oldPrice: "6,199",
@@ -1703,7 +1703,7 @@ export const categoriesData = {
       {
         id: "adled-1",
         saveAmount: "₹5,000",
-        image: "/src/assets/advertising_led_1.png",
+        image: "/advertising_led_1.png",
         category: "ADVERTISING LED",
         title: "Indoor Advertising LED Display",
         price: "45,000",
@@ -1718,7 +1718,7 @@ export const categoriesData = {
       {
         id: "adled-2",
         saveAmount: "₹8,000",
-        image: "/src/assets/advertising_led_2.png",
+        image: "/advertising_led_2.png",
         category: "ADVERTISING LED",
         title: "Outdoor Advertising LED Screen",
         price: "95,000",
@@ -1733,7 +1733,7 @@ export const categoriesData = {
       {
         id: "adled-3",
         saveAmount: "₹6,000",
-        image: "/src/assets/advertising_led_3.png",
+        image: "/advertising_led_3.png",
         category: "ADVERTISING LED",
         title: "Digital Standee LED Display",
         price: "38,000",
@@ -1748,7 +1748,7 @@ export const categoriesData = {
       {
         id: "adled-4",
         saveAmount: "₹12,000",
-        image: "/src/assets/advertising_led_4.png",
+        image: "/advertising_led_4.png",
         category: "ADVERTISING LED",
         title: "Double Side LED Totem Display",
         price: "1,35,000",
@@ -1763,7 +1763,7 @@ export const categoriesData = {
       {
         id: "adled-5",
         saveAmount: "₹10,000",
-        image: "/src/assets/advertising_led_5.png",
+        image: "/advertising_led_5.png",
         category: "ADVERTISING LED",
         title: "Window Facing LED Display",
         price: "72,000",
@@ -1778,7 +1778,7 @@ export const categoriesData = {
       {
         id: "adled-6",
         saveAmount: "₹15,000",
-        image: "/src/assets/advertising_led_6.png",
+        image: "/advertising_led_6.png",
         category: "ADVERTISING LED",
         title: "Large Outdoor Billboard LED",
         price: "2,80,000",
@@ -1834,25 +1834,25 @@ export const categoriesData = {
         {
           title: "RETAIL STORES",
           description: "Boost product visibility and in-store promotions",
-          image: "/src/assets/ad_retail.png",
+          image: "/ad_retail.png",
           alt: "Retail Advertising LED",
         },
         {
           title: "OUTDOOR BILLBOARDS",
           description: "High brightness screens for outdoor marketing",
-          image: "/src/assets/ad_outdoor.png",
+          image: "/ad_outdoor.png",
           alt: "Outdoor Advertising LED",
         },
         {
           title: "MALLS & SHOWROOMS",
           description: "Engage customers with dynamic digital content",
-          image: "/src/assets/ad_mall.png",
+          image: "/ad_mall.png",
           alt: "Mall Advertising LED",
         },
         {
           title: "AIRPORTS & METROS",
           description: "Large-format displays for mass communication",
-          image: "/src/assets/ad_airport.png",
+          image: "/ad_airport.png",
           alt: "Airport Advertising LED",
         },
       ],
@@ -1862,7 +1862,7 @@ export const categoriesData = {
       {
         id: "rec-adled-1",
         saveAmount: "₹8,000",
-        image: "/src/assets/advertising_led_1.png",
+        image: "/advertising_led_1.png",
         title: "Indoor LED Display 43 Inch",
         price: "42,999",
         oldPrice: "50,999",
@@ -1870,7 +1870,7 @@ export const categoriesData = {
       {
         id: "rec-adled-2",
         saveAmount: "₹12,000",
-        image: "/src/assets/advertising_led_2.png",
+        image: "/advertising_led_2.png",
         title: "Outdoor LED Screen 55 Inch",
         price: "89,999",
         oldPrice: "1,01,999",
@@ -1878,7 +1878,7 @@ export const categoriesData = {
       {
         id: "rec-adled-3",
         saveAmount: "₹15,000",
-        image: "/src/assets/advertising_led_4.png",
+        image: "/advertising_led_4.png",
         title: "LED Totem Display",
         price: "1,29,999",
         oldPrice: "1,44,999",
@@ -1886,7 +1886,7 @@ export const categoriesData = {
       {
         id: "rec-adled-4",
         saveAmount: "₹20,000",
-        image: "/src/assets/advertising_led_6.png",
+        image: "/advertising_led_6.png",
         title: "Outdoor Billboard LED",
         price: "2,75,000",
         oldPrice: "2,95,000",
@@ -1903,7 +1903,7 @@ export const myOrdersData = {
       title: 'Miltronix 189cm (75 inch) 4K Ultra HD Quantum Dot LED Google TV - HDR10+/HLG, Dolby Vision, MEMC, Dolby Atoms, Screen Sharing, Google Assistant',
       rating: 4,
       price: '89,990.00',
-      image: '/src/assets/my-order-img.png',
+      image: '/my-order-img.png',
     },
   ],
   past: [
@@ -1912,7 +1912,7 @@ export const myOrdersData = {
       title: '2 MP HD DOME CAMERA - White',
       rating: 5,
       price: '1,999.00',
-      image: '/src/assets/image 11.png',
+      image: '/image 11.png',
     },
   ],
   pending: [],
@@ -1922,7 +1922,7 @@ export const wishlistData = [
   {
     id: 'wish-1',
     saveAmount: '₹300',
-    image: '/src/assets/image 11.png',
+    image: '/image 11.png',
     category: 'Camera',
     title: '2 MP HD DOME CAMERA',
     price: '1,999',
@@ -1933,7 +1933,7 @@ export const wishlistData = [
   {
     id: 'wish-2',
     saveAmount: '₹300',
-    image: '/src/assets/image 10.png',
+    image: '/image 10.png',
     category: 'Television',
     title: 'QLED 40-inch',
     price: '14,444',
@@ -1960,13 +1960,13 @@ export const savedPaymentsData = [
     type: 'Visa',
     last4: '1234',
     expiry: '08/2026',
-    icon: '/src/assets/credit-card.png', // Or use a specific Visa icon
+    icon: '/credit-card.png', // Or use a specific Visa icon
   },
   {
     id: 'card2',
     type: 'Master Card',
     last4: '5678',
     expiry: '12/2027',
-    icon: '/src/assets/credit-card.png', // Or use a specific Mastercard icon
+    icon: '/credit-card.png', // Or use a specific Mastercard icon
   },
 ];

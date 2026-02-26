@@ -2,8 +2,8 @@ import React from "react";
 import { ProgressBar } from "react-bootstrap";
 import { useNavigate, useParams } from "react-router-dom";
 
-const starIconFull = "/src/assets/icon7.svg";
-const starIconEmpty = "/src/assets/icon8.svg";
+const starIconFull = "/icon7.svg";
+const starIconEmpty = "/icon8.svg";
 
 const RatingSummary = ({ reviews = [], product = null }) => {
   const navigate = useNavigate();

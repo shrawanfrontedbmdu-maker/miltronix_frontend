@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { addItemToCart, addItemToWishlist, getCartItems } from "../../api/api";
 
-const starIconFull = "/src/assets/icon7.svg";
-const starIconHalf = "/src/assets/icon9.svg";
-const starIconEmpty = "/src/assets/icon8.svg";
+const starIconFull = "/icon7.svg";
+const starIconHalf = "/icon9.svg";
+const starIconEmpty = "/icon8.svg";
 
 const ShopCard = ({
   product,
