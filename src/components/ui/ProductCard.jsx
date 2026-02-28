@@ -22,6 +22,13 @@ const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
 
   const imageUrl = product.images?.[0]?.url || "/images/placeholder.png";
 
+  const categoryName =
+    typeof product.category === "object" && product.category
+      ? product.category.pageTitle ||
+        product.category.categoryKey ||
+        "Uncategorized"
+      : "Uncategorized";
+
   const variant = product.variants?.[0];
   const price = variant?.price || 0;
   const oldPrice = variant?.compareAtPrice || price + 5000;
@@ -41,19 +48,43 @@ const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
 
     setLoadingCart(true);
     try {
-      await addItemToCart({
-        productId: product._id,
-        sku: variant.sku,
-        quantity: 1,
-      });
+      const user = JSON.parse(localStorage.getItem("user") || "null");
 
-      setAddedCart(true);
-
-      if (onCartUpdate) {
-        const updatedCart = await getCartItems();
-        onCartUpdate(updatedCart);
+      if (user?._id) {
+        // Logged in: API call
+        await addItemToCart({
+          productId: product._id,
+          sku: variant.sku,
+          quantity: 1,
+        });
+        if (onCartUpdate) {
+          const updatedCart = await getCartItems();
+          onCartUpdate(updatedCart);
+        }
+      } else {
+        // Guest: localStorage mein save
+        const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+        const existingIndex = guestCart.findIndex(
+          (item) => item.productId === product._id && item.sku === variant.sku
+        );
+        if (existingIndex > -1) {
+          guestCart[existingIndex].quantity += 1;
+        } else {
+          guestCart.push({
+            productId: product._id,
+            sku: variant.sku,
+            quantity: 1,
+            name: product.name,
+            image: imageUrl,
+            price: price,
+            category: categoryName,
+          });
+        }
+        localStorage.setItem("guestCart", JSON.stringify(guestCart));
+        if (onCartUpdate) onCartUpdate(guestCart);
       }
 
+      setAddedCart(true);
       setTimeout(() => navigate("/cart"), 500);
     } catch (err) {
       alert(err.message || "Failed to add to cart");
@@ -64,19 +95,42 @@ const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
 
   // ---- Add to Wishlist ----
   const handleAddToWishlist = async () => {
-    if (!resolvedUserId) return alert("Please login");
+    if (!product._id || !price) return alert("Product not found");
 
     setLoadingWishlist(true);
     try {
-      await addItemToWishlist({
-        userId: resolvedUserId,
-        productId: product._id,
-        priceSnapshot: price,
-        variant: { sku: variant?.sku },
-      });
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+
+      if (user?._id) {
+        // Logged in: API call
+        await addItemToWishlist({
+          userId: user._id,
+          productId: product._id,
+          priceSnapshot: price,
+          variant: { sku: variant?.sku },
+        });
+        if (onWishlistUpdate) onWishlistUpdate();
+      } else {
+        // Guest: localStorage mein save
+        const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
+        const alreadyExists = guestWishlist.some(
+          (item) => item.productId === product._id
+        );
+        if (!alreadyExists) {
+          guestWishlist.push({
+            productId: product._id,
+            name: product.name,
+            image: imageUrl,
+            price: price,
+            category: categoryName,
+            sku: variant?.sku || "",
+          });
+          localStorage.setItem("guestWishlist", JSON.stringify(guestWishlist));
+        }
+        if (onWishlistUpdate) onWishlistUpdate(guestWishlist);
+      }
 
       setAddedWishlist(true);
-      if (onWishlistUpdate) onWishlistUpdate();
     } catch (err) {
       alert(err.message || "Failed to add to wishlist");
     } finally {
@@ -132,16 +186,16 @@ const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
               : "Add to Cart"}
           </button>
 
-           <button
-              className={`btn shop-card-btn-wishlist ${
-                addedWishlist ? "btn-danger" : ""
-              }`}
-              onClick={handleAddToWishlist}
-              disabled={loadingWishlist || addedWishlist}
-            >
-              <i className="bi bi-heart-fill"></i>
-              {loadingWishlist ? " Adding..." : addedWishlist ? " Added" : ""}
-            </button>
+          <button
+            className={`btn shop-card-btn-wishlist ${
+              addedWishlist ? "btn-danger" : ""
+            }`}
+            onClick={handleAddToWishlist}
+            disabled={loadingWishlist || addedWishlist}
+          >
+            <i className="bi bi-heart-fill"></i>
+            {loadingWishlist ? " Adding..." : addedWishlist ? " Added" : ""}
+          </button>
         </div>
       </div>
     </div>

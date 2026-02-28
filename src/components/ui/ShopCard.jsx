@@ -56,19 +56,43 @@ const ShopCard = ({
 
     setLoadingCart(true);
     try {
-      await addItemToCart({
-        productId: product._id,
-        sku: variant.sku,
-        quantity: 1,
-      });
+      const user = JSON.parse(localStorage.getItem("user") || "null");
 
-      setAddedCart(true);
-
-      if (onCartUpdate) {
-        const updatedCart = await getCartItems();
-        onCartUpdate(updatedCart);
+      if (user?._id) {
+        // Logged in: API call (same as before)
+        await addItemToCart({
+          productId: product._id,
+          sku: variant.sku,
+          quantity: 1,
+        });
+        if (onCartUpdate) {
+          const updatedCart = await getCartItems();
+          onCartUpdate(updatedCart);
+        }
+      } else {
+        // Guest: localStorage mein save
+        const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+        const existingIndex = guestCart.findIndex(
+          (item) => item.productId === product._id && item.sku === variant.sku
+        );
+        if (existingIndex > -1) {
+          guestCart[existingIndex].quantity += 1;
+        } else {
+          guestCart.push({
+            productId: product._id,
+            sku: variant.sku,
+            quantity: 1,
+            name: product.name,
+            image: imageUrl,
+            price: price,
+            category: categoryName,
+          });
+        }
+        localStorage.setItem("guestCart", JSON.stringify(guestCart));
+        if (onCartUpdate) onCartUpdate(guestCart);
       }
 
+      setAddedCart(true);
       setTimeout(() => navigate("/cart"), 500);
     } catch (err) {
       console.error(err);
@@ -83,27 +107,49 @@ const ShopCard = ({
   const handleAddToWishlist = async (e) => {
     e.stopPropagation();
 
-    if (!resolvedUserId) return alert("Please login to add items to wishlist");
     if (!product._id || !price) return alert("Product not found");
 
     setLoadingWishlist(true);
     try {
-      await addItemToWishlist({
-        userId: resolvedUserId,
-        productId: product._id,
-        title: product.name,
-        images: product.images?.map((img) => ({
-          url: img.url,
-          public_id: img.public_id || img.url,
-          alt: img.alt || product.name || "",
-        })),
-        category: categoryName,
-        priceSnapshot: price,
-        variant: variant ? { sku: variant.sku } : undefined,
-      });
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+
+      if (user?._id) {
+        // Logged in: API call (same as before)
+        await addItemToWishlist({
+          userId: user._id,
+          productId: product._id,
+          title: product.name,
+          images: product.images?.map((img) => ({
+            url: img.url,
+            public_id: img.public_id || img.url,
+            alt: img.alt || product.name || "",
+          })),
+          category: categoryName,
+          priceSnapshot: price,
+          variant: variant ? { sku: variant.sku } : undefined,
+        });
+        if (onWishlistUpdate) onWishlistUpdate();
+      } else {
+        // Guest: localStorage mein save
+        const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
+        const alreadyExists = guestWishlist.some(
+          (item) => item.productId === product._id
+        );
+        if (!alreadyExists) {
+          guestWishlist.push({
+            productId: product._id,
+            name: product.name,
+            image: imageUrl,
+            price: price,
+            category: categoryName,
+            sku: variant?.sku || "",
+          });
+          localStorage.setItem("guestWishlist", JSON.stringify(guestWishlist));
+        }
+        if (onWishlistUpdate) onWishlistUpdate(guestWishlist);
+      }
 
       setAddedWishlist(true);
-      if (onWishlistUpdate) onWishlistUpdate();
     } catch (err) {
       console.error(err);
       alert(err.message || "Failed to add to wishlist");
@@ -196,7 +242,7 @@ const ShopCard = ({
             className={`shop-card-btn-cart btn ${
               addedCart ? "btn-success" : "btn-primary"
             }`}
-            style={{ width: "75%", marginLeft: "5%" }} // ← increased width and slight left offset
+            style={{ width: "75%", marginLeft: "5%" }}
             onClick={handleAddToCart}
             disabled={loadingCart || addedCart || !hasStock}
           >

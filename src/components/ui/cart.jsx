@@ -155,8 +155,47 @@ const CartPage = () => {
   const loadCart = async (showLoader = false) => {
     try {
       if (showLoader) setLoading(true);
-      const data = await getCartItems();
-      setCart(data || { items: [], subtotal: 0 });
+      const user = JSON.parse(localStorage.getItem("user") || "null");
+
+      if (user?._id) {
+        // Logged in user: pehle guest cart merge karo, phir API se lo
+        const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+        if (guestCart.length > 0) {
+          await Promise.all(
+            guestCart.map((item) =>
+              addItemToCart({
+                productId: item.productId,
+                sku: item.sku,
+                quantity: item.quantity,
+              }).catch(() => {})
+            )
+          );
+          localStorage.removeItem("guestCart");
+        }
+        const data = await getCartItems();
+        setCart(data || { items: [], subtotal: 0 });
+      } else {
+        // Guest user: localStorage se dikhao
+        const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+        const subtotal = guestCart.reduce(
+          (sum, item) => sum + item.price * item.quantity,
+          0
+        );
+        setCart({
+          items: guestCart.map((item) => ({
+            product: {
+              _id: item.productId,
+              name: item.name,
+              images: [{ url: item.image }],
+              category: item.category,
+            },
+            variant: { sku: item.sku },
+            quantity: item.quantity,
+            priceSnapshot: item.price,
+          })),
+          subtotal,
+        });
+      }
     } catch {
       setCart({ items: [], subtotal: 0 });
     } finally {
@@ -185,16 +224,33 @@ const CartPage = () => {
   const handleQuantityChange = async (item, newQty) => {
     if (newQty < 1) return;
     const key = `${item.product?._id}-${item.variant?.sku || "default"}`;
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+
     try {
       setUpdatingKey(key);
-      const qtyDiff = newQty - (item.quantity || 0);
-      if (qtyDiff === 0) return;
-      await addItemToCart({
-        productId: item.product?._id,
-        sku: item.variant?.sku,
-        quantity: qtyDiff,
-      });
-      await loadCart(false); // loader nahi, sirf data refresh
+
+      if (user?._id) {
+        // Logged in: API call
+        const qtyDiff = newQty - (item.quantity || 0);
+        if (qtyDiff === 0) return;
+        await addItemToCart({
+          productId: item.product?._id,
+          sku: item.variant?.sku,
+          quantity: qtyDiff,
+        });
+        await loadCart(false);
+      } else {
+        // Guest: localStorage update
+        const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+        const idx = guestCart.findIndex(
+          (i) => i.productId === item.product?._id && i.sku === item.variant?.sku
+        );
+        if (idx > -1) {
+          guestCart[idx].quantity = newQty;
+          localStorage.setItem("guestCart", JSON.stringify(guestCart));
+        }
+        await loadCart(false);
+      }
       setCouponApplied(null);
     } catch {
       alert("Failed to update cart item");
@@ -205,13 +261,27 @@ const CartPage = () => {
 
   const handleRemove = async (item) => {
     const key = `${item.product?._id}-${item.variant?.sku || "default"}`;
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+
     try {
       setUpdatingKey(key);
-      await removeCartItem({
-        productId: item.product?._id,
-        sku: item.variant?.sku,
-      });
-      await loadCart(false);
+
+      if (user?._id) {
+        // Logged in: API call
+        await removeCartItem({
+          productId: item.product?._id,
+          sku: item.variant?.sku,
+        });
+        await loadCart(false);
+      } else {
+        // Guest: localStorage se remove
+        const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+        const updated = guestCart.filter(
+          (i) => !(i.productId === item.product?._id && i.sku === item.variant?.sku)
+        );
+        localStorage.setItem("guestCart", JSON.stringify(updated));
+        await loadCart(false);
+      }
       setCouponApplied(null);
     } catch {
       alert("Failed to remove item");
@@ -240,6 +310,10 @@ const CartPage = () => {
   };
 
   const handleCheckout = async () => {
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (!user?._id) {
+      return alert("Please login to proceed with checkout");
+    }
     await loadCart(false);
     if (!cart.items?.length) return alert("Your cart is empty!");
     navigate("/secendaddress", {
@@ -253,8 +327,8 @@ const CartPage = () => {
   // ✅ FIX: images product ke andar hoti hain — item.product.images check karo
   const getImageUrl = (item) => {
     const images =
-      item.product?.images ||   
-      item.images ||            
+      item.product?.images ||
+      item.images ||
       [];
 
     if (!images.length) return "/images/placeholder.png";
@@ -267,12 +341,11 @@ const CartPage = () => {
   };
 
   // ✅ FIX: Product name — ID nahi, actual name dikhao
-  // Cart item mein product populate hota hai — name wahan se lo
   const getProductName = (item) => {
     return (
-      item.product?.name ||       // ✅ populated product ka naam
-      item.product?.title ||      // ✅ agar title field ho
-      item.name ||                // direct item pe naam ho toh
+      item.product?.name ||
+      item.product?.title ||
+      item.name ||
       item.title ||
       "Unnamed Product"
     );
@@ -422,7 +495,6 @@ const CartPage = () => {
                       />
 
                       <div className="item-info">
-                        {/* ✅ FIX: ID nahi, actual product name dikhega */}
                         <div className="item-brand">{getProductName(item)}</div>
                         <div className="item-title">
                           {getProductCategory(item)}
