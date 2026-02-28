@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import API, { getFilterGroupsByCategory } from "../../../api/api";
 
-const FilterSidebar = ({ categoryId, setProducts }) => {
+const FilterSidebar = ({ categoryId, setProducts, setTotal }) => {
   const [filters, setFilters] = useState(null);
   const [selected, setSelected] = useState({});
 
@@ -53,31 +53,41 @@ const FilterSidebar = ({ categoryId, setProducts }) => {
       try {
         const params = { category: categoryId };
 
+        // ⭐ Collect all selected _ids from all checkbox filters
+        const allSelectedIds = [];
+
         Object.keys(selected).forEach((key) => {
           if (Array.isArray(selected[key]) && selected[key].length > 0) {
-            params[key] = selected[key].join(",");
+            allSelectedIds.push(...selected[key]);
           } else if (typeof selected[key] === "number") {
             params.maxPrice = selected[key];
           }
         });
 
+        // ⭐ Send as filterOptions param (backend expects ObjectId list)
+        if (allSelectedIds.length > 0) {
+          params.filterOptions = allSelectedIds.join(",");
+        }
+
         const res = await API.get("/products", { params });
         setProducts(res.data.products || []);
+        if (setTotal) setTotal(res.data.total || 0);
       } catch (err) {
         console.error("Filter error:", err);
       }
     };
 
     fetchFilteredProducts();
-  }, [selected, categoryId, filters, setProducts]);
+  }, [selected, categoryId, filters, setProducts, setTotal]);
 
-  const toggleFilter = (type, value) => {
+  // ⭐ Toggle by _id instead of label
+  const toggleFilter = (type, id) => {
     setSelected((prev) => {
       if (Array.isArray(prev[type])) {
-        const exists = prev[type].includes(value);
+        const exists = prev[type].includes(id);
         return {
           ...prev,
-          [type]: exists ? prev[type].filter((v) => v !== value) : [...prev[type], value],
+          [type]: exists ? prev[type].filter((v) => v !== id) : [...prev[type], id],
         };
       }
       return prev;
@@ -123,8 +133,8 @@ const FilterSidebar = ({ categoryId, setProducts }) => {
                     type="checkbox"
                     className="form-check-input"
                     id={item._id}
-                    onChange={() => toggleFilter(key, item.label)}
-                    checked={selected[key]?.includes(item.label)}
+                    onChange={() => toggleFilter(key, item._id)} // ⭐ _id bhejo label nahi
+                    checked={selected[key]?.includes(item._id)} // ⭐ _id se check karo
                   />
                   <label className="form-check-label hv" htmlFor={item._id}>
                     {item.label}

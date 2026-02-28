@@ -28,6 +28,7 @@ const ProductListingPage = () => {
   const [filterGroups, setFilterGroups] = useState([]);
 
   const [products, setProducts] = useState([]); // ⭐ shared state
+  const [total, setTotal] = useState(0); // ⭐ total added
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -59,6 +60,7 @@ const ProductListingPage = () => {
           limit: 12,
         });
         setProducts(productRes?.products || []);
+        setTotal(productRes?.total || 0); // ⭐ total set
 
         const recommendedRes = await fetchProducts({
           category: category._id,
@@ -110,6 +112,7 @@ const ProductListingPage = () => {
                   <FilterSidebar
                     categoryId={pageData?._id}
                     setProducts={setProducts}   // ⭐ important
+                    setTotal={setTotal}         // ⭐ total pass kiya
                   />
                 </div>
 
@@ -118,6 +121,7 @@ const ProductListingPage = () => {
                     categoryId={pageData?._id}
                     products={products}        // ⭐ important
                     setProducts={setProducts}
+                    total={total}              // ⭐ total pass kiya
                   />
                 </div>
 

@@ -758,11 +758,10 @@ export type ReviewsResponseType = {
   totalReviews: number;
 };
 
-// ✅ FIXED: /reviews/:productId  (bina /product/ ke)
 export const getReviewsByProductApi = async (productId: string) => {
   if (!productId) throw new Error("productId is required");
   try {
-    const res = await API.get(`/reviews/${productId}`);
+    const res = await API.get(`/reviews/product/${productId}`); // ✅ /product/ add kiya
     return res.data as ReviewsResponseType;
   } catch (error) {
     handleError(error);

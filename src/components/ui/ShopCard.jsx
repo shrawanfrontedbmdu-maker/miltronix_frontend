@@ -6,6 +6,8 @@ const starIconFull = "/icon7.svg";
 const starIconHalf = "/icon9.svg";
 const starIconEmpty = "/icon8.svg";
 
+const yellowFilter = "brightness(0) saturate(100%) invert(78%) sepia(60%) saturate(500%) hue-rotate(5deg)";
+
 const ShopCard = ({
   product,
   userId,
@@ -47,6 +49,7 @@ const ShopCard = ({
   const reviews = product.reviewCount || 0;
   const hasStock = variant?.hasStock && variant?.stockQuantity > 0;
 
+ 
   // ---------------- ADD TO CART ----------------
   const handleAddToCart = async (e) => {
     e.stopPropagation();
@@ -59,7 +62,6 @@ const ShopCard = ({
       const user = JSON.parse(localStorage.getItem("user") || "null");
 
       if (user?._id) {
-        // Logged in: API call (same as before)
         await addItemToCart({
           productId: product._id,
           sku: variant.sku,
@@ -70,7 +72,6 @@ const ShopCard = ({
           onCartUpdate(updatedCart);
         }
       } else {
-        // Guest: localStorage mein save
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         const existingIndex = guestCart.findIndex(
           (item) => item.productId === product._id && item.sku === variant.sku
@@ -114,7 +115,6 @@ const ShopCard = ({
       const user = JSON.parse(localStorage.getItem("user") || "null");
 
       if (user?._id) {
-        // Logged in: API call (same as before)
         await addItemToWishlist({
           userId: user._id,
           productId: product._id,
@@ -130,7 +130,6 @@ const ShopCard = ({
         });
         if (onWishlistUpdate) onWishlistUpdate();
       } else {
-        // Guest: localStorage mein save
         const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
         const alreadyExists = guestWishlist.some(
           (item) => item.productId === product._id
@@ -213,17 +212,26 @@ const ShopCard = ({
         )}
 
         <div className="product-rating1">
+          {/* ⭐ Full Stars - Yellow */}
           {[...Array(fullStars)].map((_, i) => (
             <img
               key={`full-${i}`}
               src={starIconFull}
               alt="star"
               className="star1"
+              style={{ filter: yellowFilter }}
             />
           ))}
+          {/* ⭐ Half Star - Yellow */}
           {halfStar && (
-            <img src={starIconHalf} alt="half-star" className="star1" />
+            <img
+              src={starIconHalf}
+              alt="half-star"
+              className="star1"
+              style={{ filter: yellowFilter }}
+            />
           )}
+          {/* Empty Stars - Grey (no filter) */}
           {[...Array(emptyStars)].map((_, i) => (
             <img
               key={`empty-${i}`}
