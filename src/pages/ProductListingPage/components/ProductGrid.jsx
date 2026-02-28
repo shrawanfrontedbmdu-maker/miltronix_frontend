@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useSearchParams } from "react-router-dom";
 import ShopCard from "../../../components/ui/ShopCard";
-import { fetchProducts } from "../../../api/api";
 
-const ProductGrid = ({ categoryId }) => {
+const ProductGrid = ({ categoryId, products = [], setProducts, total = 0 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const search = searchParams.get("search") || "";
@@ -11,45 +10,7 @@ const ProductGrid = ({ categoryId }) => {
   const page = Number(searchParams.get("page")) || 1;
   const limit = 12;
 
-  const [products, setProducts] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
   const userId = JSON.parse(localStorage.getItem("user") || "null")?._id || "";
-
-  useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        setLoading(true);
-        setError("");
-
-        const params = { page, limit };
-        if (search) params.search = search;
-        if (sort) params.sort = sort;
-        if (categoryId) params.category = categoryId;
-
-        const data = await fetchProducts(params);
-
-        if (data.success) {
-          setProducts(data.products || []);
-          setTotal(data.total || 0);
-        } else {
-          setProducts([]);
-          setTotal(0);
-        }
-      } catch (err) {
-        console.error("Error fetching products:", err);
-        setError(err.message || "Failed to load products");
-        setProducts([]);
-        setTotal(0);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadProducts();
-  }, [categoryId, search, sort, page]);
 
   const updateSearchParams = (newParams) => {
     const params = new URLSearchParams(searchParams);
@@ -68,19 +29,8 @@ const ProductGrid = ({ categoryId }) => {
     if (products.length === limit) updateSearchParams({ search, sort, page: page + 1 });
   };
 
-  if (loading)
-    return <p style={{ textAlign: "center", padding: "2rem" }}>Loading products...</p>;
-
-  if (error)
-    return (
-      <p style={{ textAlign: "center", padding: "2rem", color: "red" }}>
-        {error}
-      </p>
-    );
-
   return (
     <div>
-      {/* PRODUCT GRID */}
       <div className="row g-4">
         {products.length > 0 ? (
           products.map((product) => (
@@ -88,14 +38,13 @@ const ProductGrid = ({ categoryId }) => {
           ))
         ) : (
           <div className="col-12">
-            <p style={{ textAlign: "center", padding: "2rem" }}>
+            {/* <p style={{ textAlign: "center", padding: "2rem" }}>
               No products match your filters.
-            </p>
+            </p> */}
           </div>
         )}
       </div>
 
-      {/* PAGINATION */}
       {total > limit && (
         <div className="d-flex justify-content-center align-items-center gap-3 mt-5">
           <button
@@ -105,11 +54,9 @@ const ProductGrid = ({ categoryId }) => {
           >
             Previous
           </button>
-
           <span className="fw-bold">
             Page {page} of {Math.ceil(total / limit)}
           </span>
-
           <button
             className="btn btn-outline-primary"
             disabled={products.length < limit || page >= Math.ceil(total / limit)}

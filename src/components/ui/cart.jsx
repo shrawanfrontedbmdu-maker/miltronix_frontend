@@ -20,16 +20,7 @@ const BACKEND_URL = "https://miltronix-backend-2.onrender.com";
 
 /* ─── Icons ─── */
 const TrashIcon = () => (
-  <svg
-    width="14"
-    height="14"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="3 6 5 6 21 6" />
     <path d="M19 6l-1 14H6L5 6" />
     <path d="M10 11v6" />
@@ -38,65 +29,32 @@ const TrashIcon = () => (
   </svg>
 );
 const TagIcon = () => (
-  <svg
-    width="13"
-    height="13"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
     <line x1="7" y1="7" x2="7.01" y2="7" />
   </svg>
 );
 const CheckIcon = () => (
-  <svg
-    width="12"
-    height="12"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2.5"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="20 6 9 17 4 12" />
   </svg>
 );
 const CheckIconWhite = () => (
-  <svg
-    width="13"
-    height="13"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="white"
-    strokeWidth="3"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
     <polyline points="20 6 9 17 4 12" />
   </svg>
 );
 
 /* ─── Header ─── */
-const CartHeader = () => {
-  return (
-    <div className="fixed-top">
-      <section className="miltronix-banner d-flex justify-content-center align-items-center">
-        <Link to="/">
-          <img
-            src={logoBanner}
-            alt="Miltronix Logo"
-            className="img-fluid miltronix-logo"
-          />
-        </Link>
-      </section>
-    </div>
-  );
-};
+const CartHeader = () => (
+  <div className="fixed-top">
+    <section className="miltronix-banner d-flex justify-content-center align-items-center">
+      <Link to="/">
+        <img src={logoBanner} alt="Miltronix Logo" className="img-fluid miltronix-logo" />
+      </Link>
+    </section>
+  </div>
+);
 
 /* ─── Step Indicator ─── */
 const StepIndicator = ({ currentStep = 1 }) => {
@@ -114,18 +72,10 @@ const StepIndicator = ({ currentStep = 1 }) => {
           return (
             <React.Fragment key={step.num}>
               <div className="step-item">
-                <div
-                  className={`step-circle ${done ? "done" : active ? "active" : ""}`}
-                >
-                  {done ? (
-                    <CheckIconWhite />
-                  ) : (
-                    <span className="step-circle-num">{step.num}</span>
-                  )}
+                <div className={`step-circle ${done ? "done" : active ? "active" : ""}`}>
+                  {done ? <CheckIconWhite /> : <span className="step-circle-num">{step.num}</span>}
                 </div>
-                <span
-                  className={`step-label ${done ? "done" : active ? "active" : ""}`}
-                >
+                <span className={`step-label ${done ? "done" : active ? "active" : ""}`}>
                   {step.label}
                 </span>
               </div>
@@ -151,23 +101,20 @@ const CartPage = () => {
   const [couponError, setCouponError] = useState("");
   const [applicableCoupons, setApplicableCoupons] = useState([]);
 
-  // ✅ showLoader flag — qty/remove pe poora page reload nahi hoga
+  // ✅ Login modal state
+  const [modalToShow, setModalToShow] = useState(null);
+
   const loadCart = async (showLoader = false) => {
     try {
       if (showLoader) setLoading(true);
       const user = JSON.parse(localStorage.getItem("user") || "null");
 
       if (user?._id) {
-        // Logged in user: pehle guest cart merge karo, phir API se lo
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         if (guestCart.length > 0) {
           await Promise.all(
             guestCart.map((item) =>
-              addItemToCart({
-                productId: item.productId,
-                sku: item.sku,
-                quantity: item.quantity,
-              }).catch(() => {})
+              addItemToCart({ productId: item.productId, sku: item.sku, quantity: item.quantity }).catch(() => {})
             )
           );
           localStorage.removeItem("guestCart");
@@ -175,12 +122,8 @@ const CartPage = () => {
         const data = await getCartItems();
         setCart(data || { items: [], subtotal: 0 });
       } else {
-        // Guest user: localStorage se dikhao
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-        const subtotal = guestCart.reduce(
-          (sum, item) => sum + item.price * item.quantity,
-          0
-        );
+        const subtotal = guestCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
         setCart({
           items: guestCart.map((item) => ({
             product: {
@@ -213,81 +156,56 @@ const CartPage = () => {
     }
   };
 
-  useEffect(() => {
-    loadCart(true); // sirf pehli baar loader
-  }, []);
+  useEffect(() => { loadCart(true); }, []);
+  useEffect(() => { if (cart.subtotal > 0) loadApplicableCoupons(cart.subtotal); }, [cart.subtotal]);
 
+  // ✅ Login hone ke baad cart reload karo aur checkout pe jao
   useEffect(() => {
-    if (cart.subtotal > 0) loadApplicableCoupons(cart.subtotal);
-  }, [cart.subtotal]);
+    const user = JSON.parse(localStorage.getItem("user") || "null");
+    if (user?._id && modalToShow === null) {
+      loadCart(false);
+    }
+  }, [modalToShow]);
 
   const handleQuantityChange = async (item, newQty) => {
     if (newQty < 1) return;
     const key = `${item.product?._id}-${item.variant?.sku || "default"}`;
     const user = JSON.parse(localStorage.getItem("user") || "null");
-
     try {
       setUpdatingKey(key);
-
       if (user?._id) {
-        // Logged in: API call
         const qtyDiff = newQty - (item.quantity || 0);
         if (qtyDiff === 0) return;
-        await addItemToCart({
-          productId: item.product?._id,
-          sku: item.variant?.sku,
-          quantity: qtyDiff,
-        });
+        await addItemToCart({ productId: item.product?._id, sku: item.variant?.sku, quantity: qtyDiff });
         await loadCart(false);
       } else {
-        // Guest: localStorage update
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-        const idx = guestCart.findIndex(
-          (i) => i.productId === item.product?._id && i.sku === item.variant?.sku
-        );
-        if (idx > -1) {
-          guestCart[idx].quantity = newQty;
-          localStorage.setItem("guestCart", JSON.stringify(guestCart));
-        }
+        const idx = guestCart.findIndex((i) => i.productId === item.product?._id && i.sku === item.variant?.sku);
+        if (idx > -1) { guestCart[idx].quantity = newQty; localStorage.setItem("guestCart", JSON.stringify(guestCart)); }
         await loadCart(false);
       }
       setCouponApplied(null);
-    } catch {
-      alert("Failed to update cart item");
-    } finally {
-      setUpdatingKey(null);
-    }
+    } catch { alert("Failed to update cart item"); }
+    finally { setUpdatingKey(null); }
   };
 
   const handleRemove = async (item) => {
     const key = `${item.product?._id}-${item.variant?.sku || "default"}`;
     const user = JSON.parse(localStorage.getItem("user") || "null");
-
     try {
       setUpdatingKey(key);
-
       if (user?._id) {
-        // Logged in: API call
-        await removeCartItem({
-          productId: item.product?._id,
-          sku: item.variant?.sku,
-        });
+        await removeCartItem({ productId: item.product?._id, sku: item.variant?.sku });
         await loadCart(false);
       } else {
-        // Guest: localStorage se remove
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-        const updated = guestCart.filter(
-          (i) => !(i.productId === item.product?._id && i.sku === item.variant?.sku)
-        );
+        const updated = guestCart.filter((i) => !(i.productId === item.product?._id && i.sku === item.variant?.sku));
         localStorage.setItem("guestCart", JSON.stringify(updated));
         await loadCart(false);
       }
       setCouponApplied(null);
-    } catch {
-      alert("Failed to remove item");
-    } finally {
-      setUpdatingKey(null);
-    }
+    } catch { alert("Failed to remove item"); }
+    finally { setUpdatingKey(null); }
   };
 
   const handleApplyCoupon = async (code) => {
@@ -309,10 +227,12 @@ const CartPage = () => {
     }
   };
 
+  // ✅ Bina login: login modal open karo
   const handleCheckout = async () => {
     const user = JSON.parse(localStorage.getItem("user") || "null");
     if (!user?._id) {
-      return alert("Please login to proceed with checkout");
+      setModalToShow("login"); // ✅ login modal open
+      return;
     }
     await loadCart(false);
     if (!cart.items?.length) return alert("Your cart is empty!");
@@ -324,15 +244,9 @@ const CartPage = () => {
     });
   };
 
-  // ✅ FIX: images product ke andar hoti hain — item.product.images check karo
   const getImageUrl = (item) => {
-    const images =
-      item.product?.images ||
-      item.images ||
-      [];
-
+    const images = item.product?.images || item.images || [];
     if (!images.length) return "/images/placeholder.png";
-
     const img = images[0];
     if (img?.url && /^https?:\/\//.test(img.url)) return img.url;
     if (img?.url) return `${BACKEND_URL}/${img.url.replace(/^\/+/, "")}`;
@@ -340,33 +254,16 @@ const CartPage = () => {
     return "/images/placeholder.png";
   };
 
-  // ✅ FIX: Product name — ID nahi, actual name dikhao
-  const getProductName = (item) => {
-    return (
-      item.product?.name ||
-      item.product?.title ||
-      item.name ||
-      item.title ||
-      "Unnamed Product"
-    );
-  };
+  const getProductName = (item) =>
+    item.product?.name || item.product?.title || item.name || item.title || "Unnamed Product";
 
-  // ✅ Product category
-  const getProductCategory = (item) => {
-    return (
-      item.product?.category?.name ||
-      item.product?.category ||
-      item.category ||
-      "Electronics"
-    );
-  };
+  const getProductCategory = (item) =>
+    item.product?.category?.name || item.product?.category || item.category || "Electronics";
 
   const finalTotal = couponApplied
-    ? couponApplied.newTotalPrice ||
-      cart.subtotal - (couponApplied.discountAmount || 0)
+    ? couponApplied.newTotalPrice || cart.subtotal - (couponApplied.discountAmount || 0)
     : cart.subtotal;
 
-  /* Loading */
   if (loading) {
     return (
       <>
@@ -385,6 +282,9 @@ const CartPage = () => {
     <>
       <CartHeader />
 
+      {/* ✅ Login Modal — cart page pe hi khulega */}
+      <AuthModals modalToShow={modalToShow} setModalToShow={setModalToShow} />
+
       <div className="cart-page">
         <main className="cart-main">
           <StepIndicator currentStep={1} />
@@ -394,72 +294,43 @@ const CartPage = () => {
               <div className="empty-emoji">🛍️</div>
               <div className="empty-title">Your bag is empty</div>
               <div className="empty-subtitle">Add items to it now</div>
-              <button className="shop-btn" onClick={() => navigate("/")}>
-                Shop Now
-              </button>
+              <button className="shop-btn" onClick={() => navigate("/")}>Shop Now</button>
             </div>
           ) : (
             <div className="cart-wrap">
               {/* ── LEFT ── */}
               <div>
-                {/* Coupon Card */}
                 <div className="coupon-card">
-                  <div className="coupon-card-title">
-                    <TagIcon />
-                    Apply Coupon
-                  </div>
+                  <div className="coupon-card-title"><TagIcon /> Apply Coupon</div>
                   <div className="coupon-top">
                     <input
                       className="coupon-input"
                       placeholder="Enter coupon code"
                       value={couponCode}
-                      onChange={(e) => {
-                        setCouponCode(e.target.value);
-                        setCouponError("");
-                      }}
+                      onChange={(e) => { setCouponCode(e.target.value); setCouponError(""); }}
                     />
-                    <button
-                      className="apply-btn"
-                      onClick={() => handleApplyCoupon()}
-                    >
-                      APPLY
-                    </button>
+                    <button className="apply-btn" onClick={() => handleApplyCoupon()}>APPLY</button>
                   </div>
 
-                  {couponError && (
-                    <div className="error-msg">{couponError}</div>
-                  )}
+                  {couponError && <div className="error-msg">{couponError}</div>}
                   {couponApplied && (
                     <div className="success-msg">
                       <CheckIcon />
-                      <span>
-                        "{couponApplied.code}" applied — you save ₹
-                        {couponApplied.discountAmount}!
-                      </span>
+                      <span>"{couponApplied.code}" applied — you save ₹{couponApplied.discountAmount}!</span>
                     </div>
                   )}
 
-                  {/* Available coupon pills */}
                   {applicableCoupons.length > 0 && (
                     <div className="coupon-pills-wrap">
                       <div className="available-title">
-                        {applicableCoupons.length} coupon
-                        {applicableCoupons.length > 1 ? "s" : ""} available
+                        {applicableCoupons.length} coupon{applicableCoupons.length > 1 ? "s" : ""} available
                       </div>
                       <div style={{ display: "flex", flexWrap: "wrap" }}>
                         {applicableCoupons.map((c) => (
-                          <button
-                            key={c._id}
-                            className="coupon-pill"
-                            onClick={() => handleApplyCoupon(c.code)}
-                          >
-                            <TagIcon />
-                            {c.code}
+                          <button key={c._id} className="coupon-pill" onClick={() => handleApplyCoupon(c.code)}>
+                            <TagIcon /> {c.code}
                             <span className="coupon-pill-discount">
-                              &nbsp;·&nbsp;
-                              {c.discountType === "flat"
-                                ? `₹${c.discountValue} off`
-                                : `${c.discountValue}% off`}
+                              &nbsp;·&nbsp;{c.discountType === "flat" ? `₹${c.discountValue} off` : `${c.discountValue}% off`}
                             </span>
                           </button>
                         ))}
@@ -468,94 +339,41 @@ const CartPage = () => {
                   )}
                 </div>
 
-                {/* Order Summary heading */}
                 <div className="section-head">
-                  Order Summary ({cart.items.length} item
-                  {cart.items.length !== 1 ? "s" : ""})
+                  Order Summary ({cart.items.length} item{cart.items.length !== 1 ? "s" : ""})
                 </div>
 
-                {/* Cart Items */}
                 {cart.items.map((item, idx) => {
                   const key = `${item.product?._id}-${item.variant?.sku || "default"}`;
                   const busy = updatingKey === key;
                   return (
-                    <div
-                      key={key}
-                      className="cart-item"
-                      style={{
-                        animationDelay: `${idx * 60}ms`,
-                        opacity: busy ? 0.5 : 1,
-                        transition: "opacity .2s",
-                      }}
-                    >
-                      <img
-                        src={getImageUrl(item)}
-                        alt={getProductName(item)}
-                        className="item-img"
-                      />
-
+                    <div key={key} className="cart-item" style={{ animationDelay: `${idx * 60}ms`, opacity: busy ? 0.5 : 1, transition: "opacity .2s" }}>
+                      <img src={getImageUrl(item)} alt={getProductName(item)} className="item-img" />
                       <div className="item-info">
                         <div className="item-brand">{getProductName(item)}</div>
-                        <div className="item-title">
-                          {getProductCategory(item)}
-                        </div>
-
-                        {item.variant?.sku && (
-                          <span className="item-sku">
-                            SKU: {item.variant.sku}
-                          </span>
-                        )}
-
+                        <div className="item-title">{getProductCategory(item)}</div>
+                        {item.variant?.sku && <span className="item-sku">SKU: {item.variant.sku}</span>}
                         <div className="price-row">
                           <span className="item-price">
-                            ₹
-                            {(
-                              (item.quantity || 0) * (item.priceSnapshot || 0)
-                            ).toLocaleString("en-IN")}
+                            ₹{((item.quantity || 0) * (item.priceSnapshot || 0)).toLocaleString("en-IN")}
                           </span>
                           {item.quantity > 1 && (
                             <span className="item-price-unit">
-                              ₹{item.priceSnapshot?.toLocaleString("en-IN")} ×{" "}
-                              {item.quantity}
+                              ₹{item.priceSnapshot?.toLocaleString("en-IN")} × {item.quantity}
                             </span>
                           )}
                         </div>
-
                         <div className="qty-row">
                           <span className="qty-label">QTY</span>
                           <div className="qty-control">
-                            <button
-                              className="qty-btn"
-                              disabled={item.quantity <= 1 || busy}
-                              onClick={() =>
-                                handleQuantityChange(item, item.quantity - 1)
-                              }
-                            >
-                              −
-                            </button>
-                            <span className="qty-num">
-                              {item.quantity || 0}
-                            </span>
-                            <button
-                              className="qty-btn"
-                              disabled={busy}
-                              onClick={() =>
-                                handleQuantityChange(item, item.quantity + 1)
-                              }
-                            >
-                              +
-                            </button>
+                            <button className="qty-btn" disabled={item.quantity <= 1 || busy} onClick={() => handleQuantityChange(item, item.quantity - 1)}>−</button>
+                            <span className="qty-num">{item.quantity || 0}</span>
+                            <button className="qty-btn" disabled={busy} onClick={() => handleQuantityChange(item, item.quantity + 1)}>+</button>
                           </div>
                         </div>
                       </div>
-
-                      <button
-                        className="remove-btn"
-                        disabled={busy}
-                        onClick={() => handleRemove(item)}
-                      >
-                        <TrashIcon />
-                        Remove
+                      <button className="remove-btn" disabled={busy} onClick={() => handleRemove(item)}>
+                        <TrashIcon /> Remove
                       </button>
                     </div>
                   );
@@ -566,62 +384,34 @@ const CartPage = () => {
               <div>
                 <div className="summary-card">
                   <div className="summary-title">Price Details</div>
-
                   <div className="summary-row">
-                    <span className="summary-label">
-                      Price ({cart.items.length} item
-                      {cart.items.length !== 1 ? "s" : ""})
-                    </span>
-                    <span className="summary-val">
-                      ₹{(cart.subtotal || 0).toLocaleString("en-IN")}
-                    </span>
+                    <span className="summary-label">Price ({cart.items.length} item{cart.items.length !== 1 ? "s" : ""})</span>
+                    <span className="summary-val">₹{(cart.subtotal || 0).toLocaleString("en-IN")}</span>
                   </div>
-
                   <div className="summary-row">
                     <span className="summary-label">Delivery Charges</span>
                     <span className="summary-val free">FREE</span>
                   </div>
-
                   {couponApplied && (
                     <div className="discount-row">
                       <span>Coupon Discount</span>
-                      <span>
-                        − ₹
-                        {(couponApplied.discountAmount || 0).toLocaleString(
-                          "en-IN",
-                        )}
-                      </span>
+                      <span>− ₹{(couponApplied.discountAmount || 0).toLocaleString("en-IN")}</span>
                     </div>
                   )}
-
                   <hr className="summary-divider" />
-
                   <div className="total-row">
                     <span>Total Amount</span>
                     <span>₹{(finalTotal || 0).toLocaleString("en-IN")}</span>
                   </div>
-
                   {couponApplied && (
                     <div className="savings-badge">
-                      🎉 You save ₹
-                      {(couponApplied.discountAmount || 0).toLocaleString(
-                        "en-IN",
-                      )}{" "}
-                      on this order!
+                      🎉 You save ₹{(couponApplied.discountAmount || 0).toLocaleString("en-IN")} on this order!
                     </div>
                   )}
-
-                  <button
-                    className="checkout-btn"
-                    style={{ marginTop: couponApplied ? 12 : 0 }}
-                    onClick={handleCheckout}
-                  >
+                  <button className="checkout-btn" style={{ marginTop: couponApplied ? 12 : 0 }} onClick={handleCheckout}>
                     CHECKOUT
                   </button>
-
-                  <p className="cart-secure-text">
-                    Safe &amp; Secure Payments. Easy returns.
-                  </p>
+                  <p className="cart-secure-text">Safe &amp; Secure Payments. Easy returns.</p>
                 </div>
               </div>
             </div>
