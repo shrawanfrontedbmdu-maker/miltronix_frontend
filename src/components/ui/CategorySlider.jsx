@@ -38,7 +38,7 @@ function CategorySlider() {
       <style>{`
         .category-bg {
           background: #e5e3e1;
-          padding: 70px 0 25px 0;
+          padding: 30px 0 25px 0;
         }
 
         .category-slide {

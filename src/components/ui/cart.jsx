@@ -1,6 +1,6 @@
+// ================= CartPage.jsx =================
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { Bell } from "lucide-react";
 import axios from "axios";
 import {
   getCartItems,
@@ -100,9 +100,10 @@ const CartPage = () => {
   const [couponApplied, setCouponApplied] = useState(null);
   const [couponError, setCouponError] = useState("");
   const [applicableCoupons, setApplicableCoupons] = useState([]);
-
-  // ✅ Login modal state
   const [modalToShow, setModalToShow] = useState(null);
+
+  // ── Header badge refresh karne ka helper ──
+  const refreshHeader = () => window.dispatchEvent(new Event("header:refresh"));
 
   const loadCart = async (showLoader = false) => {
     try {
@@ -159,7 +160,6 @@ const CartPage = () => {
   useEffect(() => { loadCart(true); }, []);
   useEffect(() => { if (cart.subtotal > 0) loadApplicableCoupons(cart.subtotal); }, [cart.subtotal]);
 
-  // ✅ Login hone ke baad cart reload karo aur checkout pe jao
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user") || "null");
     if (user?._id && modalToShow === null) {
@@ -167,6 +167,7 @@ const CartPage = () => {
     }
   }, [modalToShow]);
 
+  // ── Quantity change — badge bhi refresh hoga ──
   const handleQuantityChange = async (item, newQty) => {
     if (newQty < 1) return;
     const key = `${item.product?._id}-${item.variant?.sku || "default"}`;
@@ -178,17 +179,20 @@ const CartPage = () => {
         if (qtyDiff === 0) return;
         await addItemToCart({ productId: item.product?._id, sku: item.variant?.sku, quantity: qtyDiff });
         await loadCart(false);
+        refreshHeader(); // ✅ badge update
       } else {
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         const idx = guestCart.findIndex((i) => i.productId === item.product?._id && i.sku === item.variant?.sku);
         if (idx > -1) { guestCart[idx].quantity = newQty; localStorage.setItem("guestCart", JSON.stringify(guestCart)); }
         await loadCart(false);
+        refreshHeader(); // ✅ badge update
       }
       setCouponApplied(null);
     } catch { alert("Failed to update cart item"); }
     finally { setUpdatingKey(null); }
   };
 
+  // ── Remove item — badge bhi refresh hoga ──
   const handleRemove = async (item) => {
     const key = `${item.product?._id}-${item.variant?.sku || "default"}`;
     const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -197,11 +201,13 @@ const CartPage = () => {
       if (user?._id) {
         await removeCartItem({ productId: item.product?._id, sku: item.variant?.sku });
         await loadCart(false);
+        refreshHeader(); // ✅ badge update
       } else {
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         const updated = guestCart.filter((i) => !(i.productId === item.product?._id && i.sku === item.variant?.sku));
         localStorage.setItem("guestCart", JSON.stringify(updated));
         await loadCart(false);
+        refreshHeader(); // ✅ badge update
       }
       setCouponApplied(null);
     } catch { alert("Failed to remove item"); }
@@ -227,11 +233,10 @@ const CartPage = () => {
     }
   };
 
-  // ✅ Bina login: login modal open karo
   const handleCheckout = async () => {
     const user = JSON.parse(localStorage.getItem("user") || "null");
     if (!user?._id) {
-      setModalToShow("login"); // ✅ login modal open
+      setModalToShow("login");
       return;
     }
     await loadCart(false);
@@ -268,7 +273,7 @@ const CartPage = () => {
     return (
       <>
         <CartHeader />
-        <div className="cart-page loading-wrap">
+        <div className="cart-page loading-wrap" style={{ paddingTop: "100px" }}>
           <div className="loading-inner">
             <div className="spinner" />
             <p className="loading-text">Loading your bag...</p>
@@ -281,11 +286,9 @@ const CartPage = () => {
   return (
     <>
       <CartHeader />
-
-      {/* ✅ Login Modal — cart page pe hi khulega */}
       <AuthModals modalToShow={modalToShow} setModalToShow={setModalToShow} />
 
-      <div className="cart-page">
+      <div className="cart-page" style={{ paddingTop: "100px" }}>
         <main className="cart-main">
           <StepIndicator currentStep={1} />
 

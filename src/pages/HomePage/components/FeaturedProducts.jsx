@@ -23,7 +23,7 @@ const FeaturedProducts = () => {
     fetchData();
   }, []);
 
-  if (loading) return <p>Loading featured products...</p>;
+  if (loading) return;
   if (featuredProducts.length === 0) return <p>No featured products available.</p>;
 
   return (

@@ -6,7 +6,8 @@ const starIconFull = "/icon7.svg";
 const starIconHalf = "/icon9.svg";
 const starIconEmpty = "/icon8.svg";
 
-const yellowFilter = "brightness(0) saturate(100%) invert(78%) sepia(60%) saturate(500%) hue-rotate(5deg)";
+const yellowFilter =
+  "brightness(0) saturate(100%) invert(78%) sepia(60%) saturate(500%) hue-rotate(5deg)";
 
 const ShopCard = ({
   product,
@@ -49,7 +50,6 @@ const ShopCard = ({
   const reviews = product.reviewCount || 0;
   const hasStock = variant?.hasStock && variant?.stockQuantity > 0;
 
- 
   // ---------------- ADD TO CART ----------------
   const handleAddToCart = async (e) => {
     e.stopPropagation();
@@ -74,7 +74,7 @@ const ShopCard = ({
       } else {
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         const existingIndex = guestCart.findIndex(
-          (item) => item.productId === product._id && item.sku === variant.sku
+          (item) => item.productId === product._id && item.sku === variant.sku,
         );
         if (existingIndex > -1) {
           guestCart[existingIndex].quantity += 1;
@@ -130,9 +130,11 @@ const ShopCard = ({
         });
         if (onWishlistUpdate) onWishlistUpdate();
       } else {
-        const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
+        const guestWishlist = JSON.parse(
+          localStorage.getItem("guestWishlist") || "[]",
+        );
         const alreadyExists = guestWishlist.some(
-          (item) => item.productId === product._id
+          (item) => item.productId === product._id,
         );
         if (!alreadyExists) {
           guestWishlist.push({
@@ -165,7 +167,6 @@ const ShopCard = ({
         style={{ cursor: "pointer" }}
         onClick={() => navigate(`/product-details/${product._id}`)}
       >
-        {/* Remove button (wishlist page) */}
         {onRemove && (
           <button
             onClick={(e) => {
@@ -178,16 +179,43 @@ const ShopCard = ({
               top: "10px",
               right: "10px",
               zIndex: 10,
-              background: "white",
-              border: "none",
+              background: "rgba(108, 99, 255, 0.15)",
+              border: "1px solid rgba(108, 99, 255, 0.35)",
               borderRadius: "50%",
               width: "32px",
               height: "32px",
               cursor: "pointer",
-              boxShadow: "0 1px 4px rgba(0,0,0,0.2)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backdropFilter: "blur(6px)",
+              transition: "all 0.2s ease",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.background = "rgba(255, 101, 132, 0.25)";
+              e.currentTarget.style.borderColor = "rgba(255, 101, 132, 0.5)";
+              e.currentTarget.style.transform = "scale(1.1)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.background = "rgba(108, 99, 255, 0.15)";
+              e.currentTarget.style.borderColor = "rgba(108, 99, 255, 0.35)";
+              e.currentTarget.style.transform = "scale(1)";
             }}
           >
-            ❌
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path
+                d="M1 1L11 11M11 1L1 11"
+                stroke="url(#closeGrad)"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <defs>
+                <linearGradient id="closeGrad" x1="1" y1="1" x2="11" y2="11">
+                  <stop offset="0%" stopColor="#6c63ff" />
+                  <stop offset="100%" stopColor="#ff6584" />
+                </linearGradient>
+              </defs>
+            </svg>
           </button>
         )}
 

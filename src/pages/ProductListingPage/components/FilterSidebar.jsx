@@ -94,7 +94,7 @@ const FilterSidebar = ({ categoryId, setProducts, setTotal }) => {
     });
   };
 
-  if (!filters) return <div>Loading filters...</div>;
+  if (!filters) return ;
 
   return (
     <div className="filter-card p-4">

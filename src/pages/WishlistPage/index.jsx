@@ -14,16 +14,17 @@ const WishlistPage = () => {
   const navigate = useNavigate();
   const userId = JSON.parse(localStorage.getItem("user") || "null")?._id || "";
 
+  // ── Header badge refresh karne ka helper ──
+  const refreshHeader = () => window.dispatchEvent(new Event("header:refresh"));
+
   // ---------------- Fetch Wishlist ----------------
   const fetchWishlist = async () => {
     try {
       setLoading(true);
 
       if (userId) {
-        // Logged in: pehle guestWishlist merge karo, phir API se lo
         const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
         if (guestWishlist.length > 0) {
-          // guest items API mein add karo (best effort)
           await Promise.all(
             guestWishlist.map((item) =>
               import('../../api/api').then(({ addItemToWishlist }) =>
@@ -44,7 +45,6 @@ const WishlistPage = () => {
         const data = await getUserWishlist(userId);
         setWishlistItems(data?.wishlist?.items || []);
       } else {
-        // Guest: localStorage se dikhao
         const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
         setWishlistItems(guestWishlist);
       }
@@ -63,25 +63,24 @@ const WishlistPage = () => {
   // ---------------- Remove Item ----------------
   const handleRemoveItem = async (itemId) => {
     if (userId) {
-      // Logged in: API call
       try {
         await removeWishlistItem(userId, itemId);
         setWishlistItems((items) => items.filter((item) => item._id !== itemId));
+        refreshHeader(); // ✅ wishlist badge update
       } catch (err) {
         console.error("Failed to remove item:", err);
       }
     } else {
-      // Guest: localStorage se remove
       const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
       const updated = guestWishlist.filter((item) => item.productId !== itemId);
       localStorage.setItem("guestWishlist", JSON.stringify(updated));
       setWishlistItems(updated);
+      refreshHeader(); // ✅ wishlist badge update
     }
   };
 
-  // ---------------- Build product (logged in items) ----------------
+  // ---------------- Build product ----------------
   const buildProduct = (item) => {
-    // Guest item already flat format mein hota hai
     if (!item._id && item.productId) {
       return {
         _id: item.productId,
@@ -99,7 +98,6 @@ const WishlistPage = () => {
       };
     }
 
-    // Logged in item
     const base = item.product && typeof item.product === "object" ? item.product : {};
     return {
       ...base,
@@ -118,13 +116,12 @@ const WishlistPage = () => {
     };
   };
 
-  // Guest item ka remove id — productId hoga
   const getRemoveId = (item) => item._id || item.productId;
 
   return (
     <>
       <Header />
-      <main style={{ paddingTop: "180px", backgroundColor: "#D5D4D3" }}>
+      <main style={{ paddingTop: "106px", backgroundColor: "#D5D4D3" }}>
         <AccountPageLayout
           pageTitle="Wishlist"
           breadcrumbPath={['Home Page', 'My Account', 'Wishlist']}
