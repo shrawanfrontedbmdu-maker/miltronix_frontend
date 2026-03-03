@@ -5,11 +5,13 @@ const DealCard = ({ deal, onClick }) => {
   const navigate = useNavigate();
 
   // ── Support both formats ──────────────────────────────────────────
-  // Format A: raw backend product  { name, images:[{url}], variants:[{price,mrp}], slug }
+  // Format A: raw backend product  { name, images:[{url}], variants:[{price,mrp}], _id }
   // Format B: mapped deal          { title, image, price, oldPrice, id }
 
   const title = deal?.name || deal?.title || "Product";
-  const slug  = deal?.slug || deal?._id || deal?.id;
+
+  // ✅ Backend compatible id only (slug removed to avoid Product not found)
+  const productId = deal?._id || deal?.id;
 
   // Image — raw format pehle, phir mapped format, phir placeholder
   const image =
@@ -19,14 +21,23 @@ const DealCard = ({ deal, onClick }) => {
     null;
 
   // Variant — raw format
-  const variant    = deal?.variants?.find((v) => v.isActive) || deal?.variants?.[0];
-  const price      = variant?.price ?? deal?.price ?? 0;
-  const mrp        = variant?.mrp ?? deal?.oldPrice ?? 0;
+  const variant = deal?.variants?.find((v) => v.isActive) || deal?.variants?.[0];
+  const price = variant?.price ?? deal?.price ?? 0;
+  const mrp = variant?.mrp ?? deal?.oldPrice ?? 0;
   const saveAmount = mrp > price ? Math.round(mrp - price) : 0;
 
   const handleClick = () => {
-    if (onClick) { onClick(); return; }
-    navigate(`/product-details/${slug}`);
+    if (onClick) {
+      onClick();
+      return;
+    }
+
+    if (!productId) {
+      console.error("No valid product identifier found");
+      return;
+    }
+
+    navigate(`/product-details/${productId}`);
   };
 
   return (
@@ -46,7 +57,9 @@ const DealCard = ({ deal, onClick }) => {
             src={image}
             alt={title}
             className="product-img"
-            onError={(e) => { e.target.style.display = "none"; }}
+            onError={(e) => {
+              e.target.style.display = "none";
+            }}
           />
         ) : (
           <div

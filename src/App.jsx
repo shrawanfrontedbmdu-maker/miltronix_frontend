@@ -12,6 +12,8 @@ import PaymentPage from "./pages/PaymentPage";
 import CareerPage from "./pages/careerpage";
 import PressPage from "./pages/presspage";
 import PartnersPage from "./pages/patnerspage";
+import SupportPage from "./pages/supportpages";
+import HelpCenterPage from "./pages/HelpCeter";
 import InvestorRelationsPage from "./pages/InvestorRelationsPage";
 import CorporateSalesPage from "./pages/CorporateSalesPage";
 import HelpSupportPage from "./pages/HelpSupportPage";
@@ -50,6 +52,8 @@ function App() {
         <Route path="/careers" element={<CareerPage />} />
         <Route path="/press" element={<PressPage />} />
         <Route path="/partners" element={<PartnersPage />} />
+        <Route path="/support" element={<SupportPage />} />
+        <Route path="/help-center" element={<HelpCenterPage />} />
         <Route path="/investor-relations" element={<InvestorRelationsPage />} />
         <Route path="/corporate-sales" element={<CorporateSalesPage />} />
         <Route path="/help-support" element={<HelpSupportPage />} />
@@ -63,6 +67,7 @@ function App() {
         <Route path="/order-confirm" element={<OrderConfirmPage />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/review/:id" element={<ReviewForm />} />
+        
       </Routes>
     </Router>
   );

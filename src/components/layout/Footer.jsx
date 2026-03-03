@@ -56,7 +56,7 @@ const Footer = () => {
             <div className="col-lg-2 col-md-6 col-6">
               <h5 className="footer-heading">Support</h5>
               <ul className="list-unstyled hv">
-                <li className="custom-margin"><Link to="help-support">Help Center</Link></li>
+                <li className="custom-margin"><Link to="/help-center">Help Center</Link></li>
                 <li className="custom-margin"><Link to="contact-us">Contact Us</Link></li>
                 <li className="custom-margin"><Link to="/support/warranty-claims">Warranty Claims</Link></li>
                 <li className="custom-margin"><Link to="/support/return-policy">Return Policy</Link></li>

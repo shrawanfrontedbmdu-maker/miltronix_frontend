@@ -497,7 +497,7 @@ function Header() {
           <div className="mil-banner-links">
             <a href="#">Track Order</a>
             <a href="#">Store Locator</a>
-            <a href="#">Support</a>
+         <Link to="/support">Support</Link>
           </div>
         </div>
 
