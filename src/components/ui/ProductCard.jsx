@@ -5,7 +5,7 @@ import { addItemToCart, addItemToWishlist, getCartItems } from "../../api/api";
 const starIconFull = "/icon7.svg";
 const starIconHalf = "/icon9.svg";
 const starIconEmpty = "/icon8.svg";
-import cartIcon from "../../assets/cart.png";
+// import cartIcon from "../../assets/cart.png";
 const wishlistIcon = "/icon9.svg";
 
 const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
@@ -65,7 +65,7 @@ const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
         // Guest: localStorage mein save
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         const existingIndex = guestCart.findIndex(
-          (item) => item.productId === product._id && item.sku === variant.sku
+          (item) => item.productId === product._id && item.sku === variant.sku,
         );
         if (existingIndex > -1) {
           guestCart[existingIndex].quantity += 1;
@@ -112,9 +112,11 @@ const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
         if (onWishlistUpdate) onWishlistUpdate();
       } else {
         // Guest: localStorage mein save
-        const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
+        const guestWishlist = JSON.parse(
+          localStorage.getItem("guestWishlist") || "[]",
+        );
         const alreadyExists = guestWishlist.some(
-          (item) => item.productId === product._id
+          (item) => item.productId === product._id,
         );
         if (!alreadyExists) {
           guestWishlist.push({
@@ -141,12 +143,11 @@ const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
   return (
     <div className="col-12 col-sm-6 col-lg-4">
       <div className="product-card h-100">
-
         <img
           src={imageUrl}
           className="product-img"
           alt={product.name}
-          onClick={() => navigate(`/checkout/${product._id}`)}
+          onClick={() => navigate(`/product-details/${product._id}`)}
           style={{ cursor: "pointer" }}
         />
 
@@ -166,7 +167,10 @@ const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
             {[...Array(emptyStars)].map((_, i) => (
               <img key={i} src={starIconEmpty} className="star" />
             ))}
-            <span> {rating.toFixed(1)} ({reviews})</span>
+            <span>
+              {" "}
+              {rating.toFixed(1)} ({reviews})
+            </span>
           </div>
         </div>
 
@@ -176,14 +180,13 @@ const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
             onClick={handleAddToCart}
             disabled={loadingCart || addedCart || !hasStock}
           >
-            <img src={cartIcon} alt="Cart" width="16" height="16" />{" "}
             {loadingCart
               ? "Adding..."
               : addedCart
-              ? "Added"
-              : !hasStock
-              ? "Out of Stock"
-              : "Add to Cart"}
+                ? "Added"
+                : !hasStock
+                  ? "Out of Stock"
+                  : "Add to Cart"}
           </button>
 
           <button

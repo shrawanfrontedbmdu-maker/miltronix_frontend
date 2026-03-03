@@ -1,24 +1,28 @@
 import React, { useEffect, useState } from "react";
-
-// Swiper
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay } from "swiper/modules";
-
-// Swiper styles
 import "swiper/css";
 import "swiper/css/autoplay";
-
-// ✅ correct import path (adjust if needed)
 import { fetchBanners } from "../../../api/api";
 
+// ─── Global cache ─────────────────────────────────────────────────────────────
+let bannersCache = null;
+
 const PromoBanner = () => {
-  const [banners, setBanners] = useState([]);
+  const [banners, setBanners] = useState(bannersCache || []);
 
   useEffect(() => {
+    if (bannersCache) {
+      setBanners(bannersCache);
+      return;
+    }
+
     const loadBanners = async () => {
       try {
         const res = await fetchBanners();
-        setBanners(res?.banners || []);
+        const data = res?.banners || [];
+        bannersCache = data;
+        setBanners(data);
       } catch (err) {
         console.error("Failed to load banners", err);
       }
@@ -27,7 +31,7 @@ const PromoBanner = () => {
     loadBanners();
   }, []);
 
-  if (!banners.length) return null; 
+  if (!banners.length) return null;
 
   return (
     <section className="category-bg1">
@@ -41,6 +45,7 @@ const PromoBanner = () => {
                 src={banner.bennerimg}
                 className="w-100 h-100 object-fit-cover"
                 alt={banner.title || `Promo Banner ${index + 1}`}
+                loading="lazy"
               />
             </div>
           ))}
@@ -53,11 +58,7 @@ const PromoBanner = () => {
             slidesPerView={1}
             spaceBetween={0}
             loop={true}
-            autoplay={{
-              delay: 2500,
-              disableOnInteraction: false,
-            }}
-            className="fourImageSwiper"
+            autoplay={{ delay: 2500, disableOnInteraction: false }}
           >
             {banners.map((banner, index) => (
               <SwiperSlide key={banner._id}>
@@ -65,6 +66,7 @@ const PromoBanner = () => {
                   src={banner.bennerimg}
                   className="w-100"
                   alt={banner.title || `Promo Banner ${index + 1}`}
+                  loading="lazy"
                 />
               </SwiperSlide>
             ))}

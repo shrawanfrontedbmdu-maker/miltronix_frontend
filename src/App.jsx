@@ -27,12 +27,16 @@ import OrderConfirmPage from "./components/ui/orderConfirm";
 import Cart from "./components/ui/cart";
 import ReviewForm from "./components/ui/reviewForm";
 
+// Backend warm-up — Render cold start fix
+const BASE_URL = import.meta.env.VITE_BASE_URL || "https://miltronix-backend-2.onrender.com";
+fetch(`${BASE_URL}/category`).catch(() => {});
+
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/" element={<HomePage />} />
-  <Route path="/product-details/:id" element={<ProductDetailPage />} />
+        <Route path="/product-details/:id" element={<ProductDetailPage />} />
         <Route
           path="/category/:categoryName"
           element={<ProductListingPage />}
@@ -51,14 +55,14 @@ function App() {
         <Route path="/help-support" element={<HelpSupportPage />} />
         <Route path="/contact-us" element={<ContactUsPage />} />
         {/* <Route path="/cart" element={<CartPage />} /> */}
-      {/* <Route path="/checkout/:id" element={<Checkout />} /> */}
+        {/* <Route path="/checkout/:id" element={<Checkout />} /> */}
         <Route path="/orderaddress" element={<OrderAddress />} />
-   <Route path="/search" element={<SearchPage />} />
+        <Route path="/search" element={<SearchPage />} />
         <Route path="/secendaddress" element={<SecendAddress />} />
         <Route path="/pay" element={<Pay />} />
         <Route path="/order-confirm" element={<OrderConfirmPage />} />
-         <Route path="/cart" element={<Cart />} />
-           <Route path="/review/:id" element={<ReviewForm />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/review/:id" element={<ReviewForm />} />
       </Routes>
     </Router>
   );

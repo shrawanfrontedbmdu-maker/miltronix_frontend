@@ -1376,6 +1376,8 @@
 .product-rating1 {
   font-size: 0.6rem;
   margin-bottom: 0px;
+  display: flex;
+  
   
 }
 

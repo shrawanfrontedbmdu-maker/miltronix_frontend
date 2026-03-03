@@ -1,59 +1,49 @@
 // src/components/ui/FilterSidebar.jsx
-import React, { useState, useEffect } from "react";
-import API, { getFilterGroupsByCategory } from "../../../api/api";
+import React, { useState, useEffect, useMemo } from "react";
+import API from "../../../api/api";
 
-const FilterSidebar = ({ categoryId, setProducts, setTotal }) => {
-  const [filters, setFilters] = useState(null);
+const FilterSidebar = ({ categoryId, filterGroups = [], setProducts, setTotal }) => {
+  // filterGroups ab parent (ProductListingPage) se aata hai — koi fetch nahi
+
+  // Transform filterGroups to UI format
+  const filters = useMemo(() => {
+    if (!filterGroups.length) return null;
+
+    const formatted = {};
+    filterGroups.forEach((group) => {
+      if (group.filterType === "range") {
+        const [min, max] = group.options[0].value.split("-").map(Number);
+        formatted[group.name] = { type: "range", min, max };
+      } else {
+        formatted[group.name] = {
+          type: "checkbox",
+          title: group.displayName,
+          items: group.options.map((opt) => ({ _id: opt._id, label: opt.label })),
+        };
+      }
+    });
+    return formatted;
+  }, [filterGroups]);
+
   const [selected, setSelected] = useState({});
 
-  // Fetch filter groups on mount or category change
+  // Jab filters ready ho tab initial selected set karo
   useEffect(() => {
-    if (!categoryId) return;
+    if (!filters) return;
+    const initialSelected = {};
+    Object.keys(filters).forEach((key) => {
+      initialSelected[key] = filters[key].type === "range" ? filters[key].max : [];
+    });
+    setSelected(initialSelected);
+  }, [filters]);
 
-    const fetchFilters = async () => {
-      try {
-        const filterGroups = await getFilterGroupsByCategory(categoryId);
-
-        // Transform API filterGroups to easier format for UI
-        const formatted = {};
-        filterGroups.forEach((group) => {
-          if (group.filterType === "range") {
-            const [min, max] = group.options[0].value.split("-").map(Number);
-            formatted[group.name] = { type: "range", min, max };
-          } else {
-            formatted[group.name] = {
-              type: "checkbox",
-              title: group.displayName,
-              items: group.options.map((opt) => ({ _id: opt._id, label: opt.label })),
-            };
-          }
-        });
-
-        setFilters(formatted);
-
-        // Initialize selected filters state
-        const initialSelected = {};
-        Object.keys(formatted).forEach((key) => {
-          initialSelected[key] = formatted[key].type === "range" ? formatted[key].max : [];
-        });
-        setSelected(initialSelected);
-      } catch (err) {
-        console.error("Error fetching filters:", err);
-      }
-    };
-
-    fetchFilters();
-  }, [categoryId]);
-
-  // Fetch products whenever selected filters change
+  // Filtered products fetch — sirf jab user filter change kare
   useEffect(() => {
     if (!categoryId || !setProducts || !filters) return;
 
     const fetchFilteredProducts = async () => {
       try {
         const params = { category: categoryId };
-
-        // ⭐ Collect all selected _ids from all checkbox filters
         const allSelectedIds = [];
 
         Object.keys(selected).forEach((key) => {
@@ -64,7 +54,6 @@ const FilterSidebar = ({ categoryId, setProducts, setTotal }) => {
           }
         });
 
-        // ⭐ Send as filterOptions param (backend expects ObjectId list)
         if (allSelectedIds.length > 0) {
           params.filterOptions = allSelectedIds.join(",");
         }
@@ -80,7 +69,6 @@ const FilterSidebar = ({ categoryId, setProducts, setTotal }) => {
     fetchFilteredProducts();
   }, [selected, categoryId, filters, setProducts, setTotal]);
 
-  // ⭐ Toggle by _id instead of label
   const toggleFilter = (type, id) => {
     setSelected((prev) => {
       if (Array.isArray(prev[type])) {
@@ -94,7 +82,7 @@ const FilterSidebar = ({ categoryId, setProducts, setTotal }) => {
     });
   };
 
-  if (!filters) return ;
+  if (!filters) return null;
 
   return (
     <div className="filter-card p-4">
@@ -133,8 +121,8 @@ const FilterSidebar = ({ categoryId, setProducts, setTotal }) => {
                     type="checkbox"
                     className="form-check-input"
                     id={item._id}
-                    onChange={() => toggleFilter(key, item._id)} // ⭐ _id bhejo label nahi
-                    checked={selected[key]?.includes(item._id)} // ⭐ _id se check karo
+                    onChange={() => toggleFilter(key, item._id)}
+                    checked={selected[key]?.includes(item._id) || false}
                   />
                   <label className="form-check-label hv" htmlFor={item._id}>
                     {item.label}

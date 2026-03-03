@@ -14,10 +14,12 @@ import ResolutionInfo from "./components/ResolutionInfo";
 
 import {
   fetchCategories,
-  fetchSubcategories,
   fetchProducts,
   getFilterGroupsByCategory,
 } from "../../api/api";
+
+// ─── Simple in-memory cache ───────────────────────────────────────────────────
+const pageCache = {};
 
 const ProductListingPage = () => {
   const { categoryName } = useParams();
@@ -26,60 +28,71 @@ const ProductListingPage = () => {
   const [subcategories, setSubcategories] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
   const [filterGroups, setFilterGroups] = useState([]);
-
-  const [products, setProducts] = useState([]); // ⭐ shared state
-  const [total, setTotal] = useState(0); // ⭐ total added
-
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [products, setProducts] = useState([]);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    const loadCategoryData = async () => {
+    if (!categoryName) return;
+
+    window.scrollTo(0, 0);
+
+    const key = categoryName.toLowerCase();
+
+    // Cache hit — instant load
+    if (pageCache[key]) {
+      const c = pageCache[key];
+      setPageData(c.pageData);
+      setProducts(c.products);
+      setTotal(c.total);
+      setRecommendations(c.recommendations);
+      setFilterGroups(c.filterGroups);
+      return;
+    }
+
+    const load = async () => {
       try {
-        setLoading(true);
-        setError(null);
-
+        // Step 1: category fetch (fast, small payload)
         const categories = await fetchCategories();
-
         const category = categories.find(
           (c) =>
             c.categoryKey?.toLowerCase() ===
-            decodeURIComponent(categoryName || "").toLowerCase()
+            decodeURIComponent(categoryName).toLowerCase()
         );
 
-        if (!category) throw new Error("Category not found");
+        if (!category) return;
+        setPageData(category); // ← page header turant dikhao
 
-        setPageData(category);
+        // Step 2: baaki sab parallel
+        const [productRes, recRes, filters] = await Promise.all([
+          fetchProducts({ category: category._id, limit: 12 }),
+          fetchProducts({ category: category._id, isRecommended: true, limit: 8 }),
+          getFilterGroupsByCategory(category._id),
+        ]);
 
-        const subRes = await fetchSubcategories(category._id);
-        setSubcategories(subRes?.subcategories || []);
+        const prods = productRes?.products || [];
+        const tot = productRes?.total || 0;
+        const recs = recRes?.products || [];
+        const filt = filters || [];
 
-        // ⭐ Initial products load
-        const productRes = await fetchProducts({
-          category: category._id,
-          limit: 12,
-        });
-        setProducts(productRes?.products || []);
-        setTotal(productRes?.total || 0); // ⭐ total set
+        setProducts(prods);
+        setTotal(tot);
+        setRecommendations(recs);
+        setFilterGroups(filt);
 
-        const recommendedRes = await fetchProducts({
-          category: category._id,
-          isRecommended: true,
-          limit: 8,
-        });
-        setRecommendations(recommendedRes?.products || []);
-
-        const filters = await getFilterGroupsByCategory(category._id);
-        setFilterGroups(filters || []);
+        // Cache mein save karo
+        pageCache[key] = {
+          pageData: category,
+          products: prods,
+          total: tot,
+          recommendations: recs,
+          filterGroups: filt,
+        };
       } catch (err) {
-        console.error("🔥 Error loading category page:", err);
-        setError(err.message || "Failed to load category");
-      } finally {
-        setLoading(false);
+        console.error("ProductListingPage load error:", err);
       }
     };
 
-    loadCategoryData();
+    load();
   }, [categoryName]);
 
   return (
@@ -89,66 +102,59 @@ const ProductListingPage = () => {
       <main style={{ backgroundColor: "#D5D4D3" }}>
         <CategorySlider />
 
-        {error && (
-          <div className="container text-center py-5">
-            <div className="alert alert-danger">{error}</div>
-          </div>
-        )}
+        <>
+          <Breadcrumb path={pageData?.breadcrumb || []} />
 
-        {!error && (
-          <>
-            <Breadcrumb path={pageData?.breadcrumb || []} />
+          <PageHeader
+            title={pageData?.pageTitle}
+            subtitle={pageData?.pageSubtitle}
+            description={pageData?.description}
+          />
 
-            <PageHeader
-              title={pageData?.pageTitle}
-              subtitle={pageData?.pageSubtitle}
-              description={pageData?.description}
-            />
+          <div className="container">
+            <div className="row">
 
-            <div className="container">
-              <div className="row">
-
-                <div className="col-md-3">
-                  <FilterSidebar
-                    categoryId={pageData?._id}
-                    setProducts={setProducts}   // ⭐ important
-                    setTotal={setTotal}         // ⭐ total pass kiya
-                  />
-                </div>
-
-                <div className="col-md-9">
-                  <ProductGrid
-                    categoryId={pageData?._id}
-                    products={products}        // ⭐ important
-                    setProducts={setProducts}
-                    total={total}              // ⭐ total pass kiya
-                  />
-                </div>
-
+              <div className="col-md-3">
+                <FilterSidebar
+                  categoryId={pageData?._id}
+                  filterGroups={filterGroups}
+                  setProducts={setProducts}
+                  setTotal={setTotal}
+                />
               </div>
+
+              <div className="col-md-9">
+                <ProductGrid
+                  categoryId={pageData?._id}
+                  products={products}
+                  setProducts={setProducts}
+                  total={total}
+                />
+              </div>
+
             </div>
+          </div>
 
-            {subcategories.length > 0 && (
-              <ResolutionInfo
-                info={{
-                  title: pageData?.pageTitle,
-                  subtitle: "Sub Categories",
-                  description: pageData?.description,
-                  cards: subcategories.map((sub) => ({
-                    _id: sub._id,
-                    title: sub.name,
-                    description: sub.description,
-                    image: sub.image,
-                  })),
-                }}
-              />
-            )}
+          {subcategories.length > 0 && (
+            <ResolutionInfo
+              info={{
+                title: pageData?.pageTitle,
+                subtitle: "Sub Categories",
+                description: pageData?.description,
+                cards: subcategories.map((sub) => ({
+                  _id: sub._id,
+                  title: sub.name,
+                  description: sub.description,
+                  image: sub.image,
+                })),
+              }}
+            />
+          )}
 
-            {recommendations.length > 0 && (
-              <RecommendationSection products={recommendations} />
-            )}
-          </>
-        )}
+          {recommendations.length > 0 && (
+            <RecommendationSection products={recommendations} />
+          )}
+        </>
       </main>
 
       <Footer />

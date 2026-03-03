@@ -9,7 +9,7 @@ const MyOrdersPage = () => {
   return (
     <>
       <Header />
-      <main style={{ paddingTop: "180px", backgroundColor: "#D5D4D3" }}>
+      <main style={{ paddingTop: "106px", backgroundColor: "#D5D4D3" }}>
         <AccountPageLayout
           pageTitle="My Orders"
           breadcrumbPath={['Home Page', 'My Account', 'My Orders']}

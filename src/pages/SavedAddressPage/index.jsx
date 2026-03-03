@@ -8,7 +8,7 @@ const SavedAddressPage = () => {
   return (
     <>
       <Header />
-      <main style={{ paddingTop: "180px", backgroundColor: "#D5D4D3" }}>
+      <main style={{ paddingTop: "106px", backgroundColor: "#D5D4D3" }}>
         <AccountPageLayout
           pageTitle="Saved Address"
           breadcrumbPath={['Home Page', 'My Account', 'Saved Address']}

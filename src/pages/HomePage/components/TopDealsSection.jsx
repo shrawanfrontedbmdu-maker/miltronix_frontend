@@ -2,16 +2,27 @@ import React, { useEffect, useState } from "react";
 import DealCard from "../../../components/ui/DealCard";
 import { fetchTopDealProducts } from "../../../api/api";
 
+// ─── Global cache ─────────────────────────────────────────────────────────────
+let topDealsCache = null;
+
 const TopDealsSection = () => {
-  const [topDeals, setTopDeals] = useState([]);
-  const [deal, setDeal] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [topDeals, setTopDeals] = useState(topDealsCache?.products || []);
+  const [deal, setDeal] = useState(topDealsCache || null);
+  const [loading, setLoading] = useState(!topDealsCache);
 
   useEffect(() => {
+    if (topDealsCache) {
+      setDeal(topDealsCache);
+      setTopDeals(topDealsCache.products || []);
+      setLoading(false);
+      return;
+    }
+
     const loadTopDeals = async () => {
       try {
         const res = await fetchTopDealProducts();
         if (res?.deal) {
+          topDealsCache = res.deal;
           setDeal(res.deal);
           setTopDeals(res.deal.products || []);
         }
@@ -21,14 +32,11 @@ const TopDealsSection = () => {
         setLoading(false);
       }
     };
+
     loadTopDeals();
   }, []);
 
-  if (loading) {
-    return <div className="text-center py-5">Loading Top Deals...</div>;
-  }
-
-  if (!deal) return null;
+  if (loading || !deal) return null;
 
   return (
     <>
@@ -45,7 +53,11 @@ const TopDealsSection = () => {
               <p className="qled-desc mb-0 d-none d-md-block">
                 {deal.description}
               </p>
-              <a href="/category/qled" className="btn custom-btn px-4">
+              <a
+                href="/category/qled"
+                className="btn custom-btn"
+                style={{ minWidth: "200px", padding: "12px 20px", textAlign: "center" }}
+              >
                 View All Products
               </a>
             </div>

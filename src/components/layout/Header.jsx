@@ -11,6 +11,11 @@ import Notifications from "../../pages/Notification/Notifications";
 const BASE_URL =
   import.meta.env.VITE_BASE_URL || "https://miltronix-backend-2.onrender.com";
 
+// ─── Global cache — ek baar fetch, baad mein instant ─────────────────────────
+let countsCache = null; // { cartCount, wishlistCount, notifCount, notifications }
+let lastFetchTime = 0;
+const CACHE_TTL = 30000; // 30 seconds
+
 const headerStyles = `
   /* ── BANNER ── */
   .mil-banner {
@@ -353,17 +358,17 @@ function Header() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
 
-  const [cartCount, setCartCount] = useState(0);
-  const [wishlistCount, setWishlistCount] = useState(0);
-  const [notifCount, setNotifCount] = useState(0);
-  const [notifications, setNotifications] = useState([]);
+  // Cache se initialize karo — instant display
+  const [cartCount, setCartCount] = useState(countsCache?.cartCount || 0);
+  const [wishlistCount, setWishlistCount] = useState(countsCache?.wishlistCount || 0);
+  const [notifCount, setNotifCount] = useState(countsCache?.notifCount || 0);
+  const [notifications, setNotifications] = useState(countsCache?.notifications || []);
 
   const dropdownRef = useRef(null);
   const notifRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // ── Token aur user dono se safe read ──
   const getToken = () => localStorage.getItem("token");
   const getUserId = () => {
     try {
@@ -373,67 +378,78 @@ function Header() {
   };
   const isLoggedIn = () => !!getToken();
 
-  // ── Fetch counts using correct API functions ──
-  const fetchCounts = useCallback(async () => {
-    if (!isLoggedIn()) {
-      // Guest — guestCart aur guestWishlist se count lo
-      const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-      const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
-      setCartCount(guestCart.reduce((sum, i) => sum + (i.quantity || 1), 0));
-      setWishlistCount(guestWishlist.length);
-      setNotifCount(0);
+  const fetchCounts = useCallback(async (force = false) => {
+    const now = Date.now();
+
+    // Cache valid hai aur force nahi — skip
+    if (!force && countsCache && (now - lastFetchTime) < CACHE_TTL) {
+      setCartCount(countsCache.cartCount);
+      setWishlistCount(countsCache.wishlistCount);
+      setNotifCount(countsCache.notifCount);
+      setNotifications(countsCache.notifications);
       return;
     }
 
-    // ── Cart count ──
-    try {
-      const cartData = await getCartItems(); // GET /cart — interceptor token lagata hai
-      const count = (cartData?.items || []).reduce(
-        (sum, item) => sum + (item.quantity || 0), 0
-      );
-      setCartCount(count);
-    } catch (_) {}
-
-    // ── Wishlist count ──
-    try {
-      const userId = getUserId();
-      if (userId) {
-        const wishData = await getUserWishlist(userId); // GET /wishlist/user/:userId
-        setWishlistCount(wishData?.wishlist?.items?.length || 0);
-      }
-    } catch (_) {}
-
-    // ── Notifications ──
-    try {
-      const token = getToken();
-      const res = await axios.get(`${BASE_URL}/notifications`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const all = res.data?.notifications || [];
-      setNotifications(all);
-      setNotifCount(all.filter((n) => !n.isRead).length);
-    } catch (_) {
+    if (!isLoggedIn()) {
+      const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+      const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
+      const cc = guestCart.reduce((sum, i) => sum + (i.quantity || 1), 0);
+      const wc = guestWishlist.length;
+      setCartCount(cc);
+      setWishlistCount(wc);
       setNotifCount(0);
+      countsCache = { cartCount: cc, wishlistCount: wc, notifCount: 0, notifications: [] };
+      lastFetchTime = now;
+      return;
     }
+
+    // Sab parallel fetch karo — ek baar mein
+    const [cartRes, wishRes, notifRes] = await Promise.allSettled([
+      getCartItems(),
+      getUserId() ? getUserWishlist(getUserId()) : Promise.resolve(null),
+      axios.get(`${BASE_URL}/notifications`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      }),
+    ]);
+
+    const cc = cartRes.status === "fulfilled"
+      ? (cartRes.value?.items || []).reduce((sum, i) => sum + (i.quantity || 0), 0)
+      : 0;
+
+    const wc = wishRes.status === "fulfilled"
+      ? (wishRes.value?.wishlist?.items?.length || 0)
+      : 0;
+
+    const allNotifs = notifRes.status === "fulfilled"
+      ? (notifRes.value?.data?.notifications || [])
+      : [];
+
+    const nc = allNotifs.filter((n) => !n.isRead).length;
+
+    setCartCount(cc);
+    setWishlistCount(wc);
+    setNotifCount(nc);
+    setNotifications(allNotifs);
+
+    // Cache update
+    countsCache = { cartCount: cc, wishlistCount: wc, notifCount: nc, notifications: allNotifs };
+    lastFetchTime = now;
   }, []);
 
-  // ── Route change hone par refresh ──
+  // Sirf pehli baar fetch karo — route change pe nahi
   useEffect(() => {
     fetchCounts();
-  }, [location.pathname, fetchCounts]);
-
-  // ── Kisi bhi page se header:refresh event pe refresh ──
-  useEffect(() => {
-    const handler = () => fetchCounts();
-    window.addEventListener("header:refresh", handler);
-    return () => window.removeEventListener("header:refresh", handler);
   }, [fetchCounts]);
 
-  // ── Login/logout hone pe bhi refresh (storage change) ──
+  // Force refresh sirf jab explicitly trigger ho (cart add, login, etc.)
   useEffect(() => {
-    const handler = () => fetchCounts();
+    const handler = () => fetchCounts(true);
+    window.addEventListener("header:refresh", handler);
     window.addEventListener("storage", handler);
-    return () => window.removeEventListener("storage", handler);
+    return () => {
+      window.removeEventListener("header:refresh", handler);
+      window.removeEventListener("storage", handler);
+    };
   }, [fetchCounts]);
 
   // ── Debounce search ──

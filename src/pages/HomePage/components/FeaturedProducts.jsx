@@ -4,15 +4,26 @@ import ProductCard from "../../../components/ui/ProductCard";
 import { fetchFeaturedProducts } from "../../../api/api";
 import "./feturedproduct.css";
 
+// ─── Global cache ─────────────────────────────────────────────────────────────
+let featuredCache = null;
+
 const FeaturedProducts = () => {
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [featuredProducts, setFeaturedProducts] = useState(featuredCache || []);
+  const [loading, setLoading] = useState(!featuredCache);
 
   useEffect(() => {
+    if (featuredCache) {
+      setFeaturedProducts(featuredCache);
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
       try {
-        const res = await fetchFeaturedProducts(); 
-        setFeaturedProducts(res.products || []);
+        const res = await fetchFeaturedProducts();
+        const data = res?.products || [];
+        featuredCache = data;
+        setFeaturedProducts(data);
       } catch (error) {
         console.error("Failed to fetch featured products:", error);
       } finally {
@@ -23,8 +34,8 @@ const FeaturedProducts = () => {
     fetchData();
   }, []);
 
-  if (loading) return;
-  if (featuredProducts.length === 0) return <p>No featured products available.</p>;
+  if (loading) return null;
+  if (!featuredProducts.length) return null;
 
   return (
     <section className="product-section">

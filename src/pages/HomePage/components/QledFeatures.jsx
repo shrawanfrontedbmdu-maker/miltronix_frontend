@@ -33,7 +33,9 @@ const QledFeatures = () => {
     loadQledCategory();
   }, []);
 
-  if (loading) return <p>Loading...</p>;
+ if (loading) {
+  return <div className="text-center py-5"></div>;
+}
 
   return (
     <section className="qled-features">

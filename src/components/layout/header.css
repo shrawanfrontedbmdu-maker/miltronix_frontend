@@ -1,3 +1,11 @@
-.main-content-padding {
-  padding-top: 106px !important;
+.main{
+    margin-left: 40px;
+}
+
+.side{
+    margin-right: 40px;
+}
+
+.heart{
+    margin-right:30px;
 }

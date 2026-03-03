@@ -50,7 +50,6 @@ const ShopCard = ({
   const reviews = product.reviewCount || 0;
   const hasStock = variant?.hasStock && variant?.stockQuantity > 0;
 
-  // ---------------- ADD TO CART ----------------
   const handleAddToCart = async (e) => {
     e.stopPropagation();
 
@@ -74,7 +73,7 @@ const ShopCard = ({
       } else {
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         const existingIndex = guestCart.findIndex(
-          (item) => item.productId === product._id && item.sku === variant.sku,
+          (item) => item.productId === product._id && item.sku === variant.sku
         );
         if (existingIndex > -1) {
           guestCart[existingIndex].quantity += 1;
@@ -104,7 +103,6 @@ const ShopCard = ({
     }
   };
 
-  // ---------------- ADD TO WISHLIST ----------------
   const handleAddToWishlist = async (e) => {
     e.stopPropagation();
 
@@ -131,10 +129,10 @@ const ShopCard = ({
         if (onWishlistUpdate) onWishlistUpdate();
       } else {
         const guestWishlist = JSON.parse(
-          localStorage.getItem("guestWishlist") || "[]",
+          localStorage.getItem("guestWishlist") || "[]"
         );
         const alreadyExists = guestWishlist.some(
-          (item) => item.productId === product._id,
+          (item) => item.productId === product._id
         );
         if (!alreadyExists) {
           guestWishlist.push({
@@ -167,58 +165,6 @@ const ShopCard = ({
         style={{ cursor: "pointer" }}
         onClick={() => navigate(`/product-details/${product._id}`)}
       >
-        {onRemove && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove();
-            }}
-            title="Remove from wishlist"
-            style={{
-              position: "absolute",
-              top: "10px",
-              right: "10px",
-              zIndex: 10,
-              background: "rgba(108, 99, 255, 0.15)",
-              border: "1px solid rgba(108, 99, 255, 0.35)",
-              borderRadius: "50%",
-              width: "32px",
-              height: "32px",
-              cursor: "pointer",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              backdropFilter: "blur(6px)",
-              transition: "all 0.2s ease",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(255, 101, 132, 0.25)";
-              e.currentTarget.style.borderColor = "rgba(255, 101, 132, 0.5)";
-              e.currentTarget.style.transform = "scale(1.1)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(108, 99, 255, 0.15)";
-              e.currentTarget.style.borderColor = "rgba(108, 99, 255, 0.35)";
-              e.currentTarget.style.transform = "scale(1)";
-            }}
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-              <path
-                d="M1 1L11 11M11 1L1 11"
-                stroke="url(#closeGrad)"
-                strokeWidth="2"
-                strokeLinecap="round"
-              />
-              <defs>
-                <linearGradient id="closeGrad" x1="1" y1="1" x2="11" y2="11">
-                  <stop offset="0%" stopColor="#6c63ff" />
-                  <stop offset="100%" stopColor="#ff6584" />
-                </linearGradient>
-              </defs>
-            </svg>
-          </button>
-        )}
-
         {saveAmount > 0 && (
           <span className="shop-card-badge">
             Save ₹{saveAmount.toLocaleString()}
@@ -236,11 +182,16 @@ const ShopCard = ({
         <p className="product-price2">₹{price.toLocaleString()}</p>
 
         {oldPrice > price && (
-          <p className="product-old-price2">₹{oldPrice.toLocaleString()}</p>
+          <p className="product-old-price2">
+            ₹{oldPrice.toLocaleString()}
+          </p>
         )}
 
-        <div className="product-rating1">
-          {/* ⭐ Full Stars - Yellow */}
+        {/* ⭐ Rating Horizontal */}
+        <div
+          className="product-rating1"
+          style={{ display: "flex", alignItems: "center", gap: "4px", justifyContent: "center" }}
+        >
           {[...Array(fullStars)].map((_, i) => (
             <img
               key={`full-${i}`}
@@ -250,7 +201,7 @@ const ShopCard = ({
               style={{ filter: yellowFilter }}
             />
           ))}
-          {/* ⭐ Half Star - Yellow */}
+
           {halfStar && (
             <img
               src={starIconHalf}
@@ -259,7 +210,7 @@ const ShopCard = ({
               style={{ filter: yellowFilter }}
             />
           )}
-          {/* Empty Stars - Grey (no filter) */}
+
           {[...Array(emptyStars)].map((_, i) => (
             <img
               key={`empty-${i}`}
@@ -268,6 +219,7 @@ const ShopCard = ({
               className="star1"
             />
           ))}
+
           <span>
             {rating.toFixed(1)} ({reviews})
           </span>
@@ -282,17 +234,13 @@ const ShopCard = ({
             onClick={handleAddToCart}
             disabled={loadingCart || addedCart || !hasStock}
           >
-            {loadingCart ? (
-              "Adding..."
-            ) : addedCart ? (
-              "Added"
-            ) : !hasStock ? (
-              "Out of Stock"
-            ) : (
-              <>
-                <i className="bi bi-cart"></i> Add to Cart
-              </>
-            )}
+            {loadingCart
+              ? "Adding..."
+              : addedCart
+              ? "Added"
+              : !hasStock
+              ? "Out of Stock"
+              : "Add to Cart"}
           </button>
 
           {!onRemove && (

@@ -4,20 +4,28 @@ import { useNavigate } from "react-router-dom";
 import "swiper/css";
 import { fetchCategories } from "../../api/api";
 
+// ─── Global cache — component unmount hone pe bhi data rehta hai ──────────────
+let categoriesCache = null;
+
 function CategorySlider() {
   const navigate = useNavigate();
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState(categoriesCache || []);
 
   useEffect(() => {
+    // Cache hit — koi fetch nahi
+    if (categoriesCache) {
+      setCategories(categoriesCache);
+      return;
+    }
+
     const loadCategories = async () => {
       try {
         const cats = await fetchCategories();
-        setCategories(Array.isArray(cats) ? cats : []);
+        const data = Array.isArray(cats) ? cats : [];
+        categoriesCache = data; // cache mein save
+        setCategories(data);
       } catch (err) {
         console.error("Fetch categories error:", err);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -28,10 +36,7 @@ function CategorySlider() {
     navigate(`/category/${categoryKey}`);
   };
 
-
-  if (!categories.length) {
-    return null; 
-  }
+  if (!categories.length) return null;
 
   return (
     <>
@@ -40,12 +45,10 @@ function CategorySlider() {
           background: #e5e3e1;
           padding: 30px 0 25px 0;
         }
-
         .category-slide {
           text-align: center;
           cursor: pointer;
         }
-
         .category-img {
           width: 100px;
           height: 100px;
@@ -54,11 +57,9 @@ function CategorySlider() {
           margin: auto;
           transition: transform 0.3s ease;
         }
-
         .category-img:hover {
           transform: scale(1.05);
         }
-
         .category-title {
           margin-top: 8px;
           font-size: 14px;
@@ -86,20 +87,14 @@ function CategorySlider() {
                 onClick={() => handleClick(cat.categoryKey)}
               >
                 <img
-                  src={
-                    cat.image
-                      ? cat.image.startsWith("http")
-                        ? cat.image
-                        : cat.image
-                      : "/src/assets/default-category.png"
-                  }
+                  src={cat.image || "/src/assets/default-category.png"}
                   alt={cat.pageTitle || "category"}
                   className="category-img"
+                  loading="lazy"
                   onError={(e) => {
                     e.currentTarget.src = "/src/assets/default-category.png";
                   }}
                 />
-
                 <p className="category-title">{cat.pageTitle}</p>
               </SwiperSlide>
             ))}

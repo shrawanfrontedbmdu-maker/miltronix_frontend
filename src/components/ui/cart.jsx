@@ -16,7 +16,7 @@ import "./CartPage.css";
 // Assets
 import logoBanner from "../../assets/MILTRONIX APP DESIGN 3.png";
 
-const BACKEND_URL = "https://miltronix-backend-2.onrender.com";
+const BACKEND_URL = "https://miltronix-backend-2.onrender.com/api";
 
 /* ─── Icons ─── */
 const TrashIcon = () => (

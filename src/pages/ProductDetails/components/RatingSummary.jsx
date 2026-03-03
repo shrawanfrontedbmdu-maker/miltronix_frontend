@@ -36,7 +36,10 @@ const RatingSummary = ({ reviews = [], product = null }) => {
 
       {/* Average Rating */}
       <div className="d-flex align-items-center mb-2">
-        <div className="product-rating1 me-3">
+       <div
+          className="product-rating1"
+          style={{ display: "flex", alignItems: "center", gap: "4px", justifyContent: "center" }}
+        >
           {[...Array(5)].map((_, i) => (
             <img
               key={i}
