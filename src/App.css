@@ -5,6 +5,9 @@ html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }
+html {
+  zoom: 0.9;
+}
 @font-face {
   font-family: 'Helvetica';
  src: url('./assets/Helvetica.woff') format('woff');
