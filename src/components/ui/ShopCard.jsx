@@ -6,7 +6,7 @@ const starIconFull = "/icon7.svg";
 const starIconHalf = "/icon9.svg";
 const starIconEmpty = "/icon8.svg";
 
-const brandFilter = 
+const brandFilter =
   "invert(43%) sepia(11%) saturate(542%) hue-rotate(122deg) brightness(93%) contrast(87%)";
 
 const ShopCard = ({
@@ -29,7 +29,9 @@ const ShopCard = ({
 
   const categoryName =
     typeof product.category === "object" && product.category
-      ? product.category.pageTitle || product.category.categoryKey || "Uncategorized"
+      ? product.category.pageTitle ||
+        product.category.categoryKey ||
+        "Uncategorized"
       : "Uncategorized";
 
   const variant = product.variants?.[0];
@@ -46,23 +48,39 @@ const ShopCard = ({
 
   const handleAddToCart = async (e) => {
     e.stopPropagation();
-    if (!product._id || !variant?.sku) return alert("Product/variant not found");
+    if (!product._id || !variant?.sku)
+      return alert("Product/variant not found");
 
     setLoadingCart(true);
     try {
       const user = JSON.parse(localStorage.getItem("user") || "null");
       if (user?._id) {
-        await addItemToCart({ productId: product._id, sku: variant.sku, quantity: 1 });
+        await addItemToCart({
+          productId: product._id,
+          sku: variant.sku,
+          quantity: 1,
+        });
         if (onCartUpdate) {
           const updatedCart = await getCartItems();
           onCartUpdate(updatedCart);
         }
       } else {
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-        const existingIndex = guestCart.findIndex((item) => item.productId === product._id && item.sku === variant.sku);
-        if (existingIndex > -1) { guestCart[existingIndex].quantity += 1; } 
-        else {
-          guestCart.push({ productId: product._id, sku: variant.sku, quantity: 1, name: product.name, image: imageUrl, price: price, category: categoryName });
+        const existingIndex = guestCart.findIndex(
+          (item) => item.productId === product._id && item.sku === variant.sku,
+        );
+        if (existingIndex > -1) {
+          guestCart[existingIndex].quantity += 1;
+        } else {
+          guestCart.push({
+            productId: product._id,
+            sku: variant.sku,
+            quantity: 1,
+            name: product.name,
+            image: imageUrl,
+            price: price,
+            category: categoryName,
+          });
         }
         localStorage.setItem("guestCart", JSON.stringify(guestCart));
         if (onCartUpdate) onCartUpdate(guestCart);
@@ -88,16 +106,29 @@ const ShopCard = ({
           userId: user._id,
           productId: product._id,
           title: product.name,
-          images: product.images?.map((img) => ({ url: img.url, public_id: img.public_id || img.url, alt: img.alt || "" })),
+          images: product.images?.map((img) => ({
+            url: img.url,
+            public_id: img.public_id || img.url,
+            alt: img.alt || "",
+          })),
           category: categoryName,
           priceSnapshot: price,
           variant: variant ? { sku: variant.sku } : undefined,
         });
         if (onWishlistUpdate) onWishlistUpdate();
       } else {
-        const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
-        if (!guestWishlist.some(item => item.productId === product._id)) {
-          guestWishlist.push({ productId: product._id, name: product.name, image: imageUrl, price: price, category: categoryName, sku: variant?.sku || "" });
+        const guestWishlist = JSON.parse(
+          localStorage.getItem("guestWishlist") || "[]",
+        );
+        if (!guestWishlist.some((item) => item.productId === product._id)) {
+          guestWishlist.push({
+            productId: product._id,
+            name: product.name,
+            image: imageUrl,
+            price: price,
+            category: categoryName,
+            sku: variant?.sku || "",
+          });
           localStorage.setItem("guestWishlist", JSON.stringify(guestWishlist));
         }
         if (onWishlistUpdate) onWishlistUpdate(guestWishlist);
@@ -112,34 +143,96 @@ const ShopCard = ({
 
   return (
     <div className="col-md-6 col-lg-4">
-      <div className="shop-card text-center position-relative" style={{ cursor: "pointer" }} onClick={() => navigate(`/product-details/${product._id}`)}>
-        {saveAmount > 0 && <span className="shop-card-badge">Save ₹{saveAmount.toLocaleString()}</span>}
-        
-        <img src={imageUrl} alt={product.name} className="img-fluid shop-card-img" />
+      <div
+        className="shop-card text-center position-relative"
+        style={{ cursor: "pointer" }}
+        onClick={() => navigate(`/product-details/${product._id}`)}
+      >
+        {saveAmount > 0 && (
+          <span className="shop-card-badge">
+            Save ₹{saveAmount.toLocaleString()}
+          </span>
+        )}
+
+        {/* ✅ Remove button — sirf wishlist page pe dikhega */}
+        {onRemove && (
+          <button
+            className="shop-card-close-btn"
+            onClick={(e) => { e.stopPropagation(); onRemove(); }}
+            title="Remove from Wishlist"
+          >
+            <i className="bi bi-x-lg"></i>
+          </button>
+        )}
+
+        <img
+          src={imageUrl}
+          alt={product.name}
+          className="img-fluid shop-card-img"
+        />
         <h5 className="product-title2">{product.name}</h5>
         <p className="product-price2">₹{price.toLocaleString()}</p>
-        
-        {oldPrice > price && <p className="product-old-price2">₹{oldPrice.toLocaleString()}</p>}
 
-        <div className="product-rating1" style={{ display: "flex", alignItems: "center", gap: "4px", justifyContent: "center" }}>
+        {oldPrice > price && (
+          <p className="product-old-price2">₹{oldPrice.toLocaleString()}</p>
+        )}
+
+        <div
+          className="product-rating1"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+            justifyContent: "center",
+          }}
+        >
           {[...Array(fullStars)].map((_, i) => (
-            <img key={`f-${i}`} src={starIconFull} alt="s" className="star1" style={{ filter: brandFilter }} />
+            <img
+              key={`f-${i}`}
+              src={starIconFull}
+              alt="s"
+              className="star1"
+              style={{ filter: brandFilter }}
+            />
           ))}
-          {halfStar && <img src={starIconHalf} alt="h" className="star1" style={{ filter: brandFilter }} />}
+          {halfStar && (
+            <img
+              src={starIconHalf}
+              alt="h"
+              className="star1"
+              style={{ filter: brandFilter }}
+            />
+          )}
           {[...Array(emptyStars)].map((_, i) => (
             <img key={`e-${i}`} src={starIconEmpty} alt="e" className="star1" />
           ))}
-          <span>{rating.toFixed(1)} ({reviews})</span>
+          <span>
+            {rating.toFixed(1)} ({reviews})
+          </span>
         </div>
 
         <div className="d-flex justify-content-between mt-2">
-          <button className={`shop-card-btn-cart btn ${addedCart ? "btn-success" : "btn-primary"}`} 
-            style={{ width: "75%", marginLeft: "5%" }} onClick={handleAddToCart} disabled={loadingCart || addedCart || !hasStock}>
-            {loadingCart ? "Adding..." : addedCart ? "Added" : !hasStock ? "Out of Stock" : "Add to Cart"}
+          <button
+            className={`shop-card-btn-cart btn ${addedCart ? "btn-success" : "btn-primary"}`}
+            style={{ width: "75%", marginLeft: "5%" }}
+            onClick={handleAddToCart}
+            disabled={loadingCart || addedCart || !hasStock}
+          >
+            {loadingCart
+              ? "Adding..."
+              : addedCart
+                ? "Added"
+                : !hasStock
+                  ? "Out of Stock"
+                  : "Add to Cart"}
           </button>
+          {/* ✅ Wishlist button — sirf tab dikhega jab onRemove nahi hai */}
           {!onRemove && (
-            <button className={`btn shop-card-btn-wishlist ${addedWishlist ? "btn-danger" : ""}`} 
-              onClick={handleAddToWishlist} disabled={loadingWishlist || addedWishlist}>
+            <button
+              className={`btn shop-card-btn-wishlist ${addedWishlist ? "btn-danger" : ""}`}
+              onClick={handleAddToWishlist}
+              disabled={loadingWishlist || addedWishlist}
+            >
               <i className="bi bi-heart-fill"></i>
             </button>
           )}
