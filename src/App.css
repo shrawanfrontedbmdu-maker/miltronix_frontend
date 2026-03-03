@@ -2215,17 +2215,17 @@ ease-in-out;
   background-color: #616D6B;
 }
 .main-content-padding {
-  padding-top: 116px !important;
+  padding-top: 87px !important;
 }
 
 @media (max-width: 767px) {
   .main-content-padding {
-    padding-top: 96px !important;
+    padding-top: 80px !important;
   }
 }
 
 @media (max-width: 991px) {
   .main-content-padding {
-    padding-top: 106px !important;
+    padding-top: 87px !important;
   }
 }
