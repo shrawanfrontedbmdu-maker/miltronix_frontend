@@ -5,7 +5,8 @@ import Header from '../../components/layout/Header';
 import Footer from '../../components/layout/Footer';
 import SubscriptionSection from '../HomePage/components/SubscriptionSection';
 
-const logoBanner = 'src/assets/MILTRONIX-APP-DESIGN-3.png';
+
+import logoBanner from '../../assets/MILTRONIX-APP-DESIGN-3.png';
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -280,7 +281,9 @@ export default function HelpCenterPage() {
       {/* ── FIXED BANNER ── */}
       <div className="fixed-top">
         <section className="miltronix-banner d-flex justify-content-center align-items-center">
-          <img src={logoBanner} alt="Miltronix Logo" className="img-fluid miltronix-logo" />
+        <a href="/">
+  <img src={logoBanner} alt="Miltronix Logo" className="img-fluid miltronix-logo" />
+</a>
         </section>
       </div>
 

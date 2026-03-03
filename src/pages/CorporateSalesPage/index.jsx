@@ -25,7 +25,8 @@ const corporateSalesContent = [
   },
 ];
 
-const logoBanner = 'src/assets/MILTRONIX-APP-DESIGN-3.png';
+
+import logoBanner from '../../assets/MILTRONIX-APP-DESIGN-3.png';
 
 const CorporateSalesPage = () => {
   return (

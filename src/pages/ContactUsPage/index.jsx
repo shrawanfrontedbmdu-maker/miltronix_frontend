@@ -214,7 +214,9 @@ const ContactUsPage = () => {
       {/* Fixed Banner */}
       <div className="fixed-top">
         <section className="miltronix-banner d-flex justify-content-center align-items-center">
-          <img src={logoBanner} alt="Miltronix Logo" className="img-fluid miltronix-logo" />
+         <a href="/">
+  <img src={logoBanner} alt="Miltronix Logo" className="img-fluid miltronix-logo" />
+</a>
         </section>
       </div>
 

@@ -48,7 +48,8 @@ const values = [
   { icon: '🤝', title: 'Trust', desc: 'Relationships built to last' },
 ];
 
-const logoBanner = 'src/assets/MILTRONIX-APP-DESIGN-3.png';
+
+import logoBanner from '../../assets/MILTRONIX-APP-DESIGN-3.png';
 
 // --- Inline Styles ---
 const styles = {
@@ -319,7 +320,9 @@ const AboutUsPage = () => {
       {/* Fixed Banner */}
       <div className="fixed-top">
         <section className="miltronix-banner d-flex justify-content-center align-items-center">
-          <img src={logoBanner} alt="Miltronix Logo" className="img-fluid miltronix-logo" />
+         <a href="/">
+  <img src={logoBanner} alt="Miltronix Logo" className="img-fluid miltronix-logo" />
+</a>
         </section>
       </div>
 
