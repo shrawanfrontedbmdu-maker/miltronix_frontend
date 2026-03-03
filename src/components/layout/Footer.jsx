@@ -109,7 +109,7 @@ const Footer = () => {
       </section>
 
       {/* Bottom Copyright & Socials Section */}
-      <section className="bottom-section py-3">
+      <section className="bottom-section py-3">n
         <div className="container d-flex flex-column flex-sm-row justify-content-between align-items-center">
           <p className="mb-2 mb-sm-0 bottom-text text-sm-start text-center">
             © 2025 Miltronix. All rights reserved.

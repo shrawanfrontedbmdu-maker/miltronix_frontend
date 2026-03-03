@@ -2214,3 +2214,18 @@ ease-in-out;
 .prodct-listing-page{
   background-color: #616D6B;
 }
+.main-content-padding {
+  padding-top: 116px !important;
+}
+
+@media (max-width: 767px) {
+  .main-content-padding {
+    padding-top: 96px !important;
+  }
+}
+
+@media (max-width: 991px) {
+  .main-content-padding {
+    padding-top: 106px !important;
+  }
+}
