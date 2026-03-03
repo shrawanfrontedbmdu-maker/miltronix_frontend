@@ -1,6 +1,6 @@
 import React from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import logoBanner from "../../assets/MILTRONIX APP DESIGN 3.png";
+import logoBanner from "../../assets/MILTRONIX-APP-DESIGN-3.png";
 
 const BACKEND_URL = "https://miltronix-backend-2.onrender.com";
 

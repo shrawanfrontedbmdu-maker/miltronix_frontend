@@ -14,10 +14,13 @@ import PressPage from "./pages/presspage";
 import PartnersPage from "./pages/patnerspage";
 import SupportPage from "./pages/supportpages";
 import HelpCenterPage from "./pages/HelpCeter";
+import WarrantyClaimPage from "./pages/WarrantyClaimPage";
+import ReturnPolicyPage from "./pages/ReturnPolicypages";
 import InvestorRelationsPage from "./pages/InvestorRelationsPage";
 import CorporateSalesPage from "./pages/CorporateSalesPage";
 import HelpSupportPage from "./pages/HelpSupportPage";
 import ContactUsPage from "./pages/ContactUsPage";
+import B2BEnquiriesPage from "./pages/B2BEnquiresPage";
 // import CartPage from "./pages/cartpage";
 // import Checkout from "./components/ui/Checkout";
 import OrderAddress from "./components/ui/OrderAddress";
@@ -54,10 +57,13 @@ function App() {
         <Route path="/partners" element={<PartnersPage />} />
         <Route path="/support" element={<SupportPage />} />
         <Route path="/help-center" element={<HelpCenterPage />} />
+        <Route path="/support/warranty-claims" element={<WarrantyClaimPage />} />
+        <Route path="/support/return-policy" element={<ReturnPolicyPage />} />
         <Route path="/investor-relations" element={<InvestorRelationsPage />} />
         <Route path="/corporate-sales" element={<CorporateSalesPage />} />
         <Route path="/help-support" element={<HelpSupportPage />} />
         <Route path="/contact-us" element={<ContactUsPage />} />
+        <Route path="/b2b-enquiries" element={<B2BEnquiriesPage />} />
         {/* <Route path="/cart" element={<CartPage />} /> */}
         {/* <Route path="/checkout/:id" element={<Checkout />} /> */}
         <Route path="/orderaddress" element={<OrderAddress />} />

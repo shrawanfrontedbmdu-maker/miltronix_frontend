@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import "./pay.css";
 import { createOrderApi } from "../../api/api";
-import logoBanner from "../../assets/MILTRONIX APP DESIGN 3.png";
+import logoBanner from "../../assets/MILTRONIX-APP-DESIGN-3.png";
 
 const BACKEND_URL = "https://miltronix-backend-2.onrender.com";
 

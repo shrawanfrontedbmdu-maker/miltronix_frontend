@@ -14,7 +14,7 @@ import Notifications from "../../pages/Notification/Notifications";
 import "./CartPage.css";
 
 // Assets
-import logoBanner from "../../assets/MILTRONIX APP DESIGN 3.png";
+import logoBanner from "../../assets/MILTRONIX-APP-DESIGN-3.png";
 
 const BACKEND_URL = "https://miltronix-backend-2.onrender.com/api";
 

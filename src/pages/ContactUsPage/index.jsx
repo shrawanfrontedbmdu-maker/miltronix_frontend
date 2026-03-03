@@ -5,7 +5,7 @@ import Header from "../../components/layout/Header";
 import Footer from "../../components/layout/Footer";
 import SubscriptionSection from "../HomePage/components/SubscriptionSection";
 
-const logoBanner = "src/assets/MILTRONIX APP DESIGN 3.png";
+import logoBanner from "../../assets/MILTRONIX-APP-DESIGN-3.png";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 

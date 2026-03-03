@@ -57,10 +57,10 @@ const Footer = () => {
               <h5 className="footer-heading">Support</h5>
               <ul className="list-unstyled hv">
                 <li className="custom-margin"><Link to="/help-center">Help Center</Link></li>
-                <li className="custom-margin"><Link to="contact-us">Contact Us</Link></li>
-                <li className="custom-margin"><Link to="/support/warranty-claims">Warranty Claims</Link></li>
-                <li className="custom-margin"><Link to="/support/return-policy">Return Policy</Link></li>
-                <li className="custom-margin"><Link to="/support/shipping-info">Shipping Info</Link></li>
+                <li className="custom-margin"><Link to="/contact-us">Contact Us</Link></li>
+              <li className="custom-margin"><Link to="/support/warranty-claims">Warranty Claims</Link></li>
+            <li className="custom-margin"><Link to="/support/return-policy">Return Policy</Link></li>
+                <li className="custom-margin"><Link to="/b2b-enquiries">Enquiries / B2B Orders</Link></li>
                 <li className="custom-margin"><Link to="/support/track-order">Track Order</Link></li>
               </ul>
             </div>

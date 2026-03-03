@@ -25,7 +25,7 @@ const investorRelationsContent = [
   },
 ];
 
-const logoBanner = "src/assets/MILTRONIX APP DESIGN 3.png";
+const logoBanner = 'src/assets/MILTRONIX-APP-DESIGN-3.png';
 
 const InvestorRelationsPage = () => {
   return (

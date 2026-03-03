@@ -48,7 +48,7 @@ const values = [
   { icon: '🤝', title: 'Trust', desc: 'Relationships built to last' },
 ];
 
-const logoBanner = 'src/assets/MILTRONIX APP DESIGN 3.png';
+const logoBanner = 'src/assets/MILTRONIX-APP-DESIGN-3.png';
 
 // --- Inline Styles ---
 const styles = {

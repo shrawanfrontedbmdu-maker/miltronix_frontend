@@ -7,7 +7,7 @@ import {
   getCheckoutDetailsApi,
   getCartItems,
 } from "../../api/api";
-import logoBanner from "../../assets/MILTRONIX APP DESIGN 3.png";
+import logoBanner from "../../assets/MILTRONIX-APP-DESIGN-3.png";
 
 /* ─── Icons ─── */
 const CheckIconWhite = () => (
