@@ -7,12 +7,27 @@ import {
 } from "../../../api/api";
 
 const COLOR_MAP = {
-  black: "#1a1a1a", white: "#f5f5f5", silver: "#c0c0c0", grey: "#808080",
-  gray: "#808080", blue: "#2563eb", red: "#dc2626", green: "#16a34a",
-  gold: "#d97706", yellow: "#eab308", pink: "#ec4899", purple: "#7c3aed",
-  orange: "#ea580c", brown: "#92400e", navy: "#4a5856", cyan: "#0891b2",
-  "space grey": "#4b5563", "midnight": "#616D6B", "starlight": "#f0ede6",
-  "rose gold": "#e8a598", "deep purple": "#581c87",
+  black: "#1a1a1a",
+  white: "#f5f5f5",
+  silver: "#c0c0c0",
+  grey: "#808080",
+  gray: "#808080",
+  blue: "#2563eb",
+  red: "#dc2626",
+  green: "#16a34a",
+  gold: "#d97706",
+  yellow: "#eab308",
+  pink: "#ec4899",
+  purple: "#7c3aed",
+  orange: "#ea580c",
+  brown: "#92400e",
+  navy: "#4a5856",
+  cyan: "#0891b2",
+  "space grey": "#4b5563",
+  midnight: "#616D6B",
+  starlight: "#f0ede6",
+  "rose gold": "#e8a598",
+  "deep purple": "#581c87",
 };
 
 const getColorHex = (val) => COLOR_MAP[val?.toLowerCase()] || null;
@@ -279,70 +294,121 @@ const ProductInfo = ({
   const [addedWishlist, setAddedWishlist] = useState(false);
 
   const price = Number(selectedVariant?.price ?? product.price ?? 0);
-  const mrp = Number(selectedVariant?.compareAtPrice ?? product.oldPrice ?? product.mrp ?? 0);
-  const stock = Number(selectedVariant?.stock ?? selectedVariant?.stockQuantity ?? product.stock ?? -1);
+  const mrp = Number(
+    selectedVariant?.compareAtPrice ?? product.oldPrice ?? product.mrp ?? 0,
+  );
+  const stock = Number(
+    selectedVariant?.stock ??
+      selectedVariant?.stockQuantity ??
+      product.stock ??
+      -1,
+  );
   const discount = mrp > price ? Math.round(((mrp - price) / mrp) * 100) : 0;
   const isOutOfStock = stock === 0;
   const imageUrl = product.images?.[0]?.url || "/images/placeholder.png";
   const categoryName =
     typeof product.category === "object" && product.category
-      ? product.category.pageTitle || product.category.categoryKey || "Uncategorized"
+      ? product.category.pageTitle ||
+        product.category.categoryKey ||
+        "Uncategorized"
       : "Uncategorized";
 
   const variants = product.variants || [];
-  const attributeKeys = variants.length > 0
-    ? [...new Set(variants.flatMap((v) => Object.keys(v.attributes || {})))]
-    : [];
+  const attributeKeys =
+    variants.length > 0
+      ? [...new Set(variants.flatMap((v) => Object.keys(v.attributes || {})))]
+      : [];
 
   const handleVariantSelect = (key, value) => {
     const currentAttrs = selectedVariant?.attributes || {};
     const newAttrs = { ...currentAttrs, [key]: value };
     const matched =
-      variants.find((v) => Object.entries(newAttrs).every(([k, val]) => v.attributes?.[k] === val)) ||
-      variants.find((v) => v.attributes?.[key] === value);
+      variants.find((v) =>
+        Object.entries(newAttrs).every(([k, val]) => v.attributes?.[k] === val),
+      ) || variants.find((v) => v.attributes?.[key] === value);
     if (matched) {
       if (onVariantChange) onVariantChange(matched);
-      const variantImg = matched.image?.url || matched.image || matched.images?.[0]?.url || null;
+      const variantImg =
+        matched.image?.url || matched.image || matched.images?.[0]?.url || null;
       if (onImageChange) onImageChange(variantImg);
     }
   };
 
   const handleAddToCart = async () => {
-    if (!product._id || !selectedVariant?.sku) return alert("Product/variant not found");
+    if (!product._id || !selectedVariant?.sku)
+      return alert("Product/variant not found");
     setLoadingCart(true);
     try {
       const user = JSON.parse(localStorage.getItem("user") || "null");
       if (user?._id) {
-        await addItemToCart({ productId: product._id, sku: selectedVariant.sku, quantity: 1 });
+        await addItemToCart({
+          productId: product._id,
+          sku: selectedVariant.sku,
+          quantity: 1,
+        });
         await getCartItems();
       } else {
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-        const idx = guestCart.findIndex(i => i.productId === product._id && i.sku === selectedVariant.sku);
+        const idx = guestCart.findIndex(
+          (i) => i.productId === product._id && i.sku === selectedVariant.sku,
+        );
         if (idx > -1) guestCart[idx].quantity += 1;
-        else guestCart.push({ productId: product._id, sku: selectedVariant.sku, quantity: 1, name: product.name || product.title, description: product.description || "", image: imageUrl, price, category: categoryName });
+        else
+          guestCart.push({
+            productId: product._id,
+            sku: selectedVariant.sku,
+            quantity: 1,
+            name: product.name || product.title,
+            description: product.description || "",
+            image: imageUrl,
+            price,
+            category: categoryName,
+          });
         localStorage.setItem("guestCart", JSON.stringify(guestCart));
       }
+      // ✅ Sirf "Added ✓" state set hoga — navigate NAHI hoga
       setAddedCart(true);
-      setTimeout(() => navigate("/cart"), 500);
-    } catch (err) { alert(err.message || "Failed to add to cart"); }
-    finally { setLoadingCart(false); }
+    } catch (err) {
+      alert(err.message || "Failed to add to cart");
+    } finally {
+      setLoadingCart(false);
+    }
   };
 
   const handleBuyNow = async () => {
-    if (!product._id || !selectedVariant?.sku) return alert("Product/variant not found");
+    if (!product._id || !selectedVariant?.sku)
+      return alert("Product/variant not found");
     try {
       const user = JSON.parse(localStorage.getItem("user") || "null");
       if (user?._id) {
-        await addItemToCart({ productId: product._id, sku: selectedVariant.sku, quantity: 1 });
+        await addItemToCart({
+          productId: product._id,
+          sku: selectedVariant.sku,
+          quantity: 1,
+        });
       } else {
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-        const idx = guestCart.findIndex(i => i.productId === product._id && i.sku === selectedVariant.sku);
+        const idx = guestCart.findIndex(
+          (i) => i.productId === product._id && i.sku === selectedVariant.sku,
+        );
         if (idx > -1) guestCart[idx].quantity += 1;
-        else guestCart.push({ productId: product._id, sku: selectedVariant.sku, quantity: 1, name: product.name || product.title, description: product.description || "", image: imageUrl, price, category: categoryName });
+        else
+          guestCart.push({
+            productId: product._id,
+            sku: selectedVariant.sku,
+            quantity: 1,
+            name: product.name || product.title,
+            description: product.description || "",
+            image: imageUrl,
+            price,
+            category: categoryName,
+          });
         localStorage.setItem("guestCart", JSON.stringify(guestCart));
       }
-      navigate("/secendaddress");
-    } catch (err) { alert(err.message || "Failed to proceed"); }
+      navigate("/cart");
+    } catch (err) {
+      alert(err.message || "Failed to proceed");
+    }
   };
 
   const handleAddToWishlist = async () => {
@@ -352,48 +418,77 @@ const ProductInfo = ({
       const user = JSON.parse(localStorage.getItem("user") || "null");
       if (user?._id) {
         await addItemToWishlist({
-          userId: user._id, productId: product._id,
+          userId: user._id,
+          productId: product._id,
           title: product.name || product.title,
-          images: product.images?.map(img => ({ url: img.url, public_id: img.public_id || img.url, alt: img.alt || "" })),
-          category: categoryName, priceSnapshot: price,
+          images: product.images?.map((img) => ({
+            url: img.url,
+            public_id: img.public_id || img.url,
+            alt: img.alt || "",
+          })),
+          category: categoryName,
+          priceSnapshot: price,
           variant: selectedVariant ? { sku: selectedVariant.sku } : undefined,
         });
       } else {
-        const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
-        if (!guestWishlist.some(i => i.productId === product._id)) {
-          guestWishlist.push({ productId: product._id, name: product.name || product.title, description: product.description || "", image: imageUrl, price, category: categoryName, sku: selectedVariant?.sku || "" });
+        const guestWishlist = JSON.parse(
+          localStorage.getItem("guestWishlist") || "[]",
+        );
+        if (!guestWishlist.some((i) => i.productId === product._id)) {
+          guestWishlist.push({
+            productId: product._id,
+            name: product.name || product.title,
+            description: product.description || "",
+            image: imageUrl,
+            price,
+            category: categoryName,
+            sku: selectedVariant?.sku || "",
+          });
           localStorage.setItem("guestWishlist", JSON.stringify(guestWishlist));
         }
       }
       setAddedWishlist(true);
-    } catch (err) { alert(err.message || "Failed to add to wishlist"); }
-    finally { setLoadingWishlist(false); }
+    } catch (err) {
+      alert(err.message || "Failed to add to wishlist");
+    } finally {
+      setLoadingWishlist(false);
+    }
   };
 
   const details = [
-    product.brand        && { icon: "🏷️", label: "Brand",     value: product.brand },
-    product.warranty     && { icon: "🛡️", label: "Warranty",  value: product.warranty },
-    product.emi          && { icon: "💳", label: "EMI from",   value: `₹${Number(product.emi).toLocaleString("en-IN")}/mo` },
-    product.deliveryInfo && { icon: "🚚", label: "Delivery",   value: product.deliveryInfo },
-    product.returnPolicy && { icon: "↩️", label: "Returns",    value: product.returnPolicy },
+    product.brand && { icon: "🏷️", label: "Brand", value: product.brand },
+    product.warranty && {
+      icon: "🛡️",
+      label: "Warranty",
+      value: product.warranty,
+    },
+    product.emi && {
+      icon: "💳",
+      label: "EMI from",
+      value: `₹${Number(product.emi).toLocaleString("en-IN")}/mo`,
+    },
+    product.deliveryInfo && {
+      icon: "🚚",
+      label: "Delivery",
+      value: product.deliveryInfo,
+    },
+    product.returnPolicy && {
+      icon: "↩️",
+      label: "Returns",
+      value: product.returnPolicy,
+    },
   ].filter(Boolean);
 
   return (
     <>
       <style>{STYLE}</style>
 
-      {/*
-        ── ALIGNMENT FIX ──
-        alignSelf: "flex-start"  → Gallery ke saath top pe rahe, stretch na ho
-        paddingLeft match karo Gallery ke paddingRight se
-        Koi sticky nahi — ProductInfo scroll honi chahiye normally
-      */}
       <div
         className="col-12 col-lg-6 pi-root"
         style={{
           paddingLeft: "16px",
           paddingRight: "16px",
-          alignSelf: "flex-start",  /* ← gallery ke saath top-align */
+          alignSelf: "flex-start",
         }}
       >
         {/* Title */}
@@ -410,21 +505,43 @@ const ProductInfo = ({
 
         {/* Price block */}
         <div className="pi-price-block">
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: "10px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "flex-start",
+              justifyContent: "space-between",
+              flexWrap: "wrap",
+              gap: "10px",
+            }}
+          >
             <div>
-              <div className="pi-price-main">₹{price.toLocaleString("en-IN")}</div>
-              {mrp > price && <div className="pi-price-mrp">MRP ₹{mrp.toLocaleString("en-IN")}</div>}
-              {mrp > price && <div className="pi-savings">You save ₹{(mrp - price).toLocaleString("en-IN")}</div>}
+              <div className="pi-price-main">
+                ₹{price.toLocaleString("en-IN")}
+              </div>
+              {mrp > price && (
+                <div className="pi-price-mrp">
+                  MRP ₹{mrp.toLocaleString("en-IN")}
+                </div>
+              )}
+              {mrp > price && (
+                <div className="pi-savings">
+                  You save ₹{(mrp - price).toLocaleString("en-IN")}
+                </div>
+              )}
               <div className="pi-tax-note">Inclusive of all taxes</div>
             </div>
-            {discount > 0 && <span className="pi-discount-badge">{discount}% OFF</span>}
+            {discount > 0 && (
+              <span className="pi-discount-badge">{discount}% OFF</span>
+            )}
           </div>
         </div>
 
         {/* Stock */}
         <div style={{ marginBottom: "16px" }}>
           {isOutOfStock ? (
-            <span className="pi-stock-out"><span className="pi-dot-red" /> Out of Stock</span>
+            <span className="pi-stock-out">
+              <span className="pi-dot-red" /> Out of Stock
+            </span>
           ) : (
             <span className="pi-stock-in">
               <span className="pi-dot-green" />
@@ -435,40 +552,78 @@ const ProductInfo = ({
 
         {/* Variant Selectors */}
         {attributeKeys.map((key) => {
-          const uniqueValues = [...new Set(variants.map(v => v.attributes?.[key]).filter(Boolean))];
+          const uniqueValues = [
+            ...new Set(
+              variants.map((v) => v.attributes?.[key]).filter(Boolean),
+            ),
+          ];
           if (!uniqueValues.length) return null;
           const selectedValue = selectedVariant?.attributes?.[key];
-          const isColorKey = key.toLowerCase().includes("color") || key.toLowerCase().includes("colour");
+          const isColorKey =
+            key.toLowerCase().includes("color") ||
+            key.toLowerCase().includes("colour");
 
           return (
             <div key={key} style={{ marginBottom: "18px" }}>
               <div className="pi-variant-key">
-                {key}{selectedValue && <> : <span>{selectedValue}</span></>}
+                {key}
+                {selectedValue && (
+                  <>
+                    {" "}
+                    : <span>{selectedValue}</span>
+                  </>
+                )}
               </div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "7px" }}>
                 {uniqueValues.map((val) => {
                   const isSelected = selectedValue === val;
-                  const variantForVal = variants.find(v => v.attributes?.[key] === val);
-                  const outOfStock = variantForVal?.stockQuantity === 0 || variantForVal?.stock === 0;
+                  const variantForVal = variants.find(
+                    (v) => v.attributes?.[key] === val,
+                  );
+                  const outOfStock =
+                    variantForVal?.stockQuantity === 0 ||
+                    variantForVal?.stock === 0;
                   const colorHex = isColorKey ? getColorHex(val) : null;
 
                   return (
                     <button
                       key={val}
-                      onClick={() => !outOfStock && handleVariantSelect(key, val)}
+                      onClick={() =>
+                        !outOfStock && handleVariantSelect(key, val)
+                      }
                       disabled={outOfStock}
                       className={`pi-var-btn${isSelected ? " active" : ""}`}
                     >
                       {colorHex && (
-                        <span style={{
-                          width: "12px", height: "12px", borderRadius: "50%", flexShrink: 0,
-                          backgroundColor: colorHex,
-                          border: colorHex === "#f5f5f5" ? "1px solid #d1d5db" : "1px solid rgba(0,0,0,0.12)",
-                          boxShadow: isSelected ? "0 0 0 2px rgba(255,255,255,0.4)" : "none",
-                        }} />
+                        <span
+                          style={{
+                            width: "12px",
+                            height: "12px",
+                            borderRadius: "50%",
+                            flexShrink: 0,
+                            backgroundColor: colorHex,
+                            border:
+                              colorHex === "#f5f5f5"
+                                ? "1px solid #d1d5db"
+                                : "1px solid rgba(0,0,0,0.12)",
+                            boxShadow: isSelected
+                              ? "0 0 0 2px rgba(255,255,255,0.4)"
+                              : "none",
+                          }}
+                        />
                       )}
                       {val}
-                      {outOfStock && <span style={{ fontSize: "9.5px", color: "#94a3b8", fontWeight: 400 }}>N/A</span>}
+                      {outOfStock && (
+                        <span
+                          style={{
+                            fontSize: "9.5px",
+                            color: "#94a3b8",
+                            fontWeight: 400,
+                          }}
+                        >
+                          N/A
+                        </span>
+                      )}
                     </button>
                   );
                 })}
@@ -477,7 +632,7 @@ const ProductInfo = ({
           );
         })}
 
-        {/* Detail Cards — premium horizontal list */}
+        {/* Detail Cards */}
         {details.length > 0 && (
           <div className="pi-detail-list">
             {details.map(({ icon, label, value }) => (
@@ -487,10 +642,18 @@ const ProductInfo = ({
                   <span className="pi-pill-label">{label}</span>
                   <span className="pi-pill-value">{value}</span>
                 </div>
-                <svg className="pi-detail-arrow" width="14" height="14"
-                  viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                  strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="9 18 15 12 9 6"/>
+                <svg
+                  className="pi-detail-arrow"
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <polyline points="9 18 15 12 9 6" />
                 </svg>
               </div>
             ))}
@@ -506,11 +669,17 @@ const ProductInfo = ({
             disabled={loadingWishlist || addedWishlist}
             title="Add to Wishlist"
           >
-            <svg width="17" height="17" viewBox="0 0 24 24"
+            <svg
+              width="17"
+              height="17"
+              viewBox="0 0 24 24"
               fill={addedWishlist ? "#ef4444" : "none"}
               stroke={addedWishlist ? "#ef4444" : "#64748b"}
-              strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
             </svg>
           </button>
 
@@ -520,12 +689,27 @@ const ProductInfo = ({
             onClick={handleAddToCart}
             disabled={loadingCart || addedCart || isOutOfStock}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/>
-              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
             </svg>
-            {loadingCart ? "Adding…" : addedCart ? "Added ✓" : isOutOfStock ? "Out of Stock" : "Add to Cart"}
+            {loadingCart
+              ? "Adding…"
+              : addedCart
+                ? "Added ✓"
+                : isOutOfStock
+                  ? "Out of Stock"
+                  : "Add to Cart"}
           </button>
 
           {/* Buy Now */}
@@ -534,11 +718,19 @@ const ProductInfo = ({
             onClick={handleBuyNow}
             disabled={isOutOfStock}
           >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-              stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
-              <line x1="3" y1="6" x2="21" y2="6"/>
-              <path d="M16 10a4 4 0 0 1-8 0"/>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <path d="M16 10a4 4 0 0 1-8 0" />
             </svg>
             Buy Now
           </button>
@@ -552,7 +744,6 @@ const ProductInfo = ({
           <span className="pi-divider">·</span>
           <span>✅ Genuine Products</span>
         </div>
-
       </div>
     </>
   );

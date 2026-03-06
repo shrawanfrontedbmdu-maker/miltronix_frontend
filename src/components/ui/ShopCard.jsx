@@ -85,8 +85,8 @@ const ShopCard = ({
         localStorage.setItem("guestCart", JSON.stringify(guestCart));
         if (onCartUpdate) onCartUpdate(guestCart);
       }
+      // ✅ Sirf "Added" state set hoga — navigate NAHI hoga
       setAddedCart(true);
-      setTimeout(() => navigate("/cart"), 500);
     } catch (err) {
       alert(err.message || "Failed to add to cart");
     } finally {
@@ -154,7 +154,7 @@ const ShopCard = ({
           </span>
         )}
 
-        {/* ✅ Remove button — sirf wishlist page pe dikhega */}
+        {/* Remove button — sirf wishlist page pe dikhega */}
         {onRemove && (
           <button
             className="shop-card-close-btn"
@@ -221,12 +221,13 @@ const ShopCard = ({
             {loadingCart
               ? "Adding..."
               : addedCart
-                ? "Added"
+                ? "✓ Added to Cart"
                 : !hasStock
                   ? "Out of Stock"
                   : "Add to Cart"}
           </button>
-          {/* ✅ Wishlist button — sirf tab dikhega jab onRemove nahi hai */}
+
+          {/* Wishlist button — sirf tab dikhega jab onRemove nahi hai */}
           {!onRemove && (
             <button
               className={`btn shop-card-btn-wishlist ${addedWishlist ? "btn-danger" : ""}`}

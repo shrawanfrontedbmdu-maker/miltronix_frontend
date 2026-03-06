@@ -1,12 +1,36 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import logo from '../../assets/logo.png';
 import facebookIcon from '../../assets/icon 18.svg';
 import twitterIcon from '../../assets/icon 19.svg';
 import instagramIcon from '../../assets/icon 20.svg';
 import linkedInIcon from '../../assets/icon 21.svg';
+import { fetchCategories } from '../../api/api';
+
+// ─── Global cache ───
+let categoriesCache = null;
 
 const Footer = () => {
+  const [categories, setCategories] = useState(categoriesCache || []);
+
+  useEffect(() => {
+    if (categoriesCache) {
+      setCategories(categoriesCache);
+      return;
+    }
+    const load = async () => {
+      try {
+        const cats = await fetchCategories();
+        const data = Array.isArray(cats) ? cats : [];
+        categoriesCache = data;
+        setCategories(data);
+      } catch (err) {
+        console.error("Footer categories fetch error:", err);
+      }
+    };
+    load();
+  }, []);
+
   return (
     <>
       {/* Main Footer Section */}
@@ -39,16 +63,17 @@ const Footer = () => {
               </ul>
             </div>
 
-            {/* Column 2: Products */}
+            {/* Column 2: Products — Dynamic Categories */}
             <div className="col-lg-2 col-md-6 col-6">
               <h5 className="footer-heading">Products</h5>
               <ul className="list-unstyled hv">
-                <li className="custom-margin"><Link to="/products/laptops">Laptops & Computers</Link></li>
-                <li className="custom-margin"><Link to="/products/smartphones">Smartphones & Tablets</Link></li>
-                <li className="custom-margin"><Link to="/products/audio">Audio & Headphones</Link></li>
-                <li className="custom-margin"><Link to="/products/gaming">Gaming & Accessories</Link></li>
-                <li className="custom-margin"><Link to="/products/smart-home">Smart Home</Link></li>
-                <li className="custom-margin"><Link to="/products/wearable">Wearable Tech</Link></li>
+                {categories.map((cat) => (
+                  <li key={cat._id} className="custom-margin">
+                    <Link to={`/category/${cat.categoryKey}`}>
+                      {cat.pageTitle || cat.name}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </div>
 
@@ -58,8 +83,8 @@ const Footer = () => {
               <ul className="list-unstyled hv">
                 <li className="custom-margin"><Link to="/help-center">Help Center</Link></li>
                 <li className="custom-margin"><Link to="/contact-us">Contact Us</Link></li>
-              <li className="custom-margin"><Link to="/support/warranty-claims">Warranty Claims</Link></li>
-            <li className="custom-margin"><Link to="/support/return-policy">Return Policy</Link></li>
+                <li className="custom-margin"><Link to="/support/warranty-claims">Warranty Claims</Link></li>
+                <li className="custom-margin"><Link to="/support/return-policy">Return Policy</Link></li>
                 <li className="custom-margin"><Link to="/b2b-enquiries">Enquiries / B2B Orders</Link></li>
                 <li className="custom-margin"><Link to="/support/track-order">Track Order</Link></li>
               </ul>
@@ -109,7 +134,7 @@ const Footer = () => {
       </section>
 
       {/* Bottom Copyright & Socials Section */}
-      <section className="bottom-section py-3">n
+      <section className="bottom-section py-3">
         <div className="container d-flex flex-column flex-sm-row justify-content-between align-items-center">
           <p className="mb-2 mb-sm-0 bottom-text text-sm-start text-center">
             © 2025 Miltronix. All rights reserved.

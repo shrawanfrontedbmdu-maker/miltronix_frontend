@@ -84,8 +84,8 @@ const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
         if (onCartUpdate) onCartUpdate(guestCart);
       }
 
+      // ✅ Sirf "Added" state set hoga — navigate NAHI hoga
       setAddedCart(true);
-      setTimeout(() => navigate("/cart"), 500);
     } catch (err) {
       alert(err.message || "Failed to add to cart");
     } finally {
@@ -183,7 +183,7 @@ const ProductCard = ({ product, userId, onCartUpdate, onWishlistUpdate }) => {
             {loadingCart
               ? "Adding..."
               : addedCart
-                ? "Added"
+                ? "Added ✓"
                 : !hasStock
                   ? "Out of Stock"
                   : "Add to Cart"}

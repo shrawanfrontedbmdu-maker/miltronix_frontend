@@ -134,7 +134,7 @@ const CartPage = () => {
               images: [{ url: item.image }],
               category: item.category,
             },
-            variant: { sku: item.sku },
+            variant: { sku: item.sku, mrp: item.mrp },
             quantity: item.quantity,
             priceSnapshot: item.price,
           })),
@@ -168,7 +168,7 @@ const CartPage = () => {
     }
   }, [modalToShow]);
 
-  // ── Quantity change — badge bhi refresh hoga ──
+  // ── Quantity change ──
   const handleQuantityChange = async (item, newQty) => {
     if (newQty < 1) return;
     const key = `${item.product?._id}-${item.variant?.sku || "default"}`;
@@ -193,7 +193,7 @@ const CartPage = () => {
     finally { setUpdatingKey(null); }
   };
 
-  // ── Remove item — badge bhi refresh hoga ──
+  // ── Remove item ──
   const handleRemove = async (item) => {
     const key = `${item.product?._id}-${item.variant?.sku || "default"}`;
     const user = JSON.parse(localStorage.getItem("user") || "null");
@@ -353,6 +353,13 @@ const CartPage = () => {
                 {cart.items.map((item, idx) => {
                   const key = `${item.product?._id}-${item.variant?.sku || "default"}`;
                   const busy = updatingKey === key;
+                  const mrp = item.variant?.mrp;
+                  const price = item.priceSnapshot || 0;
+                  const hasMrpDiscount = mrp && mrp > price;
+                  const discountPercent = hasMrpDiscount
+                    ? Math.round(((mrp - price) / mrp) * 100)
+                    : 0;
+
                   return (
                     <div key={key} className="cart-item" style={{ animationDelay: `${idx * 60}ms`, opacity: busy ? 0.5 : 1, transition: "opacity .2s" }}>
                       <img src={getImageUrl(item)} alt={getProductName(item)} className="item-img" />
@@ -361,17 +368,29 @@ const CartPage = () => {
                         {getProductDescription(item) && (
                           <div className="item-title">{getProductDescription(item)}</div>
                         )}
-                        {item.variant?.sku && <span className="item-sku">SKU: {item.variant.sku}</span>}
+
+                        {/* ── Price Row ── */}
                         <div className="price-row">
                           <span className="item-price">
-                            ₹{((item.quantity || 0) * (item.priceSnapshot || 0)).toLocaleString("en-IN")}
+                            ₹{((item.quantity || 0) * price).toLocaleString("en-IN")}
                           </span>
+                          {hasMrpDiscount && (
+                            <span className="item-mrp" style={{ textDecoration: "line-through", color: "#999", fontSize: "13px", marginLeft: "6px" }}>
+                              ₹{(mrp * (item.quantity || 1)).toLocaleString("en-IN")}
+                            </span>
+                          )}
+                          {hasMrpDiscount && (
+                            <span className="item-discount" style={{ color: "#22c55e", fontSize: "12px", fontWeight: 600, marginLeft: "6px" }}>
+                              {discountPercent}% off
+                            </span>
+                          )}
                           {item.quantity > 1 && (
                             <span className="item-price-unit">
-                              ₹{item.priceSnapshot?.toLocaleString("en-IN")} × {item.quantity}
+                              ₹{price.toLocaleString("en-IN")} × {item.quantity}
                             </span>
                           )}
                         </div>
+
                         <div className="qty-row">
                           <span className="qty-label">QTY</span>
                           <div className="qty-control">
