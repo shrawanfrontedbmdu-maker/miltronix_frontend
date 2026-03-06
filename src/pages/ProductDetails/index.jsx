@@ -21,10 +21,8 @@ import {
   getReviewsByProductApi,
 } from "../../api/api";
 
-// ─── Simple in-memory cache ────────────────────────────────────────────────────
 const productCache = {};
 
-// ─── Skeleton (only shown if load takes > 300ms) ──────────────────────────────
 const skeletonBox = (extraStyle = {}) => ({
   background: "linear-gradient(90deg, #e8e8e8 25%, #f5f5f5 50%, #e8e8e8 75%)",
   backgroundSize: "200% 100%",
@@ -81,41 +79,36 @@ const SkeletonLoader = () => (
   </>
 );
 
-// ──────────────────────────────────────────────────────────────────────────────
-
 const ProductDetailPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(() => productCache[id] || null);
-  const [showSkeleton, setShowSkeleton] = useState(!productCache[id]); // skeleton sirf tab jab cache nahi
+  const [showSkeleton, setShowSkeleton] = useState(!productCache[id]);
   const [selectedVariant, setSelectedVariant] = useState(
-    () => productCache[id]?.variants?.[0] || null
+    () => productCache[id]?.variants?.[0] || null,
   );
+  const [variantImageUrl, setVariantImageUrl] = useState(null);
   const [addingToCart, setAddingToCart] = useState(false);
   const [similarProducts, setSimilarProducts] = useState([]);
   const [reviews, setReviews] = useState([]);
 
   const skeletonTimerRef = useRef(null);
 
-  // ================= FETCH PRODUCT =================
   useEffect(() => {
     if (!id) return;
-
     window.scrollTo(0, 0);
 
-    // Agar cache mein hai toh skeleton mat dikhao
     if (productCache[id]) {
       setProduct(productCache[id]);
       setSelectedVariant(productCache[id]?.variants?.[0] || null);
+      setVariantImageUrl(null);
       setShowSkeleton(false);
-      // Background mein reviews load karo
       loadReviews(id);
       loadSimilar(productCache[id]);
       return;
     }
 
-    // 300ms ke baad hi skeleton dikhao (fast connections pe flash nahi hoga)
     skeletonTimerRef.current = setTimeout(() => {
       setShowSkeleton(true);
     }, 300);
@@ -123,10 +116,8 @@ const ProductDetailPage = () => {
     const loadProduct = async () => {
       try {
         setSimilarProducts([]);
-
         const res = await fetchProductById(id);
         const prod = res?.product || res;
-
         clearTimeout(skeletonTimerRef.current);
 
         if (!prod) {
@@ -135,13 +126,11 @@ const ProductDetailPage = () => {
           return;
         }
 
-        // Cache mein save karo
         productCache[id] = prod;
-
         setProduct(prod);
         setSelectedVariant(prod?.variants?.[0] || null);
+        setVariantImageUrl(null);
         setShowSkeleton(false);
-
         loadSimilar(prod);
       } catch (error) {
         clearTimeout(skeletonTimerRef.current);
@@ -157,7 +146,6 @@ const ProductDetailPage = () => {
     return () => clearTimeout(skeletonTimerRef.current);
   }, [id]);
 
-  // ================= FETCH REVIEWS (separate function) =================
   const loadReviews = async (productId) => {
     try {
       const data = await getReviewsByProductApi(productId);
@@ -168,24 +156,19 @@ const ProductDetailPage = () => {
     }
   };
 
-  // ================= FETCH SIMILAR (separate function) =================
   const loadSimilar = async (prod) => {
     const catId =
       typeof prod?.category === "object"
         ? prod.category?._id?.toString()
         : prod?.category?.toString();
-
     if (!catId) return;
-
     try {
       const simRes = await fetchProducts({ category: catId });
       const allProducts =
         simRes?.products || simRes?.data?.products || simRes?.data || [];
-
       const filtered = allProducts.filter(
-        (p) => p._id?.toString() !== prod._id?.toString()
+        (p) => p._id?.toString() !== prod._id?.toString(),
       );
-
       setSimilarProducts(filtered.slice(0, 6));
     } catch (simErr) {
       console.error("[SimilarProducts] fetch failed:", simErr);
@@ -193,7 +176,6 @@ const ProductDetailPage = () => {
     }
   };
 
-  // ================= ADD TO CART =================
   const handleAddToCart = async () => {
     if (!product) return;
     try {
@@ -211,29 +193,17 @@ const ProductDetailPage = () => {
     }
   };
 
-  // ================= BUY NOW =================
   const handleBuyNow = () => {
-    navigate("/orderaddress", {
-      state: { product, selectedVariant },
-    });
+    navigate("/orderaddress", { state: { product, selectedVariant } });
   };
 
-  // ================= LOADING =================
   if (showSkeleton && !product) return <SkeletonLoader />;
 
-  // ================= NOT FOUND =================
   if (!product) {
     return (
       <>
         <Header />
-        <div
-          style={{
-            minHeight: "60vh",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
+        <div style={{ minHeight: "60vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
           <p style={{ color: "red", fontWeight: "bold" }}>Product not found</p>
         </div>
         <Footer />
@@ -241,48 +211,58 @@ const ProductDetailPage = () => {
     );
   }
 
-  // ================= RENDER =================
   return (
     <>
       <Header />
-
       <main>
         <CategorySlider />
-
         <section className="product-detail-section">
           <Breadcrumb path={product?.category?.pageTitle || ""} />
-
           <div className="container">
-            <div className="row g-4">
 
-              <ProductGallery images={product.images || []} />
-
+            {/* ── Gallery + Info ── */}
+            <div className="row g-4" style={{ alignItems: "flex-start", marginBottom: "48px" }}>
+              <ProductGallery
+                images={product.images || []}
+                variantImageUrl={variantImageUrl}
+              />
               <ProductInfo
                 product={product}
                 selectedVariant={selectedVariant}
                 onVariantChange={setSelectedVariant}
+                onImageChange={setVariantImageUrl}
                 onAddToCart={handleAddToCart}
                 onBuyNow={handleBuyNow}
                 addingToCart={addingToCart}
               />
-
-              <KeyFeatures features={product.keyFeatures || []} />
-
-              <ProductSpecs specs={product.specifications || []} />
-
-              <RatingSummary reviews={reviews} product={product} />
-
-              <CustomerFeedback reviews={reviews} />
-
-              {similarProducts.length > 0 && (
-                <SimilarProducts products={similarProducts} />
-              )}
-
             </div>
+
+            {/* ── Key Features ── */}
+            <div style={{ marginBottom: "48px" }}>
+              <KeyFeatures features={product.keyFeatures || []} />
+            </div>
+
+            {/* ── Specifications ── */}
+            <div style={{ marginBottom: "48px" }}>
+              <ProductSpecs specs={product.specifications || []} />
+            </div>
+
+            {/* ── Reviews ── */}
+            <div className="row g-4" style={{ alignItems: "flex-start", marginBottom: "48px" }}>
+              <RatingSummary reviews={reviews} product={product} />
+              <CustomerFeedback reviews={reviews} />
+            </div>
+
+            {/* ── Similar Products ── */}
+            {similarProducts.length > 0 && (
+              <div style={{ marginBottom: "48px" }}>
+                <SimilarProducts products={similarProducts} />
+              </div>
+            )}
+
           </div>
         </section>
       </main>
-
       <Footer />
     </>
   );

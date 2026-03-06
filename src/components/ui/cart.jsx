@@ -130,6 +130,7 @@ const CartPage = () => {
             product: {
               _id: item.productId,
               name: item.name,
+              description: item.description || "",
               images: [{ url: item.image }],
               category: item.category,
             },
@@ -179,13 +180,13 @@ const CartPage = () => {
         if (qtyDiff === 0) return;
         await addItemToCart({ productId: item.product?._id, sku: item.variant?.sku, quantity: qtyDiff });
         await loadCart(false);
-        refreshHeader(); // ✅ badge update
+        refreshHeader();
       } else {
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         const idx = guestCart.findIndex((i) => i.productId === item.product?._id && i.sku === item.variant?.sku);
         if (idx > -1) { guestCart[idx].quantity = newQty; localStorage.setItem("guestCart", JSON.stringify(guestCart)); }
         await loadCart(false);
-        refreshHeader(); // ✅ badge update
+        refreshHeader();
       }
       setCouponApplied(null);
     } catch { alert("Failed to update cart item"); }
@@ -201,13 +202,13 @@ const CartPage = () => {
       if (user?._id) {
         await removeCartItem({ productId: item.product?._id, sku: item.variant?.sku });
         await loadCart(false);
-        refreshHeader(); // ✅ badge update
+        refreshHeader();
       } else {
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         const updated = guestCart.filter((i) => !(i.productId === item.product?._id && i.sku === item.variant?.sku));
         localStorage.setItem("guestCart", JSON.stringify(updated));
         await loadCart(false);
-        refreshHeader(); // ✅ badge update
+        refreshHeader();
       }
       setCouponApplied(null);
     } catch { alert("Failed to remove item"); }
@@ -262,8 +263,11 @@ const CartPage = () => {
   const getProductName = (item) =>
     item.product?.name || item.product?.title || item.name || item.title || "Unnamed Product";
 
-  const getProductCategory = (item) =>
-    item.product?.category?.name || item.product?.category || item.category || "Electronics";
+  const getProductDescription = (item) => {
+    const desc = item.product?.description || item.description || "";
+    if (!desc) return "";
+    return desc.length > 80 ? desc.slice(0, 80) + "..." : desc;
+  };
 
   const finalTotal = couponApplied
     ? couponApplied.newTotalPrice || cart.subtotal - (couponApplied.discountAmount || 0)
@@ -354,7 +358,9 @@ const CartPage = () => {
                       <img src={getImageUrl(item)} alt={getProductName(item)} className="item-img" />
                       <div className="item-info">
                         <div className="item-brand">{getProductName(item)}</div>
-                        <div className="item-title">{getProductCategory(item)}</div>
+                        {getProductDescription(item) && (
+                          <div className="item-title">{getProductDescription(item)}</div>
+                        )}
                         {item.variant?.sku && <span className="item-sku">SKU: {item.variant.sku}</span>}
                         <div className="price-row">
                           <span className="item-price">

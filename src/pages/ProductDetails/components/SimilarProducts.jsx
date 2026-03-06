@@ -12,18 +12,14 @@ const SimilarProducts = ({ products = [] }) => {
     const variant = prod.variants?.[0];
 
     // price — variant.price > prod.price > 0
-    const price =
-      Number(variant?.price ?? prod.price ?? prod.variants?.[0]?.price ?? 0);
+    const price = Number(
+      variant?.price ?? prod.price ?? prod.variants?.[0]?.price ?? 0,
+    );
 
     // mrp — variant.mrp > variant.compareAtPrice > prod.mrp > price
-    const mrp =
-      Number(
-        variant?.mrp ??
-        variant?.compareAtPrice ??
-        prod.mrp ??
-        prod.cutPrice ??
-        0
-      );
+    const mrp = Number(
+      variant?.mrp ?? variant?.compareAtPrice ?? prod.mrp ?? prod.cutPrice ?? 0,
+    );
 
     // image — images[0].url > images[0] (string) > ""
     const img =
@@ -44,11 +40,10 @@ const SimilarProducts = ({ products = [] }) => {
 
   return (
     <>
-      {/* Section Header */}
       <div className="qled-features" style={{ width: "100%" }}>
         <div className="container">
-          <h2 className="qled-title1 ff2">
-            <span className="qled-top text-lg-start">Similar Products</span>
+          <h2 className="qled-title1 ff2" style={{ textAlign: "left" }}>
+            <span className="qled-top">Similar Products</span>
           </h2>
         </div>
       </div>

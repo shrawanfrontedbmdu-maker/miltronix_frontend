@@ -16,6 +16,7 @@ import {
   fetchCategories,
   fetchProducts,
   getFilterGroupsByCategory,
+  fetchSubcategories,
 } from "../../api/api";
 
 // ─── Simple in-memory cache ───────────────────────────────────────────────────
@@ -46,6 +47,7 @@ const ProductListingPage = () => {
       setTotal(c.total);
       setRecommendations(c.recommendations);
       setFilterGroups(c.filterGroups);
+      setSubcategories(c.subcategories || []);
       return;
     }
 
@@ -63,21 +65,24 @@ const ProductListingPage = () => {
         setPageData(category); // ← page header turant dikhao
 
         // Step 2: baaki sab parallel
-        const [productRes, recRes, filters] = await Promise.all([
+        const [productRes, recRes, filters, subRes] = await Promise.all([
           fetchProducts({ category: category._id, limit: 12 }),
           fetchProducts({ category: category._id, isRecommended: true, limit: 8 }),
           getFilterGroupsByCategory(category._id),
+          fetchSubcategories(category._id),
         ]);
 
         const prods = productRes?.products || [];
         const tot = productRes?.total || 0;
         const recs = recRes?.products || [];
         const filt = filters || [];
+        const subs = subRes?.subcategories || [];
 
         setProducts(prods);
         setTotal(tot);
         setRecommendations(recs);
         setFilterGroups(filt);
+        setSubcategories(subs);
 
         // Cache mein save karo
         pageCache[key] = {
@@ -86,6 +91,7 @@ const ProductListingPage = () => {
           total: tot,
           recommendations: recs,
           filterGroups: filt,
+          subcategories: subs,
         };
       } catch (err) {
         console.error("ProductListingPage load error:", err);
