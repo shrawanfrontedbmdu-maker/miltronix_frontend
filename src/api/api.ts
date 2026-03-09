@@ -986,5 +986,41 @@ export const deleteTopDealApi = async (id: string) => {
     handleError(error);
   }
 };
+
+// ================== SERVICE REQUESTS ==================
+
+export type CreateServiceRequestPayload = {
+  productname: string;
+  productId?: string;
+  description: string;
+  priority?: "low" | "medium" | "high";
+  type: "demo" | "repair" | "relocation" | "installation" | "warranty";
+  orderId?: string;
+  paymentdetails: {
+    method: "cash" | "online" | "card" | "upi";
+    amount?: number;
+    transactionId?: string;
+    status?: "pending" | "paid" | "failed";
+  };
+  phone: string;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    pincode: string;
+  };
+  preferredDate?: string;
+  issueImages?: string[];
+};
+
+export const createServiceRequestApi = async (data: CreateServiceRequestPayload) => {
+  try {
+    const res = await API.post("/service-requests", data);
+    return res.data;
+  } catch (error) {
+    handleError(error);
+    throw error;
+  }
+};
 // ---------------- EXPORT ----------------
 export default API;
